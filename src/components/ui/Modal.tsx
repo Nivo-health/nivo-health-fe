@@ -38,12 +38,12 @@ const Modal: React.FC<ModalProps> = ({
             size === 'fullscreen'
               ? 'inset-0 rounded-none'
               : cn(
-                  'left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] rounded-lg p-6 w-full mx-4',
+                  'left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-lg p-4 md:p-6 w-[calc(100%-2rem)] max-w-[calc(100vw-2rem)]',
                   'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]',
-                  size === 'sm' && 'max-w-sm',
-                  size === 'md' && 'max-w-md',
-                  size === 'lg' && 'max-w-2xl',
-                  size === 'xl' && 'max-w-4xl'
+                  size === 'sm' && 'md:max-w-sm',
+                  size === 'md' && 'md:max-w-md',
+                  size === 'lg' && 'md:max-w-2xl',
+                  size === 'xl' && 'md:max-w-4xl'
                 ),
             size === 'fullscreen' ? 'p-8' : ''
           )}

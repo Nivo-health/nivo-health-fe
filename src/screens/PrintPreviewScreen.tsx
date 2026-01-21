@@ -64,74 +64,76 @@ export default function PrintPreviewScreen() {
 
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-gray-50 overflow-x-hidden">
-      <div className="max-w-6xl mx-auto px-6 py-6">
+      <div className="max-w-6xl mx-auto px-4 md:px-6 py-4 md:py-6">
         <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <h1 className="text-2xl font-semibold text-gray-900">Print Preview</h1>
+          <h1 className="text-xl md:text-2xl font-semibold text-gray-900">Print Preview</h1>
           <Button onClick={handlePrint} size="lg" className="w-full sm:w-auto">
             Print
           </Button>
         </div>
 
         <Tabs.Root value={activeTab} onValueChange={(value) => setActiveTab(value as 'a4' | 'thermal')}>
-          <Tabs.List className="flex w-full overflow-x-auto border-b border-gray-200 mb-6">
+          <Tabs.List className="flex w-full overflow-x-auto border-b border-gray-200 mb-6 -mx-4 md:mx-0 px-4 md:px-0">
             <Tabs.Trigger
               value="a4"
-              className="shrink-0 px-6 py-3 text-sm font-medium border-b-2 border-transparent data-[state=active]:border-teal-600 data-[state=active]:text-teal-700 hover:text-gray-700"
+              className="shrink-0 px-4 md:px-6 py-3 text-sm font-medium border-b-2 border-transparent data-[state=active]:border-teal-600 data-[state=active]:text-teal-700 hover:text-gray-700"
             >
               A4 Prescription
             </Tabs.Trigger>
             <Tabs.Trigger
               value="thermal"
-              className="shrink-0 px-6 py-3 text-sm font-medium border-b-2 border-transparent data-[state=active]:border-teal-600 data-[state=active]:text-teal-700 hover:text-gray-700"
+              className="shrink-0 px-4 md:px-6 py-3 text-sm font-medium border-b-2 border-transparent data-[state=active]:border-teal-600 data-[state=active]:text-teal-700 hover:text-gray-700"
             >
               Thermal
             </Tabs.Trigger>
           </Tabs.List>
 
           <Tabs.Content value="a4">
-            <Card className="p-8 bg-white">
-              <div className="max-w-[210mm] mx-auto">
+            <Card className="p-4 md:p-8 bg-white overflow-x-auto">
+              <div className="max-w-[210mm] mx-auto min-w-0">
                 {/* A4 Layout */}
-                <div className="text-center mb-8 pb-4 border-b-2 border-black">
-                  <div className="text-2xl font-bold">{CLINIC_NAME}</div>
+                <div className="text-center mb-6 md:mb-8 pb-3 md:pb-4 border-b-2 border-black">
+                  <div className="text-lg md:text-2xl font-bold break-words">{CLINIC_NAME}</div>
                 </div>
 
-                <div className="mb-6 space-y-2">
-                  <p><strong>Patient Name:</strong> {patient.name}</p>
-                  <p>
+                <div className="mb-6 space-y-2 text-sm md:text-base">
+                  <p className="break-words"><strong>Patient Name:</strong> {patient.name}</p>
+                  <p className="break-words">
                     <strong>Age:</strong> {patient.age || 'N/A'}{' '}
                     {patient.gender && `| Gender: ${patient.gender === 'M' ? 'Male' : 'Female'}`}
                   </p>
-                  <p><strong>Mobile:</strong> {patient.mobile}</p>
-                  <p><strong>Date:</strong> {visitDate}</p>
+                  <p className="break-words"><strong>Mobile:</strong> {patient.mobile}</p>
+                  <p className="break-words"><strong>Date:</strong> {visitDate}</p>
                 </div>
 
                 {visit.notes && (
-                  <div className="mb-6">
+                  <div className="mb-6 text-sm md:text-base break-words">
                     <strong>Notes:</strong> {visit.notes}
                   </div>
                 )}
 
-                <table className="w-full border-collapse border border-gray-300 mb-6">
-                  <thead>
-                    <tr className="bg-gray-100">
-                      <th className="border border-gray-300 px-4 py-2 text-left">Medicine</th>
-                      <th className="border border-gray-300 px-4 py-2 text-left">Dosage</th>
-                      <th className="border border-gray-300 px-4 py-2 text-left">Duration</th>
-                      <th className="border border-gray-300 px-4 py-2 text-left">Notes</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {visit.prescription.medicines.map((med, idx) => (
-                      <tr key={idx}>
-                        <td className="border border-gray-300 px-4 py-2">{med.name}</td>
-                        <td className="border border-gray-300 px-4 py-2">{med.dosage}</td>
-                        <td className="border border-gray-300 px-4 py-2">{med.duration}</td>
-                        <td className="border border-gray-300 px-4 py-2">{med.notes || '-'}</td>
+                <div className="overflow-x-auto mb-6">
+                  <table className="w-full border-collapse border border-gray-300 min-w-[600px]">
+                    <thead>
+                      <tr className="bg-gray-100">
+                        <th className="border border-gray-300 px-2 md:px-4 py-2 text-left text-sm md:text-base">Medicine</th>
+                        <th className="border border-gray-300 px-2 md:px-4 py-2 text-left text-sm md:text-base">Dosage</th>
+                        <th className="border border-gray-300 px-2 md:px-4 py-2 text-left text-sm md:text-base">Duration</th>
+                        <th className="border border-gray-300 px-2 md:px-4 py-2 text-left text-sm md:text-base">Notes</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {visit.prescription.medicines.map((med, idx) => (
+                        <tr key={idx}>
+                          <td className="border border-gray-300 px-2 md:px-4 py-2 text-sm md:text-base break-words">{med.name}</td>
+                          <td className="border border-gray-300 px-2 md:px-4 py-2 text-sm md:text-base break-words">{med.dosage}</td>
+                          <td className="border border-gray-300 px-2 md:px-4 py-2 text-sm md:text-base break-words">{med.duration}</td>
+                          <td className="border border-gray-300 px-2 md:px-4 py-2 text-sm md:text-base break-words">{med.notes || '-'}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
 
                 {visit.prescription.followUp && (
                   <p className="mb-6">
