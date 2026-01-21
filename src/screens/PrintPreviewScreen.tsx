@@ -65,24 +65,24 @@ export default function PrintPreviewScreen() {
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-gray-50 overflow-x-hidden">
       <div className="max-w-6xl mx-auto px-6 py-6">
-        <div className="mb-6 flex justify-between items-center">
+        <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h1 className="text-2xl font-semibold text-gray-900">Print Preview</h1>
-          <Button onClick={handlePrint} size="lg">
+          <Button onClick={handlePrint} size="lg" className="w-full sm:w-auto">
             Print
           </Button>
         </div>
 
         <Tabs.Root value={activeTab} onValueChange={(value) => setActiveTab(value as 'a4' | 'thermal')}>
-          <Tabs.List className="flex border-b border-gray-200 mb-6">
+          <Tabs.List className="flex w-full overflow-x-auto border-b border-gray-200 mb-6">
             <Tabs.Trigger
               value="a4"
-              className="px-6 py-3 text-sm font-medium border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:text-blue-600 hover:text-gray-700"
+              className="shrink-0 px-6 py-3 text-sm font-medium border-b-2 border-transparent data-[state=active]:border-teal-600 data-[state=active]:text-teal-700 hover:text-gray-700"
             >
               A4 Prescription
             </Tabs.Trigger>
             <Tabs.Trigger
               value="thermal"
-              className="px-6 py-3 text-sm font-medium border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:text-blue-600 hover:text-gray-700"
+              className="shrink-0 px-6 py-3 text-sm font-medium border-b-2 border-transparent data-[state=active]:border-teal-600 data-[state=active]:text-teal-700 hover:text-gray-700"
             >
               Thermal
             </Tabs.Trigger>

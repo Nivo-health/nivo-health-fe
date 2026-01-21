@@ -77,8 +77,8 @@ export default function AllPatientsScreen() {
 
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-gray-50 overflow-x-hidden">
-      <div className="max-w-7xl mx-auto px-6 py-6">
-        <div className="mb-6 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4 md:px-6 py-6">
+        <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-3xl font-bold text-teal-900">All Patients</h1>
             <p className="text-gray-600 mt-1">
@@ -86,7 +86,7 @@ export default function AllPatientsScreen() {
               {searchQuery && ` found`}
             </p>
           </div>
-          <Button onClick={() => navigate('/patient-search')}>
+          <Button onClick={() => navigate('/patient-search')} className="w-full sm:w-auto">
             + Add New Patient
           </Button>
         </div>
@@ -112,30 +112,30 @@ export default function AllPatientsScreen() {
                 onClick={() => handlePatientClick(patient)}
               >
                 <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-4">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start gap-4">
                         <div className="w-12 h-12 bg-gradient-to-br from-teal-500 to-teal-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
                           {patient.name.charAt(0).toUpperCase()}
                         </div>
-                        <div>
-                          <h3 className="text-lg font-semibold text-gray-900">
+                        <div className="min-w-0">
+                          <h3 className="text-lg font-semibold text-gray-900 truncate">
                             {patient.name}
                           </h3>
-                          <div className="flex items-center gap-4 mt-1 text-sm text-gray-600">
-                            <span>📱 {maskMobile(patient.mobile)}</span>
-                            {patient.age && <span>👤 Age: {patient.age}</span>}
+                          <div className="mt-1 text-sm text-gray-600 flex flex-wrap gap-x-4 gap-y-1">
+                            <span className="whitespace-nowrap">📱 {maskMobile(patient.mobile)}</span>
+                            {patient.age && <span className="whitespace-nowrap">👤 Age: {patient.age}</span>}
                             {patient.gender && (
-                              <span>
+                              <span className="whitespace-nowrap">
                                 {patient.gender === 'M' ? '♂' : '♀'} {patient.gender === 'M' ? 'Male' : 'Female'}
                               </span>
                             )}
-                            <span>📅 Joined: {formatDate(patient.createdAt)}</span>
+                            <span className="whitespace-nowrap">📅 Joined: {formatDate(patient.createdAt)}</span>
                           </div>
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 shrink-0">
                       <svg
                         className="w-5 h-5 text-teal-600"
                         fill="none"
