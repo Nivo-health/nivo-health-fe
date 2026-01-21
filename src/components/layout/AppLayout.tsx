@@ -22,7 +22,7 @@ export default function AppLayout({ children, showSidebar = true }: AppLayoutPro
         )}
         <main
           className={cn(
-            'flex-1 transition-all duration-300 pt-0',
+            'flex-1 transition-all duration-300 pt-16 md:pt-0', // Add top padding on mobile for fixed header
             'pb-16 md:pb-0', // Add bottom padding on mobile for bottom nav
             showSidebar ? 'md:ml-64 ml-0' : 'ml-0'
           )}

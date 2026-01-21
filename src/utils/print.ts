@@ -46,14 +46,14 @@ export const printUtils = {
             @media print {
               @page {
                 size: A4;
-                margin: 20mm;
+                margin: 8mm;
               }
             }
             body {
               font-family: Arial, sans-serif;
               max-width: 210mm;
               margin: 0 auto;
-              padding: 20mm;
+              padding: 5mm;
               color: #000;
             }
             .header {

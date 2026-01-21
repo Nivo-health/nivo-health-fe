@@ -110,12 +110,12 @@ export default function AllPatientsScreen() {
                 key={patient.id}
                 className="border-teal-200 hover:border-teal-300 hover:shadow-md transition-all cursor-pointer"
                 onClick={() => handlePatientClick(patient)}
-              >
-                <CardContent className="p-6">
-                  <div className="flex items-start justify-between gap-4">
+              > 
+                <CardContent className="p-4 md:p-6">
+                  <div className="flex items-start justify-between gap-3 md:gap-4">
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-start gap-4">
-                        <div className="w-12 h-12 bg-gradient-to-br from-teal-500 to-teal-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                      <div className="flex items-center gap-3 md:gap-4">
+                        <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-teal-500 to-teal-600 rounded-full flex items-center justify-center text-white font-bold text-base md:text-lg flex-shrink-0">
                           {patient.name.charAt(0).toUpperCase()}
                         </div>
                         <div className="min-w-0">
