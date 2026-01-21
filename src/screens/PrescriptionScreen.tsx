@@ -178,7 +178,7 @@ export default function PrescriptionScreen() {
         {/* Visit Progress Stepper */}
         <Card className="mb-4 border-teal-200">
           <CardContent className="pt-4 pb-4">
-            <Stepper steps={visitSteps} currentStep={getVisitStep(visit)} />
+            <Stepper steps={visitSteps} currentStep={getVisitStep(visit, 'prescription')} />
           </CardContent>
         </Card>
 

@@ -7,7 +7,7 @@ import { Stepper } from '../components/ui/Stepper';
 import { visitService } from '../services/visitService';
 import { patientService } from '../services/patientService';
 import { printUtils } from '../utils/print';
-import { getVisitStep, visitSteps } from '../utils/visitStepper';
+import { visitSteps } from '../utils/visitStepper';
 import type { Patient, Visit } from '../types';
 
 export default function PrintPreviewScreen() {
@@ -70,7 +70,7 @@ export default function PrintPreviewScreen() {
         {/* Visit Progress Stepper */}
         <Card className="mb-4 border-teal-200">
           <CardContent className="pt-4 pb-4">
-            <Stepper steps={visitSteps} currentStep={getVisitStep(visit)} />
+            <Stepper steps={visitSteps} currentStep={visitSteps.length} />
           </CardContent>
         </Card>
 

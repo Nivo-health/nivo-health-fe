@@ -66,8 +66,17 @@ export default function ConsultationScreen() {
     saveNotes();
   };
 
-  const handleProceed = () => {
-    saveNotes();
+  const handleProceed = async () => {
+    // Save notes (even if empty) to mark the step as complete
+    if (!visitId) return;
+    setIsSaving(true);
+    await visitService.updateNotes(visitId, notes || '');
+    // Reload visit to update stepper
+    const updatedVisit = await visitService.getById(visitId);
+    if (updatedVisit) {
+      setVisit(updatedVisit);
+    }
+    setIsSaving(false);
     navigate(`/prescription/${visitId}`);
   };
 
@@ -86,7 +95,7 @@ export default function ConsultationScreen() {
         {/* Visit Progress Stepper */}
         <Card className="mb-4 border-teal-200">
           <CardContent className="pt-4 pb-4">
-            <Stepper steps={visitSteps} currentStep={getVisitStep(visit)} />
+            <Stepper steps={visitSteps} currentStep={getVisitStep(visit, 'consultation')} />
           </CardContent>
         </Card>
 
