@@ -208,7 +208,7 @@ class ApiClient {
         patientId: data.patientId,
         date: data.date || new Date().toISOString(),
         id: `visit_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-        status: 'active',
+        status: data.status || 'waiting',
         notes: null,
         prescription: null,
         followUp: null,
@@ -216,6 +216,22 @@ class ApiClient {
       visits.push(newVisit);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(visits));
       return { success: true, data: newVisit as T };
+    }
+
+    // Check /visits/patient/ BEFORE /visits/:visitId to avoid route conflicts
+    if (endpoint.startsWith('/visits/patient/') && method === 'GET') {
+      const patientId = endpoint.split('/')[3];
+      const patientVisits = visits
+        .filter((v: any) => v.patientId === patientId)
+        .map((v: any) => ({
+          id: v.id,
+          date: v.date,
+          status: v.status,
+          hasPrescription: !!v.prescription,
+        }))
+        .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime())
+        .slice(0, params?.limit ? Number(params.limit) : 20);
+      return { success: true, data: patientVisits as T };
     }
 
     if (endpoint.startsWith('/visits/') && method === 'GET') {
@@ -232,21 +248,6 @@ class ApiClient {
         };
       }
       return { success: true, data: visit as T };
-    }
-
-    if (endpoint.startsWith('/visits/patient/') && method === 'GET') {
-      const patientId = endpoint.split('/')[3];
-      const patientVisits = visits
-        .filter((v: any) => v.patientId === patientId)
-        .map((v: any) => ({
-          id: v.id,
-          date: v.date,
-          status: v.status,
-          hasPrescription: !!v.prescription,
-        }))
-        .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime())
-        .slice(0, params?.limit ? Number(params.limit) : 20);
-      return { success: true, data: patientVisits as T };
     }
 
     if (endpoint.startsWith('/visits/') && endpoint.endsWith('/notes') && method === 'PATCH') {
@@ -290,6 +291,31 @@ class ApiClient {
       visits[index].prescription = prescription;
       localStorage.setItem(STORAGE_KEY, JSON.stringify(visits));
       return { success: true, data: { id: visitId, prescription } as T };
+    }
+
+    if (endpoint.startsWith('/visits/') && endpoint.endsWith('/status') && method === 'PATCH') {
+      const visitId = endpoint.split('/')[2];
+      const index = visits.findIndex((v: any) => v.id === visitId);
+      if (index === -1) {
+        return {
+          success: false,
+          error: {
+            code: 'VISIT_NOT_FOUND',
+            message: `Visit with ID ${visitId} not found`,
+            statusCode: 404,
+          },
+        };
+      }
+      visits[index].status = data.status;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(visits));
+      return { success: true, data: { id: visitId, status: data.status } as T };
+    }
+
+    if (endpoint === '/visits/waiting' && method === 'GET') {
+      const waitingVisits = visits
+        .filter((v: any) => v.status === 'waiting')
+        .sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime());
+      return { success: true, data: waitingVisits as T };
     }
 
     if (endpoint.startsWith('/visits/') && endpoint.endsWith('/complete') && method === 'PATCH') {

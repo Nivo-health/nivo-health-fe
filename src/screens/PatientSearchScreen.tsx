@@ -53,6 +53,19 @@ export default function PatientSearchScreen() {
     navigate(`/visit/${visit.id}`);
   };
 
+  const handleStartVisit = async (e: React.MouseEvent, patient: Patient) => {
+    e.stopPropagation(); // Prevent card click
+    try {
+      const visit = await visitService.create({ 
+        patientId: patient.id,
+        status: 'waiting'
+      });
+      navigate(`/visit/${visit.id}`);
+    } catch (error) {
+      console.error('Failed to create visit:', error);
+    }
+  };
+
   const handleAddNewPatient = () => {
     setIsModalOpen(true);
     setNewPatient({ name: '', mobile: '', age: '', gender: '' });
@@ -89,8 +102,11 @@ export default function PatientSearchScreen() {
         gender: newPatient.gender || undefined,
       });
 
-      // Create visit for new patient
-      const visit = await visitService.create({ patientId: patient.id });
+      // Create visit for new patient with waiting status
+      const visit = await visitService.create({ 
+        patientId: patient.id,
+        status: 'waiting'
+      });
       setIsModalOpen(false);
       navigate(`/visit/${visit.id}`);
     } catch (error) {
@@ -132,8 +148,8 @@ export default function PatientSearchScreen() {
                   onClick={() => handlePatientClick(patient)}
                   className="px-4 py-3 hover:bg-teal-50 cursor-pointer transition-colors"
                 >
-                  <div className="flex justify-between items-center">
-                    <div>
+                  <div className="flex justify-between items-center gap-3">
+                    <div className="flex-1">
                       <div className="font-medium text-gray-900">{patient.name}</div>
                       <div className="text-sm text-gray-500">
                         {maskMobile(patient.mobile)}
@@ -141,19 +157,13 @@ export default function PatientSearchScreen() {
                         {patient.gender && ` • ${patient.gender === 'M' ? 'Male' : 'Female'}`}
                       </div>
                     </div>
-                    <svg
-                      className="w-5 h-5 text-gray-400"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
+                    <Button
+                      onClick={(e) => handleStartVisit(e, patient)}
+                      size="sm"
+                      className="shrink-0"
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 5l7 7-7 7"
-                      />
-                    </svg>
+                      Start Visit
+                    </Button>
                   </div>
                 </li>
               ))}

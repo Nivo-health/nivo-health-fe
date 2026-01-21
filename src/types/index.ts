@@ -32,5 +32,5 @@ export interface Visit {
   notes?: string;
   prescription?: Prescription;
   followUp?: FollowUp;
-  status: 'active' | 'completed';
+  status: 'waiting' | 'in_progress' | 'completed';
 }

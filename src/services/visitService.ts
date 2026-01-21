@@ -7,7 +7,7 @@ import type { Visit } from '../types';
 export interface VisitHistoryItem {
   id: string;
   date: string;
-  status: 'active' | 'completed';
+  status: 'waiting' | 'in_progress' | 'completed';
   hasPrescription: boolean;
 }
 
@@ -16,10 +16,11 @@ export const visitService = {
    * Create a new visit
    * POST /api/v1/visits
    */
-  async create(visitData: { patientId: string; date?: string }): Promise<Visit> {
+  async create(visitData: { patientId: string; date?: string; status?: 'waiting' | 'in_progress' | 'completed' }): Promise<Visit> {
     const response = await apiClient.post<Visit>('/visits', {
       patientId: visitData.patientId,
       date: visitData.date || new Date().toISOString(),
+      status: visitData.status || 'waiting',
     });
 
     if (!response.success || !response.data) {
@@ -50,7 +51,7 @@ export const visitService = {
   async getByPatientId(
     patientId: string,
     limit: number = 20,
-    status?: 'active' | 'completed'
+    status?: 'waiting' | 'in_progress' | 'completed'
   ): Promise<Visit[]> {
     const params: Record<string, string | number> = { limit };
     if (status) {
@@ -80,9 +81,10 @@ export const visitService = {
 
   /**
    * Get active visit for a patient (helper method)
+   * Note: This now checks for 'in_progress' status instead of 'active'
    */
   async getActiveByPatientId(patientId: string): Promise<Visit | null> {
-    const visits = await this.getByPatientId(patientId, 1, 'active');
+    const visits = await this.getByPatientId(patientId, 1, 'in_progress');
     return visits.length > 0 ? visits[0] : null;
   },
 
@@ -126,6 +128,46 @@ export const visitService = {
 
     // Return updated visit
     return this.getById(id);
+  },
+
+  /**
+   * Update visit status
+   * PATCH /api/v1/visits/:visitId/status
+   */
+  async updateStatus(id: string, status: 'waiting' | 'in_progress' | 'completed'): Promise<Visit | null> {
+    const response = await apiClient.patch<{ id: string; status: 'waiting' | 'in_progress' | 'completed' }>(
+      `/visits/${id}/status`,
+      { status }
+    );
+
+    if (!response.success) {
+      return null;
+    }
+
+    // Return updated visit
+    return this.getById(id);
+  },
+
+  /**
+   * Get all waiting visits
+   * GET /api/v1/visits/waiting
+   */
+  async getWaitingVisits(): Promise<Visit[]> {
+    const response = await apiClient.get<Visit[]>('/visits/waiting');
+
+    if (!response.success || !response.data) {
+      return [];
+    }
+
+    return response.data;
+  },
+
+  /**
+   * Get next waiting visit (oldest waiting visit)
+   */
+  async getNextWaitingVisit(): Promise<Visit | null> {
+    const waitingVisits = await this.getWaitingVisits();
+    return waitingVisits.length > 0 ? waitingVisits[0] : null;
   },
 
   /**

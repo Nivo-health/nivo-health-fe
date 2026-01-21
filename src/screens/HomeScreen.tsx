@@ -7,7 +7,7 @@ export default function HomeScreen() {
   const navigate = useNavigate();
 
   const handleStartOPD = () => {
-    navigate('/patient-search');
+    navigate('/visits');
   };
 
   return (

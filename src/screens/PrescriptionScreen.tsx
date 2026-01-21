@@ -9,12 +9,15 @@ import {
   TableHeader,
   TableRow,
 } from '../components/ui/Table';
+import { Stepper } from '../components/ui/Stepper';
+import { Card, CardContent } from '../components/ui/Card';
 import { visitService } from '../services/visitService';
 import { prescriptionService } from '../services/prescriptionService';
 import { whatsappService } from '../services/whatsappService';
 import { patientService } from '../services/patientService';
 import { toast } from '../utils/toast';
-import type { Medicine, Prescription, FollowUp } from '../types';
+import { getVisitStep, visitSteps } from '../utils/visitStepper';
+import type { Medicine, Prescription, FollowUp, Visit } from '../types';
 
 export default function PrescriptionScreen() {
   const { visitId } = useParams<{ visitId: string }>();
@@ -25,26 +28,28 @@ export default function PrescriptionScreen() {
   const [followUpUnit, setFollowUpUnit] = useState<'days' | 'weeks' | 'months'>('days');
   const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] = useState(false);
   const [whatsappEnabled, setWhatsappEnabled] = useState(true);
+  const [visit, setVisit] = useState<Visit | null>(null);
 
   useEffect(() => {
     const loadVisit = async () => {
       if (!visitId) {
-        navigate('/patient-search');
+        navigate('/visits');
         return;
       }
 
-      const visit = await visitService.getById(visitId);
-      if (!visit) {
-        navigate('/patient-search');
+      const visitData = await visitService.getById(visitId);
+      if (!visitData) {
+        navigate('/visits');
         return;
       }
 
-      if (visit.prescription) {
-        setMedicines(visit.prescription.medicines || []);
-        setFollowUp(visit.prescription.followUp || null);
-        if (visit.prescription.followUp) {
-          setFollowUpValue(visit.prescription.followUp.value.toString());
-          setFollowUpUnit(visit.prescription.followUp.unit);
+      setVisit(visitData);
+      if (visitData.prescription) {
+        setMedicines(visitData.prescription.medicines || []);
+        setFollowUp(visitData.prescription.followUp || null);
+        if (visitData.prescription.followUp) {
+          setFollowUpValue(visitData.prescription.followUp.value.toString());
+          setFollowUpUnit(visitData.prescription.followUp.unit);
         }
       }
     };
@@ -85,6 +90,11 @@ export default function PrescriptionScreen() {
 
     const success = await prescriptionService.saveToVisit(visitId!, prescription);
     if (success) {
+      // Reload visit to update stepper
+      const updatedVisit = await visitService.getById(visitId!);
+      if (updatedVisit) {
+        setVisit(updatedVisit);
+      }
       toast.success('Prescription saved');
     } else {
       toast.error('Failed to save prescription');
@@ -96,7 +106,7 @@ export default function PrescriptionScreen() {
     if (visitId) {
       await visitService.complete(visitId);
     }
-    navigate('/patient-search');
+    navigate('/visits');
     toast.success('Visit completed');
   };
 
@@ -165,6 +175,13 @@ export default function PrescriptionScreen() {
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-gray-50 overflow-x-hidden pb-32 md:pb-24">
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 md:py-6">
+        {/* Visit Progress Stepper */}
+        <Card className="mb-4 border-teal-200">
+          <CardContent className="pt-4 pb-4">
+            <Stepper steps={visitSteps} currentStep={getVisitStep(visit)} />
+          </CardContent>
+        </Card>
+
         <div className="bg-white rounded-lg border border-teal-200 shadow-sm p-4 md:p-6">
           <div className="mb-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">

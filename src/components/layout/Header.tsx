@@ -4,8 +4,7 @@ const CLINIC_NAME = (import.meta as any).env?.VITE_CLINIC_NAME || 'Clinic OPD Ma
 
 export default function Header() {
   return (
-    // not sticky in desktop view need to fix this
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-teal-100 shadow-sm md:sticky md:top-0">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-teal-100 shadow-sm">
       <div className="flex items-center justify-between h-16 px-4 md:px-6">
         <div className="flex items-center gap-4">
           <Link to="/" className="flex items-center gap-2">

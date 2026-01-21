@@ -2,10 +2,12 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import * as Tabs from '@radix-ui/react-tabs';
 import { Button } from '../components/ui/Button';
-import { Card } from '../components/ui/Card';
+import { Card, CardContent } from '../components/ui/Card';
+import { Stepper } from '../components/ui/Stepper';
 import { visitService } from '../services/visitService';
 import { patientService } from '../services/patientService';
 import { printUtils } from '../utils/print';
+import { getVisitStep, visitSteps } from '../utils/visitStepper';
 import type { Patient, Visit } from '../types';
 
 export default function PrintPreviewScreen() {
@@ -18,13 +20,13 @@ export default function PrintPreviewScreen() {
   useEffect(() => {
     const loadData = async () => {
       if (!visitId) {
-        navigate('/patient-search');
+        navigate('/visits');
         return;
       }
 
       const currentVisit = await visitService.getById(visitId);
       if (!currentVisit || !currentVisit.prescription) {
-        navigate('/patient-search');
+        navigate('/visits');
         return;
       }
 
@@ -65,6 +67,13 @@ export default function PrintPreviewScreen() {
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-gray-50 overflow-x-hidden">
       <div className="max-w-6xl mx-auto px-4 md:px-6 py-4 md:py-6">
+        {/* Visit Progress Stepper */}
+        <Card className="mb-4 border-teal-200">
+          <CardContent className="pt-4 pb-4">
+            <Stepper steps={visitSteps} currentStep={getVisitStep(visit)} />
+          </CardContent>
+        </Card>
+
         <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h1 className="text-xl md:text-2xl font-semibold text-gray-900">Print Preview</h1>
           <Button onClick={handlePrint} size="lg" className="w-full sm:w-auto">

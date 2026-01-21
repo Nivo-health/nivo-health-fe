@@ -13,7 +13,7 @@ export default function AppLayout({ children, showSidebar = true }: AppLayoutPro
   return (
     <div className="min-h-screen bg-gray-50 overflow-x-hidden">
       <Header />
-      <div className="flex">
+      <div className="flex pt-16">
         {/* Sidebar - hidden on mobile, visible on desktop */}
         {showSidebar && (
           <div className="hidden md:block">
@@ -22,7 +22,7 @@ export default function AppLayout({ children, showSidebar = true }: AppLayoutPro
         )}
         <main
           className={cn(
-            'flex-1 transition-all duration-300 pt-16 md:pt-0', // Add top padding on mobile for fixed header
+            'flex-1 transition-all duration-300',
             'pb-16 md:pb-0', // Add bottom padding on mobile for bottom nav
             showSidebar ? 'md:ml-64 ml-0' : 'ml-0'
           )}
