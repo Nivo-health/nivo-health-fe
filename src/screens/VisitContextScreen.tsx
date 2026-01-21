@@ -1,0 +1,191 @@
+import { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Button } from '../components/ui/Button';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
+import { patientService } from '../services/patientService';
+import { visitService } from '../services/visitService';
+import { toast } from '../utils/toast';
+import type { Patient, Visit } from '../types';
+
+export default function VisitContextScreen() {
+  const { visitId } = useParams<{ visitId: string }>();
+  const navigate = useNavigate();
+  const [visit, setVisit] = useState<Visit | null>(null);
+  const [patient, setPatient] = useState<Patient | null>(null);
+  const [visitHistory, setVisitHistory] = useState<Visit[]>([]);
+  const [whatsappEnabled, setWhatsappEnabled] = useState(true);
+
+  useEffect(() => {
+    const loadData = async () => {
+      if (!visitId) {
+        navigate('/patient-search');
+        return;
+      }
+
+      const currentVisit = await visitService.getById(visitId);
+      if (!currentVisit) {
+        navigate('/patient-search');
+        return;
+      }
+
+      setVisit(currentVisit);
+      const patientData = await patientService.getById(currentVisit.patientId);
+      setPatient(patientData);
+
+      // Load visit history
+      const history = await visitService.getByPatientId(currentVisit.patientId);
+      setVisitHistory(history);
+    };
+
+    loadData();
+  }, [visitId, navigate]);
+
+  const handleConsultClick = () => {
+    if (visit) {
+      navigate(`/consultation/${visit.id}`);
+    }
+  };
+
+  const handleWhatsAppToggle = () => {
+    setWhatsappEnabled(!whatsappEnabled);
+    if (!whatsappEnabled) {
+      toast.success('WhatsApp notifications enabled', 'Prescription will be sent on WhatsApp when saved');
+    }
+  };
+
+  const handleViewOldPrescription = (oldVisit: Visit) => {
+    if (oldVisit.prescription) {
+      navigate(`/print-preview/${oldVisit.id}`);
+    }
+  };
+
+  if (!visit || !patient) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-gray-500">Loading...</div>
+      </div>
+    );
+  }
+
+  const visitDate = new Date(visit.date).toLocaleDateString('en-IN', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+  });
+
+  return (
+    <div className="min-h-[calc(100vh-4rem)] bg-gray-50">
+      <div className="max-w-7xl mx-auto px-6 py-6">
+        {/* Patient Header */}
+        <Card className="mb-6 border-teal-200">
+          <CardHeader className="bg-gradient-to-r from-teal-50 to-white border-b border-teal-100">
+            <CardTitle className="text-2xl text-teal-900">{patient.name}</CardTitle>
+          </CardHeader>
+          <CardContent className="pt-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
+              <div className="flex items-center gap-2">
+                <span className="text-teal-600 font-medium">Age:</span>
+                <span className="font-semibold text-gray-900">{patient.age || 'N/A'}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-teal-600 font-medium">Gender:</span>
+                <span className="font-semibold text-gray-900">
+                  {patient.gender === 'M' ? 'Male' : patient.gender === 'F' ? 'Female' : 'N/A'}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-teal-600 font-medium">Mobile:</span>
+                <span className="font-semibold text-gray-900">{patient.mobile}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-teal-600 font-medium">Date:</span>
+                <span className="font-semibold text-gray-900">{visitDate}</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+                  {/* Primary Actions */}
+          <div className="mb-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Actions</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="whatsapp"
+                  checked={whatsappEnabled}
+                  onChange={handleWhatsAppToggle}
+                  className="w-4 h-4 text-teal-600 border-teal-300 rounded focus:ring-teal-500"
+                />
+                <label htmlFor="whatsapp" className="text-sm font-medium text-gray-700">
+                  Send prescription on WhatsApp
+                </label>
+              </div>
+                <Button
+                  onClick={handleConsultClick}
+                  size="lg"
+                  className="w-full"
+                  autoFocus
+                >
+                  Consult & Write Prescription
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Visit History */}
+          <div className="lg:col-span-1">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Visit History</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {visitHistory.length > 0 ? (
+                  <div className="space-y-2">
+                    {visitHistory.map((historyVisit) => (
+                      <div
+                        key={historyVisit.id}
+                        className={`p-3 rounded-lg border transition-colors ${
+                          historyVisit.id === visit.id
+                            ? 'bg-teal-50 border-teal-300 shadow-sm'
+                            : 'bg-white border-teal-200 hover:bg-teal-50 cursor-pointer'
+                        }`}
+                        onClick={() => {
+                          if (historyVisit.id !== visit.id && historyVisit.prescription) {
+                            handleViewOldPrescription(historyVisit);
+                          }
+                        }}
+                      >
+                        <div className="text-sm font-medium text-gray-900">
+                          {new Date(historyVisit.date).toLocaleDateString('en-IN', {
+                            day: '2-digit',
+                            month: 'short',
+                            year: 'numeric',
+                          })}
+                        </div>
+                        <div className="text-xs text-gray-600 mt-1">
+                          {historyVisit.status === 'active' ? 'Active' : 'Completed'}
+                          {historyVisit.prescription &&
+                            ` • ${historyVisit.prescription.medicines.length} medicine(s)`}
+                        </div>
+                        {historyVisit.id === visit.id && (
+                          <div className="text-xs text-teal-700 mt-1 font-semibold">Current Visit</div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-sm text-gray-500">No previous visits</div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
