@@ -44,5 +44,8 @@ export type { CardProps } from './Card';
 export { DateFilter } from './DateFilter';
 export type { DateFilterProps } from './DateFilter';
 
+export { NotesInput } from './NotesInput';
+export type { NotesInputProps } from './NotesInput';
+
 export { Stepper } from './Stepper';
 export type { StepperProps, StepperStep } from './Stepper';

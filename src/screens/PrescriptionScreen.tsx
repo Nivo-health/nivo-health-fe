@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Button, Input, Modal } from '../components/ui';
+import { Button, Input, Modal, NotesInput } from '../components/ui';
 import {
   Table,
   TableBody,
@@ -276,13 +276,13 @@ export default function PrescriptionScreen() {
                           className="w-full"
                         />
                       </div>
-                      <Input
+                      <NotesInput
                         label="Notes (Optional)"
                         value={medicine.notes || ''}
-                        onChange={(e) =>
-                          handleUpdateMedicine(medicine.id, 'notes', e.target.value)
+                        onChange={(value: string) =>
+                          handleUpdateMedicine(medicine.id, 'notes', value)
                         }
-                        placeholder="Optional notes"
+                        placeholder="Select or type notes (e.g., before food, after food)"
                         className="w-full"
                       />
                     </div>
@@ -335,12 +335,12 @@ export default function PrescriptionScreen() {
                             />
                           </TableCell>
                           <TableCell className="min-w-[200px]">
-                            <Input
+                            <NotesInput
                               value={medicine.notes || ''}
-                              onChange={(e) =>
-                                handleUpdateMedicine(medicine.id, 'notes', e.target.value)
+                              onChange={(value: string) =>
+                                handleUpdateMedicine(medicine.id, 'notes', value)
                               }
-                              placeholder="Optional notes"
+                              placeholder="Select or type notes"
                               className="w-full"
                             />
                           </TableCell>
