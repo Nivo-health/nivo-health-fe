@@ -26,6 +26,7 @@ export default function PrescriptionScreen() {
   const [followUp, setFollowUp] = useState<FollowUp | null>(null);
   const [followUpValue, setFollowUpValue] = useState('');
   const [followUpUnit, setFollowUpUnit] = useState<'days' | 'weeks' | 'months'>('days');
+  const [followUpEnabled, setFollowUpEnabled] = useState(false);
   const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] = useState(false);
   const [whatsappEnabled, setWhatsappEnabled] = useState(true);
   const [visit, setVisit] = useState<Visit | null>(null);
@@ -50,6 +51,9 @@ export default function PrescriptionScreen() {
         if (visitData.prescription.followUp) {
           setFollowUpValue(visitData.prescription.followUp.value.toString());
           setFollowUpUnit(visitData.prescription.followUp.unit);
+          setFollowUpEnabled(true);
+        } else {
+          setFollowUpEnabled(false);
         }
       } else {
         // Always start with at least one empty medicine row
@@ -167,20 +171,30 @@ export default function PrescriptionScreen() {
     navigate(`/print-preview/${visitId}`);
   };
 
-  const handleFollowUpChange = () => {
-    if (followUpValue && Number(followUpValue) > 0) {
+  const handleFollowUpValueChange = (value: string) => {
+    setFollowUpValue(value);
+    // Only update followUp if value is valid
+    if (value && Number(value) > 0) {
       setFollowUp({
-        value: Number(followUpValue),
+        value: Number(value),
         unit: followUpUnit,
       });
     } else {
+      // Clear followUp if value becomes invalid, but keep input visible
       setFollowUp(null);
     }
   };
 
-  useEffect(() => {
-    handleFollowUpChange();
-  }, [followUpValue, followUpUnit]);
+  const handleFollowUpUnitChange = (unit: 'days' | 'weeks' | 'months') => {
+    setFollowUpUnit(unit);
+    // Only update followUp if value is valid
+    if (followUpValue && Number(followUpValue) > 0) {
+      setFollowUp({
+        value: Number(followUpValue),
+        unit,
+      });
+    }
+  };
 
   const prescriptionPreview = medicines.filter((med) => med.name.trim() !== '');
 
@@ -373,8 +387,9 @@ export default function PrescriptionScreen() {
                   type="radio"
                   id="followup-none"
                   name="followup"
-                  checked={!followUp}
+                  checked={!followUpEnabled}
                   onChange={() => {
+                    setFollowUpEnabled(false);
                     setFollowUp(null);
                     setFollowUpValue('');
                   }}
@@ -389,9 +404,21 @@ export default function PrescriptionScreen() {
                   type="radio"
                   id="followup-yes"
                   name="followup"
-                  checked={!!followUp}
+                  checked={followUpEnabled}
                   onChange={() => {
-                    if (!followUpValue) setFollowUpValue('7');
+                    setFollowUpEnabled(true);
+                    if (!followUpValue) {
+                      setFollowUpValue('7');
+                      setFollowUp({
+                        value: 7,
+                        unit: followUpUnit,
+                      });
+                    } else if (followUpValue && Number(followUpValue) > 0) {
+                      setFollowUp({
+                        value: Number(followUpValue),
+                        unit: followUpUnit,
+                      });
+                    }
                   }}
                   className="w-4 h-4"
                 />
@@ -399,12 +426,12 @@ export default function PrescriptionScreen() {
                   Follow-up after
                 </label>
               </div>
-              {followUp && (
+              {followUpEnabled && (
                 <div className="flex items-center gap-2 flex-1 sm:flex-initial">
                   <Input
                     type="number"
                     value={followUpValue}
-                    onChange={(e) => setFollowUpValue(e.target.value)}
+                    onChange={(e) => handleFollowUpValueChange(e.target.value)}
                     placeholder="Value"
                     className="w-24 sm:w-32"
                     min="1"
@@ -412,7 +439,7 @@ export default function PrescriptionScreen() {
                   <select
                     value={followUpUnit}
                     onChange={(e) =>
-                      setFollowUpUnit(e.target.value as 'days' | 'weeks' | 'months')
+                      handleFollowUpUnitChange(e.target.value as 'days' | 'weeks' | 'months')
                     }
                     className="h-10 px-3 border border-teal-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white text-gray-900 flex-1 sm:flex-initial sm:w-auto"
                   >

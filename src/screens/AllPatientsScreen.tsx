@@ -208,7 +208,7 @@ export default function AllPatientsScreen() {
                 // onClick={() => handlePatientClick(patient)}
               > 
                 <CardContent className="p-4 md:p-6">
-                  <div className="flex items-start justify-between gap-3 md:gap-4">
+                  <div className="flex items-center md:items-start justify-between gap-3 md:gap-4">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-3 md:gap-4">
                         <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-teal-500 to-teal-600 rounded-full flex items-center justify-center text-white font-bold text-base md:text-lg flex-shrink-0">
@@ -231,12 +231,11 @@ export default function AllPatientsScreen() {
                         </div>
                       </div>
                     </div>
-                    {/* in mobile view the button is at the top of the card need to move to center of the card*/}
                     <div className="flex items-center justify-center gap-2 shrink-0">
                       <Button
                         onClick={(e) => handleStartVisit(e, patient)}
                         size="sm"
-                        className="shrink-0 w-full"
+                        className="shrink-0 w-full sm:w-auto"
                       >
                         Start Visit
                       </Button>
