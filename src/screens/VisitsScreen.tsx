@@ -1,11 +1,12 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Input, Button, Modal, DateFilter } from '../components/ui';
 import { Card, CardContent } from '../components/ui/Card';
 import { patientService } from '../services/patientService';
 import { visitService } from '../services/visitService';
 import { toast } from '../utils/toast';
-import type { Patient, Visit } from '../types';
+import type { Patient, Visit, ClinicDoctor } from '../types';
+import { clinicService } from '../services/clinicService';
 
 export default function VisitsScreen() {
   const navigate = useNavigate();
@@ -21,6 +22,12 @@ export default function VisitsScreen() {
     return today.toISOString().split('T')[0]; // YYYY-MM-DD format
   });
   
+  // Doctor filter
+  const [selectedDoctorFilter, setSelectedDoctorFilter] = useState<string>('');
+  
+  // Visit status filter - default to WAITING
+  const [selectedVisitStatus, setSelectedVisitStatus] = useState<string>('WAITING');
+  
   // Modal states
   const [step, setStep] = useState<'mobile' | 'patient-form'>('mobile');
   const [mobileNumber, setMobileNumber] = useState('');
@@ -33,13 +40,33 @@ export default function VisitsScreen() {
     gender: '' as 'M' | 'F' | '',
   });
   const [visitReason, setVisitReason] = useState('');
+  const [doctors, setDoctors] = useState<ClinicDoctor[]>([]);
+  const [selectedDoctorId, setSelectedDoctorId] = useState<string>('');
+  const [doctorError, setDoctorError] = useState<string>('');
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const searchInputRef = useRef<HTMLInputElement>(null);
 
-  // Load all visits when date changes
+  // Load all visits when filters change
   useEffect(() => {
     loadVisits();
-  }, [selectedDate]);
+  }, [selectedDate, selectedDoctorFilter, selectedVisitStatus]);
+
+  // Load doctors once on mount
+  useEffect(() => {
+    const loadDoctors = async () => {
+      try {
+        const clinic = await clinicService.getCurrentClinic();
+        const clinicDoctors = clinic?.doctors || [];
+        setDoctors(clinicDoctors);
+        if (clinicDoctors.length === 1) {
+          setSelectedDoctorId(clinicDoctors[0].id);
+        }
+      } catch (error) {
+        console.error('❌ Failed to load doctors from clinic:', error);
+      }
+    };
+
+    loadDoctors();
+  }, []);
 
   // Filter visits based on search
   useEffect(() => {
@@ -66,8 +93,24 @@ export default function VisitsScreen() {
   const loadVisits = async () => {
     try {
       setLoading(true);
-      console.log('🔄 Loading visits for date:', selectedDate);
-      const result = await visitService.getAllVisits(1, 50, selectedDate);
+      console.log('🔄 Loading visits with filters:', {
+        date: selectedDate,
+        doctorId: selectedDoctorFilter,
+        visitStatus: selectedVisitStatus,
+      });
+      
+      const visitStatus = selectedVisitStatus 
+        ? (selectedVisitStatus as 'WAITING' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED')
+        : undefined;
+      
+      const result = await visitService.getAllVisits(
+        1, 
+        50, 
+        selectedDate,
+        visitStatus,
+        selectedDoctorFilter || undefined
+      );
+      
       console.log('📊 Visits loaded:', result.visits.length);
       setVisits(result.visits);
       setFilteredVisits(result.visits);
@@ -87,6 +130,13 @@ export default function VisitsScreen() {
     setNewPatient({ name: '', mobile: '', age: '', gender: '' });
     setVisitReason('');
     setErrors({});
+    setDoctorError('');
+    // Auto-select doctor if only one is available
+    if (doctors.length === 1) {
+      setSelectedDoctorId(doctors[0].id);
+    } else if (doctors.length > 1) {
+      setSelectedDoctorId(''); // Reset to allow user to choose
+    }
   };
 
   const handleSearchPatient = async () => {
@@ -150,8 +200,15 @@ export default function VisitsScreen() {
     if (newPatient.age && (isNaN(Number(newPatient.age)) || Number(newPatient.age) < 0)) {
       newErrors.age = 'Age must be a valid number';
     }
+    if (doctors.length > 1 && !selectedDoctorId) {
+      setDoctorError('Please select a doctor');
+    } else {
+      setDoctorError('');
+    }
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    const hasFieldErrors = Object.keys(newErrors).length === 0;
+    const hasDoctorError = doctors.length > 1 ? !selectedDoctorId : false;
+    return hasFieldErrors && !hasDoctorError;
   };
 
   const handleCreateVisitSubmit = async () => {
@@ -191,6 +248,7 @@ export default function VisitsScreen() {
         patientId,
         visitReason: visitReason.trim() || 'General consultation',
         status: 'waiting',
+        doctorId: selectedDoctorId || undefined,
       });
 
       console.log('✅ Visit created:', visit.id);
@@ -272,6 +330,49 @@ export default function VisitsScreen() {
               />
             </CardContent>
           </Card>
+          
+          {/* Doctor Filter */}
+          {doctors.length > 0 && (
+            <Card className="border-teal-200 sm:w-56">
+              <CardContent className="pt-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Filter by Doctor
+                </label>
+                <select
+                  className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2"
+                  value={selectedDoctorFilter}
+                  onChange={(e) => setSelectedDoctorFilter(e.target.value)}
+                >
+                  <option value="">All Doctors</option>
+                  {doctors.map((doc) => (
+                    <option key={doc.id} value={doc.id}>
+                      {doc.name}
+                    </option>
+                  ))}
+                </select>
+              </CardContent>
+            </Card>
+          )}
+          
+          {/* Visit Status Filter */}
+          <Card className="border-teal-200 sm:w-56">
+            <CardContent className="pt-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Filter by Status
+              </label>
+              <select
+                className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2"
+                value={selectedVisitStatus}
+                onChange={(e) => setSelectedVisitStatus(e.target.value)}
+              >
+                <option value="">All Statuses</option>
+                <option value="WAITING">Waiting</option>
+                <option value="IN_PROGRESS">In Progress</option>
+                <option value="COMPLETED">Completed</option>
+                <option value="CANCELLED">Cancelled</option>
+              </select>
+            </CardContent>
+          </Card>
         </div>
 
         {filteredVisits.length > 0 ? (
@@ -297,13 +398,13 @@ export default function VisitsScreen() {
                             {visit.patient?.mobile && (
                               <span className="whitespace-nowrap">📱 {visit.patient.mobile}</span>
                             )}
-                            <span className="whitespace-nowrap">
+                            {/* <span className="whitespace-nowrap">
                               👤 Age: {visit.patient?.age !== undefined && visit.patient.age !== null ? visit.patient.age : 'N/A'}
-                            </span>
-                            {visit.visit_reason && (
+                            </span> */}
+                            {/* {visit.visit_reason && (
                               <span className="whitespace-nowrap">📝 {visit.visit_reason}</span>
-                            )}
-                            {visit.visit_date && (
+                            )} */}
+                            {/* {visit.visit_date && (
                               <span className="whitespace-nowrap">
                                 📅 {new Date(visit.visit_date).toLocaleDateString('en-IN', {
                                   day: '2-digit',
@@ -311,7 +412,7 @@ export default function VisitsScreen() {
                                   year: 'numeric',
                                 })}
                               </span>
-                            )}
+                            )} */}
                           </div>
                         </div>
                       </div>
@@ -483,6 +584,33 @@ export default function VisitsScreen() {
                 onChange={(e) => setVisitReason(e.target.value)}
                 placeholder="e.g., General consultation, Follow-up, etc."
               />
+
+              {/* Doctor Selection - Only show if more than one doctor */}
+              {doctors.length > 1 && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Select Doctor *
+                  </label>
+                  <select
+                    className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    value={selectedDoctorId}
+                    onChange={(e) => {
+                      setSelectedDoctorId(e.target.value);
+                      setDoctorError('');
+                    }}
+                  >
+                    <option value="">Select doctor</option>
+                    {doctors.map((doc) => (
+                      <option key={doc.id} value={doc.id}>
+                        {doc.name}
+                      </option>
+                    ))}
+                  </select>
+                  {doctorError && (
+                    <p className="mt-1 text-sm text-red-600">{doctorError}</p>
+                  )}
+                </div>
+              )}
             </>
           )}
         </div>

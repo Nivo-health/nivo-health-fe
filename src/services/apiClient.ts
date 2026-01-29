@@ -53,6 +53,7 @@ class ApiClient {
       endpoint.startsWith('/visits/patient/') || // /visits/patient/:patientId
       (endpoint.startsWith('/visits/') && endpoint.includes('/get-all/')) ||
       endpoint.match(/^\/visits\/[^/]+$/) || // /visits/:visitId
+      endpoint.startsWith('/visits/prescription/') || // /visits/prescription/:prescriptionId
       (endpoint.startsWith('/visits/') && !endpoint.includes('/patient/'))
     ) {
       return this.realRequest<T>('GET', endpoint, undefined, params);
@@ -81,6 +82,23 @@ class ApiClient {
     
     // For other endpoints, use mock for now
     return this.mockRequest<T>('POST', endpoint, data);
+  }
+
+  /**
+   * Make a PUT request
+   */
+  async put<T>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
+    // Check if this is a real API endpoint that should use HTTP
+    if (
+      endpoint.startsWith('/visits/') ||
+      endpoint.startsWith('/patients/clinic/') || 
+      endpoint.startsWith('/clinics/')
+    ) {
+      return this.realRequest<T>('PUT', endpoint, data);
+    }
+    
+    // For other endpoints, use mock for now
+    return this.mockRequest<T>('PUT', endpoint, data);
   }
 
   /**
@@ -114,7 +132,7 @@ class ApiClient {
         },
       };
 
-      if (data && (method === 'POST' || method === 'PATCH')) {
+      if (data && (method === 'POST' || method === 'PATCH' || method === 'PUT')) {
         options.body = JSON.stringify(data);
       }
 

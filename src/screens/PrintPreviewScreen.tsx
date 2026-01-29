@@ -6,6 +6,7 @@ import { Card, CardContent } from '../components/ui/Card';
 import { Stepper } from '../components/ui/Stepper';
 import { visitService } from '../services/visitService';
 import { patientService } from '../services/patientService';
+import { prescriptionService } from '../services/prescriptionService';
 import { printUtils } from '../utils/print';
 import { visitSteps } from '../utils/visitStepper';
 import { useClinic } from '../hooks/useClinic';
@@ -28,12 +29,27 @@ export default function PrintPreviewScreen() {
       }
 
       const currentVisit = await visitService.getById(visitId);
-      if (!currentVisit || !currentVisit.prescription) {
+      if (!currentVisit) {
         navigate('/visits');
         return;
       }
 
-      setVisit(currentVisit);
+      // If prescription_id exists, fetch the prescription data
+      let prescription = null;
+      if (currentVisit.prescription_id) {
+        prescription = await prescriptionService.getById(currentVisit.prescription_id);
+      } else if (currentVisit.prescription) {
+        // Fallback to visit.prescription if it exists
+        prescription = currentVisit.prescription;
+      }
+
+      if (!prescription) {
+        navigate('/visits');
+        return;
+      }
+
+      // Set visit with prescription
+      setVisit({ ...currentVisit, prescription });
       const patientData = await patientService.getById(currentVisit.patientId);
       setPatient(patientData);
     };
@@ -41,13 +57,18 @@ export default function PrintPreviewScreen() {
     loadData();
   }, [visitId, navigate]);
 
-  const handlePrint = () => {
+  const handlePrint = async () => {
     if (!visit || !patient || !visit.prescription) return;
 
     if (activeTab === 'a4') {
       printUtils.printA4(patient, visit, visit.prescription, clinicName);
     } else {
       printUtils.printThermal(patient, visit, visit.prescription, clinicName);
+    }
+
+    // Update visit status to completed after printing
+    if (visitId) {
+      await visitService.updateStatus(visitId, 'completed');
     }
   };
 
@@ -116,9 +137,9 @@ export default function PrintPreviewScreen() {
                   <p className="break-words"><strong>Date:</strong> {visitDate}</p>
                 </div>
 
-                {visit.notes && (
+                {visit.prescription.notes && (
                   <div className="mb-6 text-sm md:text-base break-words">
-                    <strong>Notes:</strong> {visit.notes}
+                    <strong>Notes:</strong> {visit.prescription.notes}
                   </div>
                 )}
 

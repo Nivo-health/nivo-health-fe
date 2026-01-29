@@ -23,6 +23,7 @@ export interface Medicine {
 export interface Prescription {
   medicines: Medicine[];
   followUp?: FollowUp;
+  notes?: string;
 }
 
 export interface Visit {
@@ -42,6 +43,15 @@ export interface Visit {
   visit_date?: string;
   created_at?: string;
   updated_at?: string;
+  prescription_id?: string | null; // ID of the prescription if it exists
+}
+
+export interface ClinicDoctor {
+  id: string;
+  name: string;
+  mobile_number?: string;
+  email?: string;
+  role?: string;
 }
 
 export interface Clinic {
@@ -52,4 +62,5 @@ export interface Clinic {
   email?: string;
   createdAt?: string;
   updatedAt?: string;
+  doctors?: ClinicDoctor[];
 }

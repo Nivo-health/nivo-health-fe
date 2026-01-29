@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Button, Input, Modal, NotesInput } from '../components/ui';
 import {
   Table,
@@ -22,6 +22,8 @@ import type { Medicine, Prescription, FollowUp, Visit } from '../types';
 export default function PrescriptionScreen() {
   const { visitId } = useParams<{ visitId: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
+  const navigationState = location.state as { notes?: string } | null;
   const [medicines, setMedicines] = useState<Medicine[]>([]);
   const [followUp, setFollowUp] = useState<FollowUp | null>(null);
   const [followUpValue, setFollowUpValue] = useState('');
@@ -30,6 +32,7 @@ export default function PrescriptionScreen() {
   const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] = useState(false);
   const [whatsappEnabled, setWhatsappEnabled] = useState(true);
   const [visit, setVisit] = useState<Visit | null>(null);
+  const [existingPrescriptionNotes, setExistingPrescriptionNotes] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     const loadVisit = async () => {
@@ -45,18 +48,35 @@ export default function PrescriptionScreen() {
       }
 
       setVisit(visitData);
-      if (visitData.prescription && visitData.prescription.medicines.length > 0) {
-        setMedicines(visitData.prescription.medicines);
-        setFollowUp(visitData.prescription.followUp || null);
-        if (visitData.prescription.followUp) {
-          setFollowUpValue(visitData.prescription.followUp.value.toString());
-          setFollowUpUnit(visitData.prescription.followUp.unit);
-          setFollowUpEnabled(true);
+      
+      // If prescription_id exists, fetch the prescription data
+      if (visitData.prescription_id) {
+        const prescriptionData = await prescriptionService.getById(visitData.prescription_id);
+        if (prescriptionData) {
+          setMedicines(prescriptionData.medicines.length > 0 ? prescriptionData.medicines : [
+            prescriptionService.createMedicine({ name: '', dosage: '', duration: '', notes: '' })
+          ]);
+          setFollowUp(prescriptionData.followUp || null);
+          setExistingPrescriptionNotes(prescriptionData.notes);
+          if (prescriptionData.followUp) {
+            setFollowUpValue(prescriptionData.followUp.value.toString());
+            setFollowUpUnit(prescriptionData.followUp.unit);
+            setFollowUpEnabled(true);
+          } else {
+            setFollowUpEnabled(false);
+          }
         } else {
-          setFollowUpEnabled(false);
+          // If fetch failed, start with empty medicine row
+          const initialMedicine: Medicine = prescriptionService.createMedicine({
+            name: '',
+            dosage: '',
+            duration: '',
+            notes: '',
+          });
+          setMedicines([initialMedicine]);
         }
       } else {
-        // Always start with at least one empty medicine row
+        // No prescription exists yet, start with empty medicine row
         const initialMedicine: Medicine = prescriptionService.createMedicine({
           name: '',
           dosage: '',
@@ -93,37 +113,46 @@ export default function PrescriptionScreen() {
     }
   };
 
-  const handleSavePrescription = async () => {
+  const handleSavePrescription = async (): Promise<boolean> => {
     const prescription: Prescription = {
       medicines: medicines.filter((med) => med.name.trim() !== ''),
       followUp: followUp || undefined,
+      // Prefer notes passed from ConsultationScreen, otherwise existing prescription notes
+      notes: navigationState?.notes ?? existingPrescriptionNotes ?? undefined,
     };
 
     if (prescription.medicines.length === 0) {
       toast.error('Please add at least one medicine');
-      return;
+      return false;
     }
 
     const success = await prescriptionService.saveToVisit(visitId!, prescription);
     if (success) {
-      // Reload visit to update stepper
+      // Reload visit to update stepper and prescription_id
       const updatedVisit = await visitService.getById(visitId!);
       if (updatedVisit) {
         setVisit(updatedVisit);
       }
       toast.success('Prescription saved');
+      return true;
     } else {
       toast.error('Failed to save prescription');
+      return false;
     }
   };
 
   const handleFinishVisit = async () => {
-    await handleSavePrescription();
-    if (visitId) {
-      await visitService.complete(visitId);
+    const saved = await handleSavePrescription();
+    if (!saved || !visitId) {
+      return;
     }
-    navigate('/visits');
-    toast.success('Visit completed');
+
+    // Mark visit as completed
+    await visitService.updateStatus(visitId, 'completed');
+
+    // Redirect to print preview for this visit
+    navigate(`/print-preview/${visitId}`);
+    toast.success('Visit completed. Ready to print.');
   };
 
   const handleWhatsApp = async () => {
@@ -155,6 +184,12 @@ export default function PrescriptionScreen() {
     });
 
     setIsWhatsAppModalOpen(false);
+    
+    // Update visit status to completed after sending WhatsApp
+    if (visitId) {
+      await visitService.updateStatus(visitId, 'completed');
+    }
+    
     if (result.success) {
       toast.success('Prescription sent on WhatsApp', result.message || 'The prescription has been shared with the patient');
     } else {
@@ -167,8 +202,12 @@ export default function PrescriptionScreen() {
       toast.error('Please add at least one medicine before printing');
       return;
     }
-    await handleSavePrescription();
-    navigate(`/print-preview/${visitId}`);
+    const saved = await handleSavePrescription();
+    if (saved && visitId) {
+      // Small delay to ensure the visit is updated in the backend
+      await new Promise(resolve => setTimeout(resolve, 300));
+      navigate(`/print-preview/${visitId}`);
+    }
   };
 
   const handleFollowUpValueChange = (value: string) => {

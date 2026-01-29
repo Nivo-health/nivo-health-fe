@@ -11,7 +11,8 @@ export const visitService = {
       patientId: apiVisit.patient?.id || apiVisit.patient_id || fallbackPatientId || '',
       date: apiVisit.visit_date || apiVisit.created_at || new Date().toISOString(),
       status: this.mapVisitStatus(apiVisit.visit_status),
-      notes: undefined,
+      // Notes saved from ConsultationScreen (if backend returns them)
+      notes: apiVisit.notes || undefined,
       prescription: undefined,
       followUp: undefined,
       // New API fields
@@ -23,6 +24,7 @@ export const visitService = {
       visit_date: apiVisit.visit_date,
       created_at: apiVisit.created_at,
       updated_at: apiVisit.updated_at,
+      prescription_id: apiVisit.prescription_id || null,
     };
   },
 
@@ -34,6 +36,7 @@ export const visitService = {
     patientId: string; 
     visitReason?: string;
     status?: 'waiting' | 'in_progress' | 'completed';
+    doctorId?: string;
   }): Promise<Visit> {
     try {
       // Get clinic ID
@@ -48,9 +51,8 @@ export const visitService = {
       };
       const visitStatus = visitStatusMap[visitData.status || 'waiting'] || 'WAITING';
 
-      // TODO: Get doctor_id from user context or settings
-      // For now, using a placeholder - this should be fetched from user/auth context
-      const doctorId = '948cfcaf-5295-431c-b531-76ff875b2dae'; // Hardcoded for now
+      // Prefer doctorId passed from caller; fall back to legacy hardcoded ID for safety
+      const doctorId = visitData.doctorId || '948cfcaf-5295-431c-b531-76ff875b2dae';
 
       const apiRequestData = {
         patient_id: visitData.patientId,
@@ -166,20 +168,34 @@ export const visitService = {
 
   /**
    * Update visit status
-   * PATCH /api/v1/visits/:visitId/status
+   * PUT /api/visits/:visitId
    */
   async updateStatus(id: string, status: 'waiting' | 'in_progress' | 'completed'): Promise<Visit | null> {
-    const response = await apiClient.patch<{ id: string; status: 'waiting' | 'in_progress' | 'completed' }>(
-      `/visits/${id}/status`,
-      { status }
-    );
+    try {
+      // Map frontend status to API format
+      const statusMap: Record<string, 'WAITING' | 'IN_PROGRESS' | 'COMPLETED'> = {
+        'waiting': 'WAITING',
+        'in_progress': 'IN_PROGRESS',
+        'completed': 'COMPLETED',
+      };
+      const apiStatus = statusMap[status] || 'WAITING';
 
-    if (!response.success) {
+      const response = await apiClient.put<any>(
+        `/visits/${id}`,
+        { visit_status: apiStatus }
+      );
+
+      if (!response.success || !response.data) {
+        console.error('❌ Failed to update visit status:', response.error);
+        return null;
+      }
+
+      // Map and return updated visit
+      return this.mapApiVisitToVisit(response.data);
+    } catch (error: any) {
+      console.error('❌ Error updating visit status:', error);
       return null;
     }
-
-    // Return updated visit
-    return this.getById(id);
   },
 
   /**
@@ -224,9 +240,15 @@ export const visitService = {
 
   /**
    * Get all visits for a clinic
-   * GET /api/visits/{clinic_id}/get-all/?page=1&page_size=20&date=YYYY-MM-DD
+   * GET /api/visits/{clinic_id}/get-all/?page=1&page_size=20&date=DD-MM-YYYY&visit_status=WAITING&doctor_id=uuid
    */
-  async getAllVisits(page: number = 1, pageSize: number = 20, date?: string): Promise<{ visits: Visit[]; count: number; next: string | null; previous: string | null }> {
+  async getAllVisits(
+    page: number = 1, 
+    pageSize: number = 20, 
+    date?: string,
+    visitStatus?: 'WAITING' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED',
+    doctorId?: string
+  ): Promise<{ visits: Visit[]; count: number; next: string | null; previous: string | null }> {
     try {
       const { clinicService } = await import('./clinicService');
       const clinicId = clinicService.getClinicId();
@@ -242,6 +264,16 @@ export const visitService = {
         // Convert to DD-MM-YYYY format for the API
         const [year, month, day] = date.split('-');
         params.date = `${day}-${month}-${year}`;
+      }
+
+      // Add visit_status parameter if provided
+      if (visitStatus) {
+        params.visit_status = visitStatus;
+      }
+
+      // Add doctor_id parameter if provided
+      if (doctorId) {
+        params.doctor_id = doctorId;
       }
 
       const response = await apiClient.get<any>(`/visits/${clinicId}/get-all/`, params);

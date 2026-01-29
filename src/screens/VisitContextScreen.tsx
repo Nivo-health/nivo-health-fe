@@ -4,6 +4,7 @@ import { Button } from '../components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
 import { patientService } from '../services/patientService';
 import { visitService } from '../services/visitService';
+import { prescriptionService } from '../services/prescriptionService';
 import { toast } from '../utils/toast';
 import type { Patient, Visit } from '../types';
 
@@ -13,6 +14,7 @@ export default function VisitContextScreen() {
   const [visit, setVisit] = useState<Visit | null>(null);
   const [patient, setPatient] = useState<Patient | null>(null);
   const [visitHistory, setVisitHistory] = useState<Visit[]>([]);
+  const [historyPrescriptionCounts, setHistoryPrescriptionCounts] = useState<Record<string, number>>({});
   const [whatsappEnabled, setWhatsappEnabled] = useState(true);
 
   useEffect(() => {
@@ -35,6 +37,30 @@ export default function VisitContextScreen() {
       // Load visit history
       const history = await visitService.getByPatientId(currentVisit.patientId);
       setVisitHistory(history);
+
+      // For history visits that have a prescription, load medicine counts
+      const entries = await Promise.all(
+        history
+          .filter((h) => h.prescription_id)
+          .map(async (h) => {
+            try {
+              const prescription = await prescriptionService.getById(h.prescription_id!);
+              if (!prescription) return null;
+              return [h.id, prescription.medicines.length] as const;
+            } catch {
+              return null;
+            }
+          })
+      );
+
+      const counts: Record<string, number> = {};
+      for (const entry of entries) {
+        if (entry) {
+          const [id, count] = entry;
+          counts[id] = count;
+        }
+      }
+      setHistoryPrescriptionCounts(counts);
     };
 
     loadData();
@@ -54,9 +80,12 @@ export default function VisitContextScreen() {
       if (updatedVisit) {
         setVisit(updatedVisit);
         navigate(`/consultation/${visit.id}`);
+      } else {
+        toast.error('Failed to start consultation. Please try again.');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to start consultation:', error);
+      toast.error(error?.message || 'Failed to start consultation. Please try again.');
     }
   };
 
@@ -68,9 +97,9 @@ export default function VisitContextScreen() {
   };
 
   const handleViewOldPrescription = (oldVisit: Visit) => {
-    if (oldVisit.prescription) {
-      navigate(`/print-preview/${oldVisit.id}`);
-    }
+    // Always navigate to print preview for that visit;
+    // PrintPreviewScreen will load the prescription via prescription_id if available.
+    navigate(`/print-preview/${oldVisit.id}`);
   };
 
   if (!visit || !patient) {
@@ -197,7 +226,8 @@ export default function VisitContextScreen() {
                             : 'bg-white border-teal-200 hover:bg-teal-50 cursor-pointer'
                         }`}
                         onClick={() => {
-                          if (historyVisit.id !== visit.id && historyVisit.prescription) {
+                          // Make all non-current history cards clickable, regardless of local prescription field
+                          if (historyVisit.id !== visit.id) {
                             handleViewOldPrescription(historyVisit);
                           }
                         }}
@@ -215,8 +245,13 @@ export default function VisitContextScreen() {
                           : historyVisit.status === 'in_progress'
                           ? 'In Progress'
                           : 'Completed'}
-                          {historyVisit.prescription &&
-                            ` • ${historyVisit.prescription.medicines.length} medicine(s)`}
+                          {historyVisit.prescription_id && (
+                            <>
+                              {' • Prescription'}
+                              {historyPrescriptionCounts[historyVisit.id] !== undefined &&
+                                ` • ${historyPrescriptionCounts[historyVisit.id]} medicine(s)`}
+                            </>
+                          )}
                         </div>
                         {historyVisit.id === visit.id && (
                           <div className="text-xs text-teal-700 mt-1 font-semibold">Current Visit</div>

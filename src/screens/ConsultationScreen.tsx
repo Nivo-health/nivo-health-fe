@@ -4,6 +4,7 @@ import { Button } from '../components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
 import { Stepper } from '../components/ui/Stepper';
 import { visitService } from '../services/visitService';
+import { prescriptionService } from '../services/prescriptionService';
 import { getVisitStep, visitSteps } from '../utils/visitStepper';
 
 export default function ConsultationScreen() {
@@ -29,7 +30,18 @@ export default function ConsultationScreen() {
       }
 
       setVisit(visitData);
-      setNotes(visitData.notes || '');
+
+      // If a prescription already exists, pre-populate notes from the prescription
+      if (visitData.prescription_id) {
+        const prescription = await prescriptionService.getById(visitData.prescription_id);
+        if (prescription?.notes) {
+          setNotes(prescription.notes);
+        } else {
+          setNotes(visitData.notes || '');
+        }
+      } else {
+        setNotes(visitData.notes || '');
+      }
       textareaRef.current?.focus();
     };
 
@@ -50,34 +62,16 @@ export default function ConsultationScreen() {
 
   const handleNotesChange = (value: string) => {
     setNotes(value);
-
-    // Clear existing timeout
-    if (saveTimeoutRef.current) {
-      clearTimeout(saveTimeoutRef.current);
-    }
-
-    // Set new timeout for auto-save
-    saveTimeoutRef.current = window.setTimeout(() => {
-      saveNotes();
-    }, 500);
   };
 
   const handleBlur = () => {
-    saveNotes();
+    // No-op for now; notes are saved when creating/updating prescription
   };
 
   const handleProceed = async () => {
-    // Save notes (even if empty) to mark the step as complete
     if (!visitId) return;
-    setIsSaving(true);
-    await visitService.updateNotes(visitId, notes || '');
-    // Reload visit to update stepper
-    const updatedVisit = await visitService.getById(visitId);
-    if (updatedVisit) {
-      setVisit(updatedVisit);
-    }
-    setIsSaving(false);
-    navigate(`/prescription/${visitId}`);
+    // Pass notes to PrescriptionScreen via navigation state
+    navigate(`/prescription/${visitId}`, { state: { notes } });
   };
 
   // Cleanup on unmount
