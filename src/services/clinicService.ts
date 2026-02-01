@@ -3,7 +3,7 @@
 import { apiClient } from './apiClient';
 import type { Clinic } from '../types';
 
-// Hardcoded clinic ID as per requirements
+// clinic ID as per requirements
 const CLINIC_ID = '92c7233d-212c-4a5a-85f3-02994d99eee4';
 
 export const clinicService = {
