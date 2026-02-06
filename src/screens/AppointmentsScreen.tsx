@@ -1,32 +1,48 @@
 import { useState, useEffect } from 'react';
-import { Input, Button, Modal, DatePicker, Select, SelectItem } from '../components/ui';
+import {
+  Input,
+  Button,
+  Modal,
+  DatePicker,
+  Select,
+  SelectItem,
+} from '../components/ui';
 import { Card, CardContent } from '../components/ui/Card';
 import { appointmentService } from '../services/appointmentService';
 import { patientService } from '../services/patientService';
 import { toast } from '../utils/toast';
 import type { Appointment, ClinicDoctor, Patient } from '../types';
 import { clinicService } from '../services/clinicService';
-import { validatePhoneNumber, formatPhoneInput } from '../utils/phoneValidation';
-import { extractValidationErrors, getErrorMessage, hasValidationErrors } from '../utils/errorHandler';
+import {
+  validatePhoneNumber,
+  formatPhoneInput,
+} from '../utils/phoneValidation';
+import {
+  extractValidationErrors,
+  getErrorMessage,
+  hasValidationErrors,
+} from '../utils/errorHandler';
 
 export default function AppointmentsScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [appointments, setAppointments] = useState<Appointment[]>([]);
-  const [filteredAppointments, setFilteredAppointments] = useState<Appointment[]>([]);
+  const [filteredAppointments, setFilteredAppointments] = useState<
+    Appointment[]
+  >([]);
   const [loading, setLoading] = useState(true);
-  
+
   // Date filter - default to today
   const [selectedDate, setSelectedDate] = useState<string>(() => {
     const today = new Date();
     return today.toISOString().split('T')[0]; // YYYY-MM-DD format
   });
-  
+
   // Doctor filter
   const [selectedDoctorFilter, setSelectedDoctorFilter] = useState<string>('');
-  
+
   // Doctors list
   const [doctors, setDoctors] = useState<ClinicDoctor[]>([]);
-  
+
   // Modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [step, setStep] = useState<'mobile' | 'patient-form'>('mobile');
@@ -74,7 +90,7 @@ export default function AppointmentsScreen() {
     const filtered = appointments.filter((appointment) => {
       const nameMatch = appointment.name?.toLowerCase().includes(query);
       const mobileMatch = appointment.mobile_number?.includes(query);
-      
+
       return nameMatch || mobileMatch;
     });
 
@@ -88,19 +104,20 @@ export default function AppointmentsScreen() {
         date: selectedDate,
         doctorId: selectedDoctorFilter,
       });
-      
+
       // Handle "all" value for doctor filter
-      const doctorId = selectedDoctorFilter && selectedDoctorFilter !== 'all' 
-        ? selectedDoctorFilter 
-        : undefined;
-      
+      const doctorId =
+        selectedDoctorFilter && selectedDoctorFilter !== 'all'
+          ? selectedDoctorFilter
+          : undefined;
+
       const result = await appointmentService.getAllAppointments(
-        1, 
-        50, 
+        1,
+        50,
         selectedDate,
-        doctorId
+        doctorId,
       );
-      
+
       console.log('📊 Appointments loaded:', result.appointments.length);
       setAppointments(result.appointments);
       setFilteredAppointments(result.appointments);
@@ -132,17 +149,19 @@ export default function AppointmentsScreen() {
   const handleSearchPatient = async () => {
     const phoneValidation = validatePhoneNumber(mobileNumber);
     if (!phoneValidation.isValid) {
-      setErrors({ mobile: phoneValidation.error || 'Please enter a valid mobile number' });
+      setErrors({
+        mobile: phoneValidation.error || 'Please enter a valid mobile number',
+      });
       return;
     }
 
     try {
       setSearching(true);
       setErrors({});
-      
+
       console.log('🔍 Searching for patient with mobile:', mobileNumber);
       const searchResults = await patientService.search(mobileNumber);
-      
+
       if (searchResults.length > 0) {
         // Patient found - use the first match and prefill form data
         const patient = searchResults[0];
@@ -181,7 +200,8 @@ export default function AppointmentsScreen() {
     }
     const phoneValidation = validatePhoneNumber(newPatient.mobile);
     if (!phoneValidation.isValid) {
-      newErrors.mobile = phoneValidation.error || 'Please enter a valid mobile number';
+      newErrors.mobile =
+        phoneValidation.error || 'Please enter a valid mobile number';
     }
     if (!newPatient.gender) {
       newErrors.gender = 'Gender is required';
@@ -214,18 +234,21 @@ export default function AppointmentsScreen() {
     try {
       // Map gender to API format
       const gender = newPatient.gender === 'M' ? 'MALE' : 'FEMALE';
-      
+
       // Get doctor ID (use selected or first doctor if only one)
-      const doctorId = selectedDoctorId || (doctors.length === 1 ? doctors[0].id : '');
-      
+      const doctorId =
+        selectedDoctorId || (doctors.length === 1 ? doctors[0].id : '');
+
       if (!doctorId) {
         toast.error('Please select a doctor');
         return;
       }
 
       // Convert datetime-local format to ISO format
-      const isoDateTime = appointmentDateTime ? new Date(appointmentDateTime).toISOString() : '';
-      
+      const isoDateTime = appointmentDateTime
+        ? new Date(appointmentDateTime).toISOString()
+        : '';
+
       if (!isoDateTime) {
         toast.error('Invalid appointment date/time');
         return;
@@ -247,27 +270,27 @@ export default function AppointmentsScreen() {
       console.log('✅ Appointment created:', appointment.id);
       toast.success('Appointment created successfully!');
       setIsModalOpen(false);
-      
+
       // Reload appointments
       await loadAppointments();
     } catch (error: any) {
       console.error('❌ Failed to create appointment:', error);
-      
+
       // Extract validation errors if present
       if (hasValidationErrors(error)) {
         const validationErrors = extractValidationErrors(error);
-        
+
         // Set form field errors
-        setErrors(prevErrors => ({
+        setErrors((prevErrors) => ({
           ...prevErrors,
           ...validationErrors,
         }));
-        
+
         // Also set doctor error if present (for doctor select field)
         if (validationErrors.doctor) {
           setDoctorError(validationErrors.doctor);
         }
-        
+
         // Show general error message
         toast.error(getErrorMessage(error));
       } else {
@@ -277,10 +300,16 @@ export default function AppointmentsScreen() {
     }
   };
 
-  const handleMarkCheckIn = async (appointmentId: string, e: React.MouseEvent) => {
+  const handleMarkCheckIn = async (
+    appointmentId: string,
+    e: React.MouseEvent,
+  ) => {
     e.stopPropagation(); // Prevent card click
     try {
-      const updated = await appointmentService.updateStatus(appointmentId, 'CHECKED_IN');
+      const updated = await appointmentService.updateStatus(
+        appointmentId,
+        'CHECKED_IN',
+      );
       if (updated) {
         toast.success('Appointment marked as checked in');
         await loadAppointments(); // Reload to refresh the list
@@ -339,14 +368,19 @@ export default function AppointmentsScreen() {
         <div className="mb-4 md:mb-6">
           <div className="flex items-start justify-between gap-3 mb-3">
             <div className="flex-1 min-w-0">
-              <h1 className="text-xl md:text-3xl font-bold text-teal-900">Appointments</h1>
+              <h1 className="text-xl md:text-3xl font-bold text-teal-900">
+                Appointments
+              </h1>
               <p className="text-xs md:text-base text-gray-600 mt-1">
-                {filteredAppointments.length} {filteredAppointments.length === 1 ? 'appointment' : 'appointments'}
+                {filteredAppointments.length}{' '}
+                {filteredAppointments.length === 1
+                  ? 'appointment'
+                  : 'appointments'}
                 {searchQuery && ` found`}
               </p>
             </div>
-            <Button 
-              onClick={handleCreateAppointment} 
+            <Button
+              onClick={handleCreateAppointment}
               className="flex-shrink-0 text-sm md:text-base px-3 md:px-4"
               size="sm"
             >
@@ -374,7 +408,7 @@ export default function AppointmentsScreen() {
               className="w-full text-sm"
             />
           </div>
-          
+
           {/* Doctor Filter */}
           {doctors.length > 0 && (
             <div className="sm:w-48 md:w-56">
@@ -408,7 +442,7 @@ export default function AppointmentsScreen() {
                     <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-teal-500 to-teal-600 rounded-full flex items-center justify-center text-white font-bold text-base md:text-lg flex-shrink-0">
                       {appointment.name?.charAt(0).toUpperCase() || '?'}
                     </div>
-                    
+
                     {/* Main Content */}
                     <div className="flex-1 min-w-0">
                       {/* Mobile View - Stacked */}
@@ -418,38 +452,43 @@ export default function AppointmentsScreen() {
                           <h3 className="text-base font-semibold text-gray-900 truncate flex-1">
                             {appointment.name || 'Unknown'}
                           </h3>
-                          <span className={`px-2 py-1 rounded-full text-xs font-semibold flex-shrink-0 ${getStatusColor(appointment.appointment_status)}`}>
+                          <span
+                            className={`px-2 py-1 rounded-full text-xs font-semibold flex-shrink-0 ${getStatusColor(appointment.appointment_status)}`}
+                          >
                             {getStatusLabel(appointment.appointment_status)}
                           </span>
                         </div>
-                        
+
                         {/* Mobile Number */}
                         {appointment.mobile_number && (
                           <div className="text-sm text-gray-600">
                             📱 {appointment.mobile_number}
                           </div>
                         )}
-                        
+
                         {/* Doctor */}
                         {appointment.doctor && (
                           <div className="text-sm text-gray-600">
                             👨‍⚕️ {appointment.doctor.name}
                           </div>
                         )}
-                        
+
                         {/* Appointment Time */}
                         {appointment.appointment_date_time && (
                           <div className="text-sm text-gray-600">
-                            🕐 {formatDateTime(appointment.appointment_date_time)}
+                            🕐{' '}
+                            {formatDateTime(appointment.appointment_date_time)}
                           </div>
                         )}
-                        
+
                         {/* Check In Button - Mobile */}
                         {appointment.appointment_status === 'WAITING' && (
                           <div className="pt-1">
                             <Button
                               size="sm"
-                              onClick={(e) => handleMarkCheckIn(appointment.id, e)}
+                              onClick={(e) =>
+                                handleMarkCheckIn(appointment.id, e)
+                              }
                               className="w-full"
                             >
                               Mark Check In
@@ -457,7 +496,7 @@ export default function AppointmentsScreen() {
                           </div>
                         )}
                       </div>
-                      
+
                       {/* Desktop View - Column-based layout */}
                       <div className="hidden md:flex items-center gap-4 w-full">
                         <div className="flex-1 min-w-0 grid grid-cols-[minmax(150px,1fr)_minmax(120px,auto)_minmax(180px,auto)_minmax(200px,auto)] gap-4 items-center">
@@ -467,44 +506,57 @@ export default function AppointmentsScreen() {
                               {appointment.name || 'Unknown'}
                             </h3>
                           </div>
-                          
+
                           {/* Mobile Column */}
                           <div className="min-w-0">
                             {appointment.mobile_number ? (
-                              <span className="text-sm text-gray-600 whitespace-nowrap">📱 {appointment.mobile_number}</span>
+                              <span className="text-sm text-gray-600 whitespace-nowrap">
+                                📱 {appointment.mobile_number}
+                              </span>
                             ) : (
                               <span className="text-sm text-gray-400">—</span>
                             )}
                           </div>
-                          
+
                           {/* Doctor Column */}
                           <div className="min-w-0">
                             {appointment.doctor ? (
-                              <span className="text-sm text-gray-600 whitespace-nowrap">👨‍⚕️ {appointment.doctor.name}</span>
+                              <span className="text-sm text-gray-600 whitespace-nowrap">
+                                👨‍⚕️ {appointment.doctor.name}
+                              </span>
                             ) : (
                               <span className="text-sm text-gray-400">—</span>
                             )}
                           </div>
-                          
+
                           {/* Appointment Time Column */}
                           <div className="min-w-0">
                             {appointment.appointment_date_time ? (
-                              <span className="text-sm text-gray-600 whitespace-nowrap">🕐 {formatDateTime(appointment.appointment_date_time)}</span>
+                              <span className="text-sm text-gray-600 whitespace-nowrap">
+                                🕐{' '}
+                                {formatDateTime(
+                                  appointment.appointment_date_time,
+                                )}
+                              </span>
                             ) : (
                               <span className="text-sm text-gray-400">—</span>
                             )}
                           </div>
                         </div>
-                        
+
                         {/* Status Badge and Check In Button - Desktop */}
                         <div className="flex items-center gap-3 flex-shrink-0">
-                          <span className={`px-3 py-1.5 rounded-full text-xs font-semibold ${getStatusColor(appointment.appointment_status)}`}>
+                          <span
+                            className={`px-3 py-1.5 rounded-full text-xs font-semibold ${getStatusColor(appointment.appointment_status)}`}
+                          >
                             {getStatusLabel(appointment.appointment_status)}
                           </span>
                           {appointment.appointment_status === 'WAITING' && (
                             <Button
                               size="sm"
-                              onClick={(e) => handleMarkCheckIn(appointment.id, e)}
+                              onClick={(e) =>
+                                handleMarkCheckIn(appointment.id, e)
+                              }
                               className="whitespace-nowrap"
                             >
                               Mark Check In
@@ -524,12 +576,16 @@ export default function AppointmentsScreen() {
               <div className="text-gray-500">
                 {searchQuery ? (
                   <>
-                    <p className="text-lg font-medium mb-2">No appointments found</p>
+                    <p className="text-lg font-medium mb-2">
+                      No appointments found
+                    </p>
                     <p className="text-sm">Try a different search term</p>
                   </>
                 ) : (
                   <>
-                    <p className="text-lg font-medium mb-2">No appointments yet</p>
+                    <p className="text-lg font-medium mb-2">
+                      No appointments yet
+                    </p>
                     <p className="text-sm">Appointments will appear here</p>
                   </>
                 )}
@@ -543,25 +599,38 @@ export default function AppointmentsScreen() {
       <Modal
         open={isModalOpen}
         onOpenChange={setIsModalOpen}
-        title={step === 'mobile' ? 'Create Appointment' : foundPatient ? 'Create Appointment - Patient Found' : 'Create Appointment - New Patient'}
+        title={
+          step === 'mobile'
+            ? 'Create Appointment'
+            : foundPatient
+              ? 'Create Appointment - Patient Found'
+              : 'Create Appointment - New Patient'
+        }
         size="lg"
         footer={
           <>
-            <Button variant="outline" onClick={() => {
-              if (step === 'patient-form') {
-                setStep('mobile');
-                setErrors({});
-              } else {
-                setIsModalOpen(false);
-              }
-            }}>
+            <Button
+              variant="outline"
+              onClick={() => {
+                if (step === 'patient-form') {
+                  setStep('mobile');
+                  setErrors({});
+                } else {
+                  setIsModalOpen(false);
+                }
+              }}
+            >
               {step === 'mobile' ? 'Cancel' : 'Back'}
             </Button>
-            <Button 
+            <Button
               onClick={handleCreateAppointmentSubmit}
               disabled={searching}
             >
-              {searching ? 'Searching...' : step === 'mobile' ? 'Search' : 'Create Appointment'}
+              {searching
+                ? 'Searching...'
+                : step === 'mobile'
+                  ? 'Search'
+                  : 'Create Appointment'}
             </Button>
           </>
         }
@@ -587,40 +656,51 @@ export default function AppointmentsScreen() {
                 }}
               />
               <p className="text-sm text-gray-600">
-                Enter the patient's mobile number to search. If the patient exists, we'll use their information. Otherwise, you'll be asked to enter their details.
+                Enter the patient's mobile number to search. If the patient
+                exists, we'll use their information. Otherwise, you'll be asked
+                to enter their details.
               </p>
             </>
           ) : (
             <>
               {foundPatient && (
                 <div className="p-3 bg-teal-50 border border-teal-200 rounded-lg mb-4">
-                  <p className="text-sm text-teal-800 font-medium">✓ Patient found in database</p>
+                  <p className="text-sm text-teal-800 font-medium">
+                    ✓ Patient found in database
+                  </p>
                   <p className="text-xs text-teal-600 mt-1">
                     {foundPatient.name} • {foundPatient.mobile}
                   </p>
                 </div>
               )}
-              
+
               <Input
                 label="Name *"
                 value={newPatient.name}
-                onChange={(e) => setNewPatient({ ...newPatient, name: e.target.value })}
+                onChange={(e) =>
+                  setNewPatient({ ...newPatient, name: e.target.value })
+                }
                 error={errors.name}
                 placeholder="Enter patient name"
                 disabled={!!foundPatient}
                 autoFocus={!foundPatient}
               />
-              
+
               <Input
                 label="Mobile *"
                 type="tel"
                 value={newPatient.mobile}
-                onChange={(e) => setNewPatient({ ...newPatient, mobile: formatPhoneInput(e.target.value) })}
+                onChange={(e) =>
+                  setNewPatient({
+                    ...newPatient,
+                    mobile: formatPhoneInput(e.target.value),
+                  })
+                }
                 error={errors.mobile}
                 placeholder="Enter mobile number (e.g., +91 9876543210)"
                 disabled={!!foundPatient}
               />
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Gender *
@@ -632,7 +712,12 @@ export default function AppointmentsScreen() {
                       name="gender"
                       value="M"
                       checked={newPatient.gender === 'M'}
-                      onChange={(e) => setNewPatient({ ...newPatient, gender: e.target.value as 'M' | 'F' })}
+                      onChange={(e) =>
+                        setNewPatient({
+                          ...newPatient,
+                          gender: e.target.value as 'M' | 'F',
+                        })
+                      }
                       className="mr-2"
                       disabled={!!foundPatient}
                     />
@@ -644,7 +729,12 @@ export default function AppointmentsScreen() {
                       name="gender"
                       value="F"
                       checked={newPatient.gender === 'F'}
-                      onChange={(e) => setNewPatient({ ...newPatient, gender: e.target.value as 'M' | 'F' })}
+                      onChange={(e) =>
+                        setNewPatient({
+                          ...newPatient,
+                          gender: e.target.value as 'M' | 'F',
+                        })
+                      }
                       className="mr-2"
                       disabled={!!foundPatient}
                     />
@@ -701,7 +791,9 @@ export default function AppointmentsScreen() {
                   min={new Date().toISOString().slice(0, 16)}
                 />
                 {errors.appointmentDateTime && (
-                  <p className="mt-1 text-sm text-red-600">{errors.appointmentDateTime}</p>
+                  <p className="mt-1 text-sm text-red-600">
+                    {errors.appointmentDateTime}
+                  </p>
                 )}
               </div>
             </>

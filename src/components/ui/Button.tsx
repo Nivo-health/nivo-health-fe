@@ -2,15 +2,23 @@ import * as React from 'react';
 import * as Slot from '@radix-ui/react-slot';
 import { cn } from '../../utils/cn';
 
-export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   asChild?: boolean;
   variant?: 'default' | 'outline' | 'ghost' | 'destructive';
   size?: 'default' | 'sm' | 'lg';
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant = 'default', size = 'default', asChild = false, ...props }, ref) => {
+  (
+    {
+      className,
+      variant = 'default',
+      size = 'default',
+      asChild = false,
+      ...props
+    },
+    ref,
+  ) => {
     const Comp = asChild ? Slot.Root : 'button';
     return (
       <Comp
@@ -33,12 +41,13 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             size === 'sm' && 'h-9 px-3 text-xs',
             size === 'lg' && 'h-11 px-5 text-base',
             className,
-          ))}
+          ),
+        )}
         ref={ref}
         {...props}
       />
     );
-  }
+  },
 );
 Button.displayName = 'Button';
 

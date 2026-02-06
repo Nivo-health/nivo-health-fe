@@ -12,7 +12,12 @@ const navItems: NavItem[] = [
     name: 'Home',
     path: '/',
     icon: (
-      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg
+        className="w-6 h-6"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -26,7 +31,12 @@ const navItems: NavItem[] = [
     name: 'Appointments',
     path: '/appointments',
     icon: (
-      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg
+        className="w-6 h-6"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -40,7 +50,12 @@ const navItems: NavItem[] = [
     name: 'Queue',
     path: '/visits',
     icon: (
-      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg
+        className="w-6 h-6"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -54,7 +69,12 @@ const navItems: NavItem[] = [
     name: 'Patients',
     path: '/patients',
     icon: (
-      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg
+        className="w-6 h-6"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -68,7 +88,12 @@ const navItems: NavItem[] = [
     name: 'Settings',
     path: '/settings',
     icon: (
-      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg
+        className="w-6 h-6"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -107,13 +132,13 @@ export default function BottomNav() {
               'flex flex-col items-center justify-center flex-1 h-full transition-colors',
               isActive(item.path)
                 ? 'text-teal-600'
-                : 'text-gray-500 hover:text-teal-600'
+                : 'text-gray-500 hover:text-teal-600',
             )}
           >
             <div
               className={cn(
                 'flex items-center justify-center mb-1',
-                isActive(item.path) && 'text-teal-600'
+                isActive(item.path) && 'text-teal-600',
               )}
             >
               {item.icon}

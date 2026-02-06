@@ -1,4 +1,9 @@
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '../components/ui/Card';
 
 export default function StatsScreen() {
   return (

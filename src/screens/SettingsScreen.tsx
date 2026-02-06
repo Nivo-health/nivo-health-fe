@@ -1,5 +1,10 @@
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '../components/ui/Card';
 import { Input, Button } from '../components/ui';
 import { useClinic } from '../hooks/useClinic';
 import { authService } from '../services/authService';
@@ -29,7 +34,9 @@ export default function SettingsScreen() {
           </CardHeader>
           <CardContent className="pt-6 space-y-4">
             {loading ? (
-              <div className="text-sm text-gray-600">Loading clinic data...</div>
+              <div className="text-sm text-gray-600">
+                Loading clinic data...
+              </div>
             ) : (
               <>
                 <Input

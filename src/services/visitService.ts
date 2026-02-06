@@ -8,15 +8,19 @@ export const visitService = {
   mapApiVisitToVisit(apiVisit: any, fallbackPatientId?: string): Visit {
     return {
       id: apiVisit.id,
-      patientId: apiVisit.patient?.id || apiVisit.patient_id || fallbackPatientId || '',
-      date: apiVisit.visit_date || apiVisit.created_at || new Date().toISOString(),
+      patientId:
+        apiVisit.patient?.id || apiVisit.patient_id || fallbackPatientId || '',
+      date:
+        apiVisit.visit_date || apiVisit.created_at || new Date().toISOString(),
       status: this.mapVisitStatus(apiVisit.visit_status),
       // Notes saved from ConsultationScreen (if backend returns them)
       notes: apiVisit.notes || undefined,
       prescription: undefined,
       followUp: undefined,
       // New API fields
-      patient: apiVisit.patient ? this.mapApiPatientToPatient(apiVisit.patient) : undefined,
+      patient: apiVisit.patient
+        ? this.mapApiPatientToPatient(apiVisit.patient)
+        : undefined,
       clinic_id: apiVisit.clinic_id,
       doctor_id: apiVisit.doctor_id,
       visit_reason: apiVisit.visit_reason,
@@ -33,23 +37,28 @@ export const visitService = {
    * Create a new visit
    * POST /api/visits
    */
-  async create(visitData: { 
-    patientId: string; 
+  async create(visitData: {
+    patientId: string;
     visitReason?: string;
     status?: 'waiting' | 'in_progress' | 'completed';
     doctorId?: string;
   }): Promise<Visit> {
     try {
       // Map status to API format
-      const visitStatusMap: Record<string, 'WAITING' | 'IN_PROGRESS' | 'COMPLETED'> = {
-        'waiting': 'WAITING',
-        'in_progress': 'IN_PROGRESS',
-        'completed': 'COMPLETED',
+      const visitStatusMap: Record<
+        string,
+        'WAITING' | 'IN_PROGRESS' | 'COMPLETED'
+      > = {
+        waiting: 'WAITING',
+        in_progress: 'IN_PROGRESS',
+        completed: 'COMPLETED',
       };
-      const visitStatus = visitStatusMap[visitData.status || 'waiting'] || 'WAITING';
+      const visitStatus =
+        visitStatusMap[visitData.status || 'waiting'] || 'WAITING';
 
       // Prefer doctorId passed from caller; fall back to legacy hardcoded ID for safety
-      const doctorId = visitData.doctorId || '948cfcaf-5295-431c-b531-76ff875b2dae';
+      const doctorId =
+        visitData.doctorId || '948cfcaf-5295-431c-b531-76ff875b2dae';
 
       // Backend will get clinic_id from cookie
       const apiRequestData = {
@@ -66,14 +75,19 @@ export const visitService = {
       if (!response.success || !response.data) {
         console.error('❌ Failed to create visit:', response.error);
         // Create error object with details for validation errors
-        const error: any = new Error(response.error?.message || 'Failed to create visit');
+        const error: any = new Error(
+          response.error?.message || 'Failed to create visit',
+        );
         error.code = response.error?.code;
         error.details = response.error?.details;
         throw error;
       }
 
       const apiVisit = response.data;
-      const mappedVisit: Visit = this.mapApiVisitToVisit(apiVisit, visitData.patientId);
+      const mappedVisit: Visit = this.mapApiVisitToVisit(
+        apiVisit,
+        visitData.patientId,
+      );
 
       console.log('✅ Visit created successfully:', mappedVisit);
       return mappedVisit;
@@ -101,7 +115,7 @@ export const visitService = {
    */
   async getByPatientId(
     patientId: string,
-    limit: number = 50
+    limit: number = 50,
   ): Promise<Visit[]> {
     const response = await apiClient.get<any[]>(`/visits/patient/${patientId}`);
 
@@ -132,7 +146,7 @@ export const visitService = {
   async updateNotes(id: string, notes: string): Promise<Visit | null> {
     const response = await apiClient.patch<{ id: string; notes: string }>(
       `/visits/${id}/notes`,
-      { notes }
+      { notes },
     );
 
     if (!response.success) {
@@ -149,15 +163,15 @@ export const visitService = {
    */
   async updatePrescription(
     id: string,
-    prescription: Visit['prescription']
+    prescription: Visit['prescription'],
   ): Promise<Visit | null> {
-    const response = await apiClient.patch<{ id: string; prescription: Visit['prescription'] }>(
-      `/visits/${id}/prescription`,
-      {
-        medicines: prescription?.medicines || [],
-        followUp: prescription?.followUp || null,
-      }
-    );
+    const response = await apiClient.patch<{
+      id: string;
+      prescription: Visit['prescription'];
+    }>(`/visits/${id}/prescription`, {
+      medicines: prescription?.medicines || [],
+      followUp: prescription?.followUp || null,
+    });
 
     if (!response.success) {
       return null;
@@ -171,20 +185,23 @@ export const visitService = {
    * Update visit status
    * PUT /api/visits/:visitId
    */
-  async updateStatus(id: string, status: 'waiting' | 'in_progress' | 'completed'): Promise<Visit | null> {
+  async updateStatus(
+    id: string,
+    status: 'waiting' | 'in_progress' | 'completed',
+  ): Promise<Visit | null> {
     try {
       // Map frontend status to API format
-      const statusMap: Record<string, 'WAITING' | 'IN_PROGRESS' | 'COMPLETED'> = {
-        'waiting': 'WAITING',
-        'in_progress': 'IN_PROGRESS',
-        'completed': 'COMPLETED',
-      };
+      const statusMap: Record<string, 'WAITING' | 'IN_PROGRESS' | 'COMPLETED'> =
+        {
+          waiting: 'WAITING',
+          in_progress: 'IN_PROGRESS',
+          completed: 'COMPLETED',
+        };
       const apiStatus = statusMap[status] || 'WAITING';
 
-      const response = await apiClient.put<any>(
-        `/visits/${id}`,
-        { visit_status: apiStatus }
-      );
+      const response = await apiClient.put<any>(`/visits/${id}`, {
+        visit_status: apiStatus,
+      });
 
       if (!response.success || !response.data) {
         console.error('❌ Failed to update visit status:', response.error);
@@ -228,7 +245,7 @@ export const visitService = {
   async complete(id: string): Promise<Visit | null> {
     const response = await apiClient.patch<{ id: string; status: 'completed' }>(
       `/visits/${id}/complete`,
-      { status: 'completed' }
+      { status: 'completed' },
     );
 
     if (!response.success) {
@@ -244,12 +261,17 @@ export const visitService = {
    * GET /api/visits/all/visit?page=1&page_size=20&date=DD-MM-YYYY&visit_status=WAITING&doctor_id=uuid
    */
   async getAllVisits(
-    page: number = 1, 
-    pageSize: number = 20, 
+    page: number = 1,
+    pageSize: number = 20,
     date?: string,
     visitStatus?: 'WAITING' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED',
-    doctorId?: string
-  ): Promise<{ visits: Visit[]; count: number; next: string | null; previous: string | null }> {
+    doctorId?: string,
+  ): Promise<{
+    visits: Visit[];
+    count: number;
+    next: string | null;
+    previous: string | null;
+  }> {
     try {
       const params: Record<string, string | number> = {
         page,
@@ -283,18 +305,24 @@ export const visitService = {
 
       // Handle paginated response
       const apiData = response.data;
-      const results = apiData.results || (Array.isArray(apiData) ? apiData : []);
-      
+      const results =
+        apiData.results || (Array.isArray(apiData) ? apiData : []);
+
       const visits: Visit[] = results.map((apiVisit: any) => ({
         id: apiVisit.id,
         patientId: apiVisit.patient?.id || '',
-        date: apiVisit.visit_date || apiVisit.created_at || new Date().toISOString(),
+        date:
+          apiVisit.visit_date ||
+          apiVisit.created_at ||
+          new Date().toISOString(),
         status: this.mapVisitStatus(apiVisit.visit_status),
         notes: undefined,
         prescription: undefined,
         followUp: undefined,
         // New API fields
-        patient: apiVisit.patient ? this.mapApiPatientToPatient(apiVisit.patient) : undefined,
+        patient: apiVisit.patient
+          ? this.mapApiPatientToPatient(apiVisit.patient)
+          : undefined,
         clinic_id: apiVisit.clinic_id,
         doctor_id: apiVisit.doctor_id,
         visit_reason: apiVisit.visit_reason,
@@ -302,7 +330,8 @@ export const visitService = {
         visit_date: apiVisit.visit_date,
         created_at: apiVisit.created_at,
         updated_at: apiVisit.updated_at,
-        token_number: apiVisit.token_number || apiVisit.tokenNumber || undefined,
+        token_number:
+          apiVisit.token_number || apiVisit.tokenNumber || undefined,
       }));
 
       return {
@@ -320,7 +349,9 @@ export const visitService = {
   /**
    * Map API visit status to our format
    */
-  mapVisitStatus(apiStatus: string | undefined): 'waiting' | 'in_progress' | 'completed' {
+  mapVisitStatus(
+    apiStatus: string | undefined,
+  ): 'waiting' | 'in_progress' | 'completed' {
     if (!apiStatus) return 'waiting';
     const upper = apiStatus.toUpperCase();
     if (upper === 'WAITING') return 'waiting';
@@ -333,7 +364,9 @@ export const visitService = {
    * Map API patient to Patient format
    */
   mapApiPatientToPatient(apiPatient: any): Patient {
-    const mapGender = (apiGender: string | undefined): 'M' | 'F' | undefined => {
+    const mapGender = (
+      apiGender: string | undefined,
+    ): 'M' | 'F' | undefined => {
       if (!apiGender) return undefined;
       const upper = apiGender.toUpperCase();
       if (upper === 'MALE' || upper === 'M') return 'M';
@@ -343,7 +376,11 @@ export const visitService = {
 
     // Only use apiPatient.age if provided - do not calculate from date_of_birth
     let age: number | undefined = undefined;
-    if (apiPatient.age !== undefined && apiPatient.age !== null && typeof apiPatient.age === 'number') {
+    if (
+      apiPatient.age !== undefined &&
+      apiPatient.age !== null &&
+      typeof apiPatient.age === 'number'
+    ) {
       age = apiPatient.age;
     }
 
@@ -353,7 +390,10 @@ export const visitService = {
       mobile: apiPatient.mobile_number || apiPatient.mobile || '',
       age: age,
       gender: mapGender(apiPatient.gender),
-      createdAt: apiPatient.created_at || apiPatient.createdAt || new Date().toISOString(),
+      createdAt:
+        apiPatient.created_at ||
+        apiPatient.createdAt ||
+        new Date().toISOString(),
     };
   },
 };

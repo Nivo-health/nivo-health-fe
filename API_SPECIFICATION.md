@@ -1,27 +1,32 @@
 # Clinic OPD Management System - API Specification
 
 ## Base URL
+
 ```
 /api/v1
 ```
 
 ## Authentication
-*Note: Based on requirements, no login is needed. If authentication is required later, add JWT tokens.*
+
+_Note: Based on requirements, no login is needed. If authentication is required later, add JWT tokens._
 
 ---
 
 ## 1. Patient APIs
 
 ### 1.1 Search Patients
+
 **GET** `/patients/search`
 
 Search patients by name or mobile number.
 
 **Query Parameters:**
+
 - `q` (string, required): Search query (minimum 2-3 characters)
 - `limit` (number, optional): Number of results (default: 20)
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -40,11 +45,13 @@ Search patients by name or mobile number.
 ```
 
 ### 1.2 Get Patient by ID
+
 **GET** `/patients/:patientId`
 
 Get patient details by ID.
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -60,11 +67,13 @@ Get patient details by ID.
 ```
 
 ### 1.3 Create New Patient
+
 **POST** `/patients`
 
 Create a new patient record.
 
 **Request Body:**
+
 ```json
 {
   "name": "Ramesh Patil",
@@ -75,6 +84,7 @@ Create a new patient record.
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -90,14 +100,17 @@ Create a new patient record.
 ```
 
 ### 1.4 Get Recent Patients
+
 **GET** `/patients/recent`
 
 Get recently visited patients (for quick access).
 
 **Query Parameters:**
+
 - `limit` (number, optional): Number of results (default: 10)
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -117,11 +130,13 @@ Get recently visited patients (for quick access).
 ## 2. Visit APIs
 
 ### 2.1 Create New Visit
+
 **POST** `/visits`
 
 Create a new visit for a patient. This is called when a new patient is registered or when starting a new visit.
 
 **Request Body:**
+
 ```json
 {
   "patientId": "patient_123",
@@ -131,11 +146,13 @@ Create a new visit for a patient. This is called when a new patient is registere
 ```
 
 **Request Body Parameters:**
+
 - `patientId` (string, required): Patient ID
 - `date` (string, optional): Visit date (ISO 8601 format). Defaults to current timestamp if not provided.
 - `status` (string, optional): Visit status. One of: `'waiting'`, `'in_progress'`, `'completed'`. Defaults to `'waiting'` if not provided.
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -152,11 +169,13 @@ Create a new visit for a patient. This is called when a new patient is registere
 ```
 
 ### 2.2 Get Visit by ID
+
 **GET** `/visits/:visitId`
 
 Get visit details including prescription.
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -186,15 +205,18 @@ Get visit details including prescription.
 ```
 
 ### 2.3 Get Patient Visit History
+
 **GET** `/visits/patient/:patientId`
 
 Get all visits for a specific patient (for visit history display).
 
 **Query Parameters:**
+
 - `limit` (number, optional): Number of results (default: 20)
 - `status` (string, optional): Filter by status ('waiting' | 'in_progress' | 'completed')
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -216,11 +238,13 @@ Get all visits for a specific patient (for visit history display).
 ```
 
 ### 2.4 Update Visit Notes
+
 **PATCH** `/visits/:visitId/notes`
 
 Update consultation notes for a visit (auto-save functionality).
 
 **Request Body:**
+
 ```json
 {
   "notes": "Patient complains of pain in the lower back..."
@@ -228,6 +252,7 @@ Update consultation notes for a visit (auto-save functionality).
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -239,11 +264,13 @@ Update consultation notes for a visit (auto-save functionality).
 ```
 
 ### 2.5 Update Visit Prescription
+
 **PATCH** `/visits/:visitId/prescription`
 
 Save or update prescription for a visit.
 
 **Request Body:**
+
 ```json
 {
   "medicines": [
@@ -262,6 +289,7 @@ Save or update prescription for a visit.
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -287,11 +315,13 @@ Save or update prescription for a visit.
 ```
 
 ### 2.6 Update Visit Status
+
 **PATCH** `/visits/:visitId/status`
 
 Update the status of a visit. Used to transition visits through the workflow: waiting → in_progress → completed.
 
 **Request Body:**
+
 ```json
 {
   "status": "in_progress"
@@ -299,9 +329,11 @@ Update the status of a visit. Used to transition visits through the workflow: wa
 ```
 
 **Request Body Parameters:**
+
 - `status` (string, required): New visit status. Must be one of: `'waiting'`, `'in_progress'`, `'completed'`.
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -313,11 +345,13 @@ Update the status of a visit. Used to transition visits through the workflow: wa
 ```
 
 ### 2.7 Get Waiting Visits
+
 **GET** `/visits/waiting`
 
 Get all visits with status "waiting", sorted by date (oldest first). Used by doctors to get the next patient in queue.
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -345,11 +379,13 @@ Get all visits with status "waiting", sorted by date (oldest first). Used by doc
 ```
 
 ### 2.8 Complete Visit
+
 **PATCH** `/visits/:visitId/complete`
 
 Mark a visit as completed and finish the consultation.
 
 **Request Body:**
+
 ```json
 {
   "status": "completed"
@@ -357,6 +393,7 @@ Mark a visit as completed and finish the consultation.
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -368,11 +405,13 @@ Mark a visit as completed and finish the consultation.
 ```
 
 ### 2.9 Get Old Visit (Read-only)
+
 **GET** `/visits/:visitId/readonly`
 
 Get a completed visit with prescription (for viewing old prescriptions).
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -406,11 +445,13 @@ Get a completed visit with prescription (for viewing old prescriptions).
 ## 3. WhatsApp APIs (Mock/Integration)
 
 ### 3.1 Send Visit Confirmation
+
 **POST** `/whatsapp/visit-confirmation`
 
 Send visit confirmation message to patient (mock implementation).
 
 **Request Body:**
+
 ```json
 {
   "patientId": "patient_123",
@@ -420,6 +461,7 @@ Send visit confirmation message to patient (mock implementation).
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -432,11 +474,13 @@ Send visit confirmation message to patient (mock implementation).
 ```
 
 ### 3.2 Send Prescription
+
 **POST** `/whatsapp/prescription`
 
 Send prescription to patient via WhatsApp (mock implementation).
 
 **Request Body:**
+
 ```json
 {
   "patientId": "patient_123",
@@ -459,6 +503,7 @@ Send prescription to patient via WhatsApp (mock implementation).
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -475,11 +520,13 @@ Send prescription to patient via WhatsApp (mock implementation).
 ## 4. Clinic Configuration APIs (Optional)
 
 ### 4.1 Get Clinic Information
+
 **GET** `/clinic/info`
 
 Get clinic name and other configuration.
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -522,17 +569,20 @@ All APIs return errors in the following format:
 ## API Usage Flow Examples
 
 ### Flow 1: New Patient Registration & Visit (Receptionist)
+
 1. `POST /patients` - Create patient
 2. `POST /visits` - Create visit with status='waiting' for new patient
 3. `GET /visits/:visitId` - Load visit context
 
 ### Flow 2: Existing Patient Visit (Receptionist)
+
 1. `GET /patients/search?q=ramesh` - Search patient
 2. `GET /visits/patient/:patientId` - Get visit history
 3. `POST /visits` - Create new visit with status='waiting'
 4. `GET /visits/:visitId` - Load visit context
 
 ### Flow 3: Doctor Workflow - Auto-load Next Patient
+
 1. `GET /visits/waiting` - Get all waiting visits (sorted by date)
 2. `GET /visits/:visitId` - Load next waiting visit
 3. `PATCH /visits/:visitId/status` - Update status to 'in_progress' when starting consultation
@@ -542,6 +592,7 @@ All APIs return errors in the following format:
 7. `GET /visits/waiting` - Auto-load next waiting visit (if any)
 
 ### Flow 4: Consultation & Prescription
+
 1. `PATCH /visits/:visitId/status` - Update status to 'in_progress' (if waiting)
 2. `PATCH /visits/:visitId/notes` - Save consultation notes
 3. `PATCH /visits/:visitId/prescription` - Save prescription
@@ -549,6 +600,7 @@ All APIs return errors in the following format:
 5. `POST /whatsapp/prescription` - Send prescription (optional)
 
 ### Flow 5: View Old Prescription
+
 1. `GET /visits/:visitId/readonly` - Get old visit details
 
 ## Visit Status Flow
@@ -560,6 +612,7 @@ The visit status transitions through the following states:
 3. **completed**: Visit is finished, prescription saved
 
 **Status Transition Rules:**
+
 - Receptionist creates visit → status: `'waiting'`
 - Doctor starts consultation → status: `'in_progress'`
 - Doctor finishes visit → status: `'completed'`

@@ -25,11 +25,7 @@ const Modal: React.FC<ModalProps> = ({
 }) => {
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
-      {trigger && (
-        <Dialog.Trigger asChild>
-          {trigger}
-        </Dialog.Trigger>
-      )}
+      {trigger && <Dialog.Trigger asChild>{trigger}</Dialog.Trigger>}
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-50 bg-black/50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
         <Dialog.Content
@@ -43,9 +39,9 @@ const Modal: React.FC<ModalProps> = ({
                   size === 'sm' && 'md:max-w-sm',
                   size === 'md' && 'md:max-w-md',
                   size === 'lg' && 'md:max-w-2xl',
-                  size === 'xl' && 'md:max-w-4xl'
+                  size === 'xl' && 'md:max-w-4xl',
                 ),
-            size === 'fullscreen' ? 'p-8' : ''
+            size === 'fullscreen' ? 'p-8' : '',
           )}
         >
           {title && (
@@ -58,10 +54,10 @@ const Modal: React.FC<ModalProps> = ({
               {description}
             </Dialog.Description>
           )}
-          <div className={cn(size === 'fullscreen' ? 'py-6' : 'py-4')}>{children}</div>
-          {footer && (
-            <div className="flex justify-end gap-2">{footer}</div>
-          )}
+          <div className={cn(size === 'fullscreen' ? 'py-6' : 'py-4')}>
+            {children}
+          </div>
+          {footer && <div className="flex justify-end gap-2">{footer}</div>}
           <Dialog.Close asChild>
             <button
               className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-white transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-teal-50 data-[state=open]:text-teal-700"

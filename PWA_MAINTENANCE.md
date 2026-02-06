@@ -5,6 +5,7 @@
 When you deploy a new version, the service worker will automatically update for users:
 
 1. **Build new version:**
+
    ```bash
    npm run build
    ```
@@ -22,16 +23,19 @@ When you deploy a new version, the service worker will automatically update for 
 ### Check Install Statistics
 
 **Chrome/Edge:**
+
 - Users who install your PWA will show up in analytics
 - Look for "standalone" display mode in analytics
 
 **iOS:**
+
 - Users who add to home screen will use the app in standalone mode
 - Track via analytics or server logs
 
 ### Browser DevTools
 
 Check PWA status:
+
 1. Open your deployed app
 2. DevTools → Application tab
 3. Check:
@@ -44,6 +48,7 @@ Check PWA status:
 ### Service Worker Not Updating
 
 If users aren't getting updates:
+
 1. Check service worker is registered
 2. Verify `registerType: 'autoUpdate'` in `vite.config.ts`
 3. Clear cache and test

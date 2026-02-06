@@ -15,12 +15,14 @@ Your Clinic OPD Management System is now configured as a Progressive Web App! Th
 ### On Mobile Devices:
 
 **Android (Chrome):**
+
 1. Open the app in Chrome browser
 2. Tap the menu (3 dots) → "Add to Home screen" or "Install app"
 3. Confirm installation
 4. The app icon will appear on your home screen
 
 **iOS (Safari):**
+
 1. Open the app in Safari
 2. Tap the Share button (square with arrow)
 3. Select "Add to Home Screen"
@@ -30,6 +32,7 @@ Your Clinic OPD Management System is now configured as a Progressive Web App! Th
 ### On Desktop:
 
 **Chrome/Edge:**
+
 1. Look for the install icon in the address bar
 2. Click "Install" when prompted
 3. The app will open in its own window
@@ -63,12 +66,14 @@ convert icon-512.png -resize 180x180 public/apple-touch-icon.png
 ### Option 3: Manual Creation
 
 Create these icon files manually:
+
 - `public/pwa-192x192.png` - 192x192 pixels
 - `public/pwa-512x512.png` - 512x512 pixels
 - `public/apple-touch-icon.png` - 180x180 pixels
 - `public/favicon.ico` - Multi-size ICO file
 
 **Icon Design Tips:**
+
 - Use your clinic logo or a medical cross icon
 - Ensure icons are clear and recognizable at small sizes
 - Use solid colors or high contrast

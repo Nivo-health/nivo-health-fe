@@ -12,7 +12,12 @@ const navItems: NavItem[] = [
     name: 'Home',
     path: '/',
     icon: (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg
+        className="w-5 h-5"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -26,7 +31,12 @@ const navItems: NavItem[] = [
     name: 'Appointments',
     path: '/appointments',
     icon: (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg
+        className="w-5 h-5"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -40,7 +50,12 @@ const navItems: NavItem[] = [
     name: 'Queue',
     path: '/visits',
     icon: (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg
+        className="w-5 h-5"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -54,7 +69,12 @@ const navItems: NavItem[] = [
     name: 'All Patients',
     path: '/patients',
     icon: (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg
+        className="w-5 h-5"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -68,7 +88,12 @@ const navItems: NavItem[] = [
     name: 'Settings',
     path: '/settings',
     icon: (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg
+        className="w-5 h-5"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -107,7 +132,7 @@ export default function Sidebar() {
               'flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors',
               isActive(item.path)
                 ? 'bg-teal-50 text-teal-700 border border-teal-200'
-                : 'text-gray-700 hover:bg-teal-50 hover:text-teal-700'
+                : 'text-gray-700 hover:bg-teal-50 hover:text-teal-700',
             )}
           >
             {item.icon}

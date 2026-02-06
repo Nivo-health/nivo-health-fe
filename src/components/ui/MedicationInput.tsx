@@ -1,7 +1,10 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import * as Popover from '@radix-ui/react-popover';
 import { Input } from './Input';
-import { medicationService, type Medication } from '../../services/medicationService';
+import {
+  medicationService,
+  type Medication,
+} from '../../services/medicationService';
 import { cn } from '../../utils/cn';
 
 export interface MedicationInputProps {
@@ -28,7 +31,7 @@ export function MedicationInput({
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
-  
+
   const inputRef = useRef<HTMLInputElement>(null);
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -96,8 +99,8 @@ export function MedicationInput({
     switch (e.key) {
       case 'ArrowDown':
         e.preventDefault();
-        setSelectedIndex((prev) => 
-          prev < suggestions.length - 1 ? prev + 1 : prev
+        setSelectedIndex((prev) =>
+          prev < suggestions.length - 1 ? prev + 1 : prev,
         );
         break;
       case 'ArrowUp':
@@ -187,7 +190,7 @@ export function MedicationInput({
               'z-[9999] w-[var(--radix-popover-trigger-width)] max-h-60 overflow-auto rounded-md border border-teal-200 bg-white shadow-lg',
               'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
               'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2',
-              'data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2'
+              'data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
             )}
             align="start"
             sideOffset={4}
@@ -201,10 +204,12 @@ export function MedicationInput({
                   'px-4 py-3 cursor-pointer hover:bg-teal-50 transition-colors',
                   index === selectedIndex && 'bg-teal-50',
                   index === 0 && 'rounded-t-md',
-                  index === suggestions.length - 1 && 'rounded-b-md'
+                  index === suggestions.length - 1 && 'rounded-b-md',
                 )}
               >
-                <div className="font-medium text-gray-900">{medication.full_name}</div>
+                <div className="font-medium text-gray-900">
+                  {medication.full_name}
+                </div>
                 {medication.manufacturer && (
                   <div className="text-xs text-gray-500 mt-1">
                     {medication.manufacturer}

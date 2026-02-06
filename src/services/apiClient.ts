@@ -25,14 +25,21 @@ class ApiClient {
 
   constructor() {
     // Get base URL from environment variable or use default
-    this.baseURL = import.meta.env.VITE_API_BASE_URL || 'https://clinics-api-13266793207.us-central1.run.app/api';
+    this.baseURL =
+      import.meta.env.VITE_API_BASE_URL ||
+      'https://clinics-api-13266793207.us-central1.run.app/api';
   }
 
   /**
    * Build full URL with query parameters
    */
-  private buildURL(endpoint: string, params?: Record<string, string | number>): string {
-    const url = new URL(endpoint.startsWith('http') ? endpoint : `${this.baseURL}${endpoint}`);
+  private buildURL(
+    endpoint: string,
+    params?: Record<string, string | number>,
+  ): string {
+    const url = new URL(
+      endpoint.startsWith('http') ? endpoint : `${this.baseURL}${endpoint}`,
+    );
     if (params) {
       Object.entries(params).forEach(([key, value]) => {
         url.searchParams.append(key, String(value));
@@ -44,21 +51,29 @@ class ApiClient {
   /**
    * Make a GET request
    */
-  async get<T>(endpoint: string, params?: Record<string, string | number>): Promise<ApiResponse<T>> {
+  async get<T>(
+    endpoint: string,
+    params?: Record<string, string | number>,
+  ): Promise<ApiResponse<T>> {
     // Check if this is a real API endpoint that should use HTTP
     if (
       endpoint === '/clinic' || // GET /api/clinic (singular, uses cookie)
       endpoint === '/patients/all' || // GET /api/patients/all
-      endpoint.startsWith('/patients/clinic/') || 
+      endpoint.startsWith('/patients/clinic/') ||
       endpoint.startsWith('/clinics/') ||
       endpoint.startsWith('/patients/search') ||
       endpoint.startsWith('/patient/') || // /patient/:id (singular)
-      (endpoint.startsWith('/patients/') && !endpoint.startsWith('/patients/clinic/') && !endpoint.startsWith('/patients/search') && endpoint !== '/patients/all') || // fallback for /patients/:id
+      (endpoint.startsWith('/patients/') &&
+        !endpoint.startsWith('/patients/clinic/') &&
+        !endpoint.startsWith('/patients/search') &&
+        endpoint !== '/patients/all') || // fallback for /patients/:id
       endpoint === '/visits/all/visit' || // GET /api/visits/all/visit
       endpoint.startsWith('/visits/patient/') || // /visits/patient/:patientId
       endpoint.match(/^\/visits\/[^/]+$/) || // /visits/:visitId
       endpoint.startsWith('/visits/prescription/') || // /visits/prescription/:prescriptionId
-      (endpoint.startsWith('/visits/') && !endpoint.includes('/patient/') && endpoint !== '/visits/all/visit') ||
+      (endpoint.startsWith('/visits/') &&
+        !endpoint.includes('/patient/') &&
+        endpoint !== '/visits/all/visit') ||
       endpoint === '/appointments/all/appointments' || // GET /api/appointments/all/appointments
       endpoint.startsWith('/appointments/') || // All other appointment endpoints
       endpoint.startsWith('/medications') || // Medication search endpoint
@@ -67,7 +82,7 @@ class ApiClient {
     ) {
       return this.realRequest<T>('GET', endpoint, undefined, params);
     }
-    
+
     // For other endpoints, use mock for now
     return this.mockRequest<T>('GET', endpoint, undefined, params);
   }
@@ -79,7 +94,7 @@ class ApiClient {
     // Check if this is a real API endpoint that should use HTTP
     if (
       endpoint.startsWith('/auth/') || // Auth endpoints
-      endpoint.startsWith('/patients/clinic/') || 
+      endpoint.startsWith('/patients/clinic/') ||
       endpoint.startsWith('/clinics/') ||
       endpoint === '/patient' || // POST /api/patient (singular for create)
       endpoint === '/patients' || // Keep for backward compatibility
@@ -91,7 +106,7 @@ class ApiClient {
     ) {
       return this.realRequest<T>('POST', endpoint, data);
     }
-    
+
     // For other endpoints, use mock for now
     return this.mockRequest<T>('POST', endpoint, data);
   }
@@ -103,13 +118,13 @@ class ApiClient {
     // Check if this is a real API endpoint that should use HTTP
     if (
       endpoint.startsWith('/visits/') ||
-      endpoint.startsWith('/patients/clinic/') || 
+      endpoint.startsWith('/patients/clinic/') ||
       endpoint.startsWith('/clinics/') ||
       endpoint.startsWith('/appointments/')
     ) {
       return this.realRequest<T>('PUT', endpoint, data);
     }
-    
+
     // For other endpoints, use mock for now
     return this.mockRequest<T>('PUT', endpoint, data);
   }
@@ -119,10 +134,13 @@ class ApiClient {
    */
   async patch<T>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
     // Check if this is a real API endpoint that should use HTTP
-    if (endpoint.startsWith('/patients/clinic/') || endpoint.startsWith('/clinics/')) {
+    if (
+      endpoint.startsWith('/patients/clinic/') ||
+      endpoint.startsWith('/clinics/')
+    ) {
       return this.realRequest<T>('PATCH', endpoint, data);
     }
-    
+
     // For other endpoints, use mock for now
     return this.mockRequest<T>('PATCH', endpoint, data);
   }
@@ -147,13 +165,13 @@ class ApiClient {
     method: string,
     endpoint: string,
     data?: any,
-    params?: Record<string, string | number>
+    params?: Record<string, string | number>,
   ): Promise<ApiResponse<T>> {
     try {
       const url = this.buildURL(endpoint, params);
       const headers: HeadersInit = {
         'Content-Type': 'application/json',
-        'Accept': 'application/json',
+        Accept: 'application/json',
       };
 
       // Add Authorization header if token exists
@@ -168,7 +186,10 @@ class ApiClient {
         credentials: 'include', // Include cookies (for current_clinic_id)
       };
 
-      if (data && (method === 'POST' || method === 'PATCH' || method === 'PUT')) {
+      if (
+        data &&
+        (method === 'POST' || method === 'PATCH' || method === 'PUT')
+      ) {
         options.body = JSON.stringify(data);
       }
 
@@ -179,14 +200,14 @@ class ApiClient {
         body: options.body ? JSON.parse(options.body as string) : undefined,
       });
       const response = await fetch(url, options);
-      
+
       // Check content type before parsing
       const contentType = response.headers.get('content-type') || '';
       let result: any;
-      
+
       // Clone response to read as text if needed for error handling
       const responseClone = response.clone();
-      
+
       if (contentType.includes('application/json')) {
         try {
           result = await response.json();
@@ -198,7 +219,7 @@ class ApiClient {
             contentType,
             textPreview: text.substring(0, 200),
           });
-          
+
           if (!response.ok) {
             return {
               success: false,
@@ -209,7 +230,7 @@ class ApiClient {
               },
             };
           }
-          
+
           return {
             success: false,
             error: {
@@ -227,7 +248,7 @@ class ApiClient {
           contentType,
           textPreview: text.substring(0, 500),
         });
-        
+
         if (!response.ok) {
           return {
             success: false,
@@ -238,7 +259,7 @@ class ApiClient {
             },
           };
         }
-        
+
         // Try to parse as JSON anyway (might be JSON without proper content-type)
         try {
           result = JSON.parse(text);
@@ -253,14 +274,17 @@ class ApiClient {
           };
         }
       }
-      
+
       console.log('📥 Raw API Response:', {
         status: response.status,
         ok: response.ok,
         result: result,
         resultType: typeof result,
         isArray: Array.isArray(result),
-        resultKeys: result && typeof result === 'object' && !Array.isArray(result) ? Object.keys(result) : 'N/A',
+        resultKeys:
+          result && typeof result === 'object' && !Array.isArray(result)
+            ? Object.keys(result)
+            : 'N/A',
       });
 
       if (!response.ok) {
@@ -269,7 +293,10 @@ class ApiClient {
           success: false,
           error: {
             code: result.error?.code || 'HTTP_ERROR',
-            message: result.error?.message || result.message || `HTTP ${response.status}`,
+            message:
+              result.error?.message ||
+              result.message ||
+              `HTTP ${response.status}`,
             statusCode: response.status,
             details: result.error?.details || result.details, // Extract validation details
           },
@@ -278,7 +305,7 @@ class ApiClient {
 
       // Handle different response structures
       let apiResponse: ApiResponse<T>;
-      
+
       // Case 1: API returns { success: true, data: [...] }
       if (result.success !== undefined && result.data !== undefined) {
         apiResponse = {
@@ -290,7 +317,9 @@ class ApiClient {
       }
       // Case 2: API returns array directly [ {...}, {...} ]
       else if (Array.isArray(result)) {
-        console.log('📋 API returned array directly, wrapping in response object');
+        console.log(
+          '📋 API returned array directly, wrapping in response object',
+        );
         apiResponse = {
           success: true,
           data: result as T,
@@ -307,8 +336,10 @@ class ApiClient {
       }
       // Case 4: API returns object directly - check for common array fields or auth tokens
       else {
-        console.log('📦 API returned object directly, checking for array fields...');
-        
+        console.log(
+          '📦 API returned object directly, checking for array fields...',
+        );
+
         // Check if this is an auth response (has access/refresh tokens)
         if (result.access || result.refresh) {
           console.log('✅ Auth response detected, using object as data');
@@ -319,17 +350,25 @@ class ApiClient {
         }
         // Check if object has common array field names
         else {
-          const possibleArrayFields = ['data', 'patients', 'items', 'results', 'content'];
+          const possibleArrayFields = [
+            'data',
+            'patients',
+            'items',
+            'results',
+            'content',
+          ];
           let foundArray: any = null;
-          
+
           for (const field of possibleArrayFields) {
             if (result[field] && Array.isArray(result[field])) {
               foundArray = result[field];
-              console.log(`✅ Found array in field '${field}' with ${foundArray.length} items`);
+              console.log(
+                `✅ Found array in field '${field}' with ${foundArray.length} items`,
+              );
               break;
             }
           }
-          
+
           if (foundArray) {
             apiResponse = {
               success: true,
@@ -337,7 +376,9 @@ class ApiClient {
             };
           } else {
             // If no array found, use the object as-is (might be a single item or different structure)
-            console.log('⚠️ No array field found in object, using object as data');
+            console.log(
+              '⚠️ No array field found in object, using object as data',
+            );
             apiResponse = {
               success: true,
               data: result as T,
@@ -369,14 +410,17 @@ class ApiClient {
     method: string,
     endpoint: string,
     data?: any,
-    params?: Record<string, string | number>
+    params?: Record<string, string | number>,
   ): Promise<ApiResponse<T>> {
     // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await new Promise((resolve) => setTimeout(resolve, 100));
 
     // Route to appropriate mock handler
     // Note: /patients/clinic/ and /clinics/ endpoints are handled by realRequest
-    if (endpoint.startsWith('/patients/clinic/') || endpoint.startsWith('/clinics/')) {
+    if (
+      endpoint.startsWith('/patients/clinic/') ||
+      endpoint.startsWith('/clinics/')
+    ) {
       // This should not happen as it's handled in get/post/patch methods
       return {
         success: false,
@@ -413,12 +457,12 @@ class ApiClient {
     method: string,
     endpoint: string,
     data?: any,
-    params?: Record<string, string | number>
+    params?: Record<string, string | number>,
   ): ApiResponse<T> {
     const STORAGE_KEY = 'clinic_patients';
     const stored = localStorage.getItem(STORAGE_KEY);
     const patients: any[] = stored ? JSON.parse(stored) : [];
-    
+
     // Debug log
     if (endpoint === '/patients/recent') {
       console.log('API Client - Patients in storage:', patients.length);
@@ -482,8 +526,12 @@ class ApiClient {
         }))
         .sort((a: any, b: any) => {
           // Sort by lastVisitDate if available, otherwise by createdAt
-          const aDate = a.lastVisitDate ? new Date(a.lastVisitDate).getTime() : new Date(a.createdAt).getTime();
-          const bDate = b.lastVisitDate ? new Date(b.lastVisitDate).getTime() : new Date(b.createdAt).getTime();
+          const aDate = a.lastVisitDate
+            ? new Date(a.lastVisitDate).getTime()
+            : new Date(a.createdAt).getTime();
+          const bDate = b.lastVisitDate
+            ? new Date(b.lastVisitDate).getTime()
+            : new Date(b.createdAt).getTime();
           return bDate - aDate;
         })
         .slice(0, limit);
@@ -507,7 +555,7 @@ class ApiClient {
     method: string,
     endpoint: string,
     data?: any,
-    _params?: Record<string, string | number>
+    _params?: Record<string, string | number>,
   ): ApiResponse<T> {
     const STORAGE_KEY = 'clinic_visits';
     const visits: any[] = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
@@ -546,7 +594,11 @@ class ApiClient {
       return { success: true, data: visit as T };
     }
 
-    if (endpoint.startsWith('/visits/') && endpoint.endsWith('/notes') && method === 'PATCH') {
+    if (
+      endpoint.startsWith('/visits/') &&
+      endpoint.endsWith('/notes') &&
+      method === 'PATCH'
+    ) {
       const visitId = endpoint.split('/')[2];
       const index = visits.findIndex((v: any) => v.id === visitId);
       if (index === -1) {
@@ -564,7 +616,11 @@ class ApiClient {
       return { success: true, data: { id: visitId, notes: data.notes } as T };
     }
 
-    if (endpoint.startsWith('/visits/') && endpoint.endsWith('/prescription') && method === 'PATCH') {
+    if (
+      endpoint.startsWith('/visits/') &&
+      endpoint.endsWith('/prescription') &&
+      method === 'PATCH'
+    ) {
       const visitId = endpoint.split('/')[2];
       const index = visits.findIndex((v: any) => v.id === visitId);
       if (index === -1) {
@@ -589,7 +645,11 @@ class ApiClient {
       return { success: true, data: { id: visitId, prescription } as T };
     }
 
-    if (endpoint.startsWith('/visits/') && endpoint.endsWith('/status') && method === 'PATCH') {
+    if (
+      endpoint.startsWith('/visits/') &&
+      endpoint.endsWith('/status') &&
+      method === 'PATCH'
+    ) {
       const visitId = endpoint.split('/')[2];
       const index = visits.findIndex((v: any) => v.id === visitId);
       if (index === -1) {
@@ -610,11 +670,18 @@ class ApiClient {
     if (endpoint === '/visits/waiting' && method === 'GET') {
       const waitingVisits = visits
         .filter((v: any) => v.status === 'waiting')
-        .sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime());
+        .sort(
+          (a: any, b: any) =>
+            new Date(a.date).getTime() - new Date(b.date).getTime(),
+        );
       return { success: true, data: waitingVisits as T };
     }
 
-    if (endpoint.startsWith('/visits/') && endpoint.endsWith('/complete') && method === 'PATCH') {
+    if (
+      endpoint.startsWith('/visits/') &&
+      endpoint.endsWith('/complete') &&
+      method === 'PATCH'
+    ) {
       const visitId = endpoint.split('/')[2];
       const index = visits.findIndex((v: any) => v.id === visitId);
       if (index === -1) {
@@ -648,7 +715,7 @@ class ApiClient {
   private handleWhatsAppRequest<T>(
     method: string,
     endpoint: string,
-    data?: any
+    data?: any,
   ): ApiResponse<T> {
     if (endpoint === '/whatsapp/visit-confirmation' && method === 'POST') {
       return {
@@ -685,9 +752,13 @@ class ApiClient {
   /**
    * Handle clinic-related requests
    */
-  private handleClinicRequest<T>(method: string, endpoint: string): ApiResponse<T> {
+  private handleClinicRequest<T>(
+    method: string,
+    endpoint: string,
+  ): ApiResponse<T> {
     if (endpoint === '/clinic/info' && method === 'GET') {
-      const clinicName = (import.meta as any).env?.VITE_CLINIC_NAME || 'Clinic OPD Management';
+      const clinicName =
+        (import.meta as any).env?.VITE_CLINIC_NAME || 'Clinic OPD Management';
       return {
         success: true,
         data: {
@@ -717,7 +788,10 @@ class ApiClient {
     const visits: any[] = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
     const patientVisits = visits
       .filter((v: any) => v.patientId === patientId)
-      .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      .sort(
+        (a: any, b: any) =>
+          new Date(b.date).getTime() - new Date(a.date).getTime(),
+      );
     return patientVisits.length > 0 ? patientVisits[0].date : null;
   }
 }

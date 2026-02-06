@@ -47,7 +47,10 @@ export const clinicService = {
    * Get clinic statistics
    * GET /api/clinic-stats?date_range=[DD-MM-YYYY,DD-MM-YYYY]
    */
-  async getStats(_clinicId?: string, dateRange?: { start: string; end: string }): Promise<{
+  async getStats(
+    _clinicId?: string,
+    dateRange?: { start: string; end: string },
+  ): Promise<{
     total_patients: number;
     total_visits: number;
     total_completed_visits: number;
@@ -58,7 +61,7 @@ export const clinicService = {
   } | null> {
     try {
       const params: Record<string, string> = {};
-      
+
       // Format date range as [DD-MM-YYYY,DD-MM-YYYY]
       if (dateRange && dateRange.start && dateRange.end) {
         // Convert YYYY-MM-DD to DD-MM-YYYY
@@ -66,12 +69,12 @@ export const clinicService = {
           const [year, month, day] = dateStr.split('-');
           return `${day}-${month}-${year}`;
         };
-        
+
         const startFormatted = formatDateForAPI(dateRange.start);
         const endFormatted = formatDateForAPI(dateRange.end);
         params.date_range = `[${startFormatted},${endFormatted}]`;
       }
-      
+
       // Backend will get clinic_id from cookie
       const response = await apiClient.get<any>(`/clinic-stats`, params);
 

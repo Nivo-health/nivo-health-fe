@@ -18,10 +18,13 @@ export const patientService = {
       return [];
     }
 
-    const response = await apiClient.get<PatientSearchResult[]>('/patients/search', {
-      query: query,
-      limit,
-    });
+    const response = await apiClient.get<PatientSearchResult[]>(
+      '/patients/search',
+      {
+        query: query,
+        limit,
+      },
+    );
 
     if (!response.success || !response.data) {
       return [];
@@ -35,7 +38,10 @@ export const patientService = {
       mobile: apiPatient.mobile_number || apiPatient.mobile || '',
       age: this.getAgeFromApiPatient(apiPatient),
       gender: this.mapGender(apiPatient.gender),
-      createdAt: apiPatient.created_at || apiPatient.createdAt || new Date().toISOString(),
+      createdAt:
+        apiPatient.created_at ||
+        apiPatient.createdAt ||
+        new Date().toISOString(),
     }));
   },
 
@@ -60,7 +66,10 @@ export const patientService = {
         mobile: apiPatient.mobile_number || apiPatient.mobile || '',
         age: this.getAgeFromApiPatient(apiPatient),
         gender: this.mapGender(apiPatient.gender),
-        createdAt: apiPatient.created_at || apiPatient.createdAt || new Date().toISOString(),
+        createdAt:
+          apiPatient.created_at ||
+          apiPatient.createdAt ||
+          new Date().toISOString(),
       };
 
       return mappedPatient;
@@ -74,7 +83,9 @@ export const patientService = {
    * Create a new patient
    * POST /api/patient (singular, not plural)
    */
-  async create(patientData: Omit<Patient, 'id' | 'createdAt'>): Promise<Patient> {
+  async create(
+    patientData: Omit<Patient, 'id' | 'createdAt'>,
+  ): Promise<Patient> {
     try {
       // Map our Patient format to API request format
       // Backend will get clinic_id from cookie
@@ -84,8 +95,13 @@ export const patientService = {
         gender: this.mapGenderToAPI(patientData.gender),
         email: (patientData as any).email || null,
         address: (patientData as any).address || null,
-        date_of_birth: patientData.age ? this.calculateDateOfBirth(patientData.age) : null,
-        blood_group: (patientData as any).bloodGroup || (patientData as any).blood_group || null,
+        date_of_birth: patientData.age
+          ? this.calculateDateOfBirth(patientData.age)
+          : null,
+        blood_group:
+          (patientData as any).bloodGroup ||
+          (patientData as any).blood_group ||
+          null,
       };
 
       console.log('📤 Creating patient with API data:', apiRequestData);
@@ -95,7 +111,9 @@ export const patientService = {
       if (!response.success || !response.data) {
         console.error('❌ Failed to create patient:', response.error);
         // Create error object with details for validation errors
-        const error: any = new Error(response.error?.message || 'Failed to create patient');
+        const error: any = new Error(
+          response.error?.message || 'Failed to create patient',
+        );
         error.code = response.error?.code;
         error.details = response.error?.details;
         throw error;
@@ -109,7 +127,10 @@ export const patientService = {
         mobile: apiPatient.mobile_number || apiPatient.mobile || '',
         age: this.getAgeFromApiPatient(apiPatient),
         gender: this.mapGender(apiPatient.gender),
-        createdAt: apiPatient.created_at || apiPatient.createdAt || new Date().toISOString(),
+        createdAt:
+          apiPatient.created_at ||
+          apiPatient.createdAt ||
+          new Date().toISOString(),
       };
 
       console.log('✅ Patient created successfully:', mappedPatient);
@@ -125,7 +146,10 @@ export const patientService = {
    * GET /api/v1/patients/recent?limit={limit}
    */
   async getRecent(limit: number = 10): Promise<PatientSearchResult[]> {
-    const response = await apiClient.get<PatientSearchResult[]>('/patients/recent', { limit });
+    const response = await apiClient.get<PatientSearchResult[]>(
+      '/patients/recent',
+      { limit },
+    );
 
     if (!response.success || !response.data) {
       return [];
@@ -141,32 +165,47 @@ export const patientService = {
   async getAll(_clinicId?: string): Promise<PatientSearchResult[]> {
     try {
       console.log('Fetching all patients...');
-      
+
       // Use real API endpoint - backend will get clinic_id from cookie
-      const response = await apiClient.get<PatientSearchResult[]>(`/patients/all`);
-      
+      const response =
+        await apiClient.get<PatientSearchResult[]>(`/patients/all`);
+
       console.log('API Response:', {
         success: response.success,
         hasData: response.data !== undefined,
         dataType: Array.isArray(response.data) ? 'array' : typeof response.data,
         dataLength: Array.isArray(response.data) ? response.data.length : 'N/A',
-        dataKeys: response.data && typeof response.data === 'object' && !Array.isArray(response.data) ? Object.keys(response.data) : 'N/A',
+        dataKeys:
+          response.data &&
+          typeof response.data === 'object' &&
+          !Array.isArray(response.data)
+            ? Object.keys(response.data)
+            : 'N/A',
         error: response.error,
         fullData: response.data, // Log full data to see structure
       });
-      
+
       // Check if response has data (even if empty array) - prioritize API response
       // Only fallback if there's an explicit error or data is completely missing
       if (response.data !== undefined && response.data !== null) {
         let patientsArray: any[] = [];
-        
+
         // If data is an array, use it directly
         if (Array.isArray(response.data)) {
           patientsArray = response.data;
         }
         // If data is an object, check for array fields
-        else if (typeof response.data === 'object' && !Array.isArray(response.data)) {
-          const possibleArrayFields = ['data', 'patients', 'items', 'results', 'content'];
+        else if (
+          typeof response.data === 'object' &&
+          !Array.isArray(response.data)
+        ) {
+          const possibleArrayFields = [
+            'data',
+            'patients',
+            'items',
+            'results',
+            'content',
+          ];
           for (const field of possibleArrayFields) {
             if (response.data[field] && Array.isArray(response.data[field])) {
               patientsArray = response.data[field];
@@ -174,38 +213,58 @@ export const patientService = {
             }
           }
         }
-        
+
         if (patientsArray.length > 0) {
           // Map API fields to our Patient interface
           const mappedPatients = patientsArray.map((apiPatient: any) => ({
             id: apiPatient.id,
             name: apiPatient.name || '',
-            mobile: apiPatient.mobile_number || apiPatient.mobile || apiPatient.phone || '',
+            mobile:
+              apiPatient.mobile_number ||
+              apiPatient.mobile ||
+              apiPatient.phone ||
+              '',
             age: this.getAgeFromApiPatient(apiPatient),
             gender: this.mapGender(apiPatient.gender),
-            createdAt: apiPatient.created_at || apiPatient.createdAt || new Date().toISOString(),
+            createdAt:
+              apiPatient.created_at ||
+              apiPatient.createdAt ||
+              new Date().toISOString(),
             // Keep original fields for reference
             ...(apiPatient.address && { address: apiPatient.address }),
             ...(apiPatient.email && { email: apiPatient.email }),
-            ...(apiPatient.blood_group && { bloodGroup: apiPatient.blood_group }),
+            ...(apiPatient.blood_group && {
+              bloodGroup: apiPatient.blood_group,
+            }),
           }));
-          
-          console.log('✅ Using API data (array) - patients count:', mappedPatients.length);
+
+          console.log(
+            '✅ Using API data (array) - patients count:',
+            mappedPatients.length,
+          );
           return mappedPatients;
         }
-        
+
         // If no array found, log warning and return empty
-        console.warn('⚠️ API returned data but no array found. Data type:', typeof response.data);
+        console.warn(
+          '⚠️ API returned data but no array found. Data type:',
+          typeof response.data,
+        );
         return [];
       }
-      
+
       // Only fallback if API explicitly failed or data is missing
       if (response.error) {
-        console.warn('❌ API request failed, falling back to mock data:', response.error?.message);
+        console.warn(
+          '❌ API request failed, falling back to mock data:',
+          response.error?.message,
+        );
       } else if (response.data === undefined || response.data === null) {
-        console.warn('⚠️ API response missing data field, falling back to mock data');
+        console.warn(
+          '⚠️ API response missing data field, falling back to mock data',
+        );
       }
-      
+
       // Fallback to mock/recent patients only if API explicitly failed
       console.log('🔄 Falling back to mock data...');
       const apiPatients = await this.getRecent(1000);
@@ -213,14 +272,17 @@ export const patientService = {
         console.log('📦 Using mock data - patients count:', apiPatients.length);
         return apiPatients;
       }
-      
+
       // Final fallback: Direct localStorage access
       try {
         const STORAGE_KEY = 'clinic_patients';
         const stored = localStorage.getItem(STORAGE_KEY);
         if (stored) {
           const patients = JSON.parse(stored);
-          console.log('💾 Using localStorage data - patients count:', patients.length);
+          console.log(
+            '💾 Using localStorage data - patients count:',
+            patients.length,
+          );
           return patients.map((p: any) => ({
             ...p,
             lastVisitDate: undefined, // Will be calculated if needed
@@ -229,7 +291,7 @@ export const patientService = {
       } catch (error) {
         console.error('Error reading from localStorage:', error);
       }
-      
+
       console.log('📭 No data found, returning empty array');
       return [];
     } catch (error) {
@@ -260,7 +322,10 @@ export const patientService = {
       const today = new Date();
       let age = today.getFullYear() - birthDate.getFullYear();
       const monthDiff = today.getMonth() - birthDate.getMonth();
-      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      if (
+        monthDiff < 0 ||
+        (monthDiff === 0 && today.getDate() < birthDate.getDate())
+      ) {
         age--;
       }
       return age >= 0 ? age : undefined;
@@ -274,7 +339,11 @@ export const patientService = {
    */
   getAgeFromApiPatient(apiPatient: any): number | undefined {
     // Only use apiPatient.age if it's a valid number
-    if (apiPatient.age !== undefined && apiPatient.age !== null && typeof apiPatient.age === 'number') {
+    if (
+      apiPatient.age !== undefined &&
+      apiPatient.age !== null &&
+      typeof apiPatient.age === 'number'
+    ) {
       return apiPatient.age;
     }
     // Do not calculate from date_of_birth - return undefined if age not provided

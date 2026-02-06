@@ -20,17 +20,17 @@ function App() {
     <BrowserRouter>
       <Routes>
         {/* Public route */}
-        <Route 
-          path="/login" 
+        <Route
+          path="/login"
           element={
             authService.isAuthenticated() ? (
               <Navigate to="/" replace />
             ) : (
               <LoginScreen />
             )
-          } 
+          }
         />
-        
+
         {/* Protected routes */}
         <Route
           path="/*"
@@ -40,13 +40,31 @@ function App() {
                 <Routes>
                   <Route path="/" element={<HomeScreen />} />
                   <Route path="/patients" element={<AllPatientsScreen />} />
-                  <Route path="/patient/:patientId" element={<PatientDetailsScreen />} />
+                  <Route
+                    path="/patient/:patientId"
+                    element={<PatientDetailsScreen />}
+                  />
                   <Route path="/visits" element={<VisitsScreen />} />
-                  <Route path="/appointments" element={<AppointmentsScreen />} />
-                  <Route path="/visit/:visitId" element={<VisitContextScreen />} />
-                  <Route path="/consultation/:visitId" element={<ConsultationScreen />} />
-                  <Route path="/prescription/:visitId" element={<PrescriptionScreen />} />
-                  <Route path="/print-preview/:visitId" element={<PrintPreviewScreen />} />
+                  <Route
+                    path="/appointments"
+                    element={<AppointmentsScreen />}
+                  />
+                  <Route
+                    path="/visit/:visitId"
+                    element={<VisitContextScreen />}
+                  />
+                  <Route
+                    path="/consultation/:visitId"
+                    element={<ConsultationScreen />}
+                  />
+                  <Route
+                    path="/prescription/:visitId"
+                    element={<PrescriptionScreen />}
+                  />
+                  <Route
+                    path="/print-preview/:visitId"
+                    element={<PrintPreviewScreen />}
+                  />
                   <Route path="/settings" element={<SettingsScreen />} />
                   <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>

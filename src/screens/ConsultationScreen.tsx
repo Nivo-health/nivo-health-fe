@@ -1,7 +1,12 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '../components/ui/Card';
 import { Stepper } from '../components/ui/Stepper';
 import { visitService } from '../services/visitService';
 import { prescriptionService } from '../services/prescriptionService';
@@ -32,7 +37,9 @@ export default function ConsultationScreen() {
 
       // If a prescription already exists, pre-populate notes from the prescription
       if (visitData.prescription_id) {
-        const prescription = await prescriptionService.getById(visitData.prescription_id);
+        const prescription = await prescriptionService.getById(
+          visitData.prescription_id,
+        );
         if (prescription?.notes) {
           setNotes(prescription.notes);
         } else {
@@ -46,7 +53,6 @@ export default function ConsultationScreen() {
 
     loadVisit();
   }, [visitId, navigate]);
-
 
   const handleNotesChange = (value: string) => {
     setNotes(value);
@@ -77,7 +83,10 @@ export default function ConsultationScreen() {
         {/* Visit Progress Stepper */}
         <Card className="mb-4 border-teal-200">
           <CardContent className="pt-4 pb-4">
-            <Stepper steps={visitSteps} currentStep={getVisitStep(visit, 'consultation')} />
+            <Stepper
+              steps={visitSteps}
+              currentStep={getVisitStep(visit, 'consultation')}
+            />
           </CardContent>
         </Card>
 
@@ -88,7 +97,10 @@ export default function ConsultationScreen() {
           <CardContent>
             <div className="space-y-4">
               <div>
-                <label htmlFor="notes" className="block text-sm font-medium text-gray-700 mb-2">
+                <label
+                  htmlFor="notes"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
                   Enter consultation notes (optional)
                 </label>
                 <textarea

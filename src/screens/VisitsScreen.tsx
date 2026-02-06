@@ -1,14 +1,28 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Input, Button, Modal, DatePicker, Select, SelectItem } from '../components/ui';
+import {
+  Input,
+  Button,
+  Modal,
+  DatePicker,
+  Select,
+  SelectItem,
+} from '../components/ui';
 import { Card, CardContent } from '../components/ui/Card';
 import { patientService } from '../services/patientService';
 import { visitService } from '../services/visitService';
 import { toast } from '../utils/toast';
 import type { Patient, Visit, ClinicDoctor } from '../types';
 import { clinicService } from '../services/clinicService';
-import { validatePhoneNumber, formatPhoneInput } from '../utils/phoneValidation';
-import { extractValidationErrors, getErrorMessage, hasValidationErrors } from '../utils/errorHandler';
+import {
+  validatePhoneNumber,
+  formatPhoneInput,
+} from '../utils/phoneValidation';
+import {
+  extractValidationErrors,
+  getErrorMessage,
+  hasValidationErrors,
+} from '../utils/errorHandler';
 
 export default function VisitsScreen() {
   const navigate = useNavigate();
@@ -17,19 +31,20 @@ export default function VisitsScreen() {
   const [filteredVisits, setFilteredVisits] = useState<Visit[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
+
   // Date filter - default to today
   const [selectedDate, setSelectedDate] = useState<string>(() => {
     const today = new Date();
     return today.toISOString().split('T')[0]; // YYYY-MM-DD format
   });
-  
+
   // Doctor filter
   const [selectedDoctorFilter, setSelectedDoctorFilter] = useState<string>('');
-  
+
   // Visit status filter - default to WAITING
-  const [selectedVisitStatus, setSelectedVisitStatus] = useState<string>('WAITING');
-  
+  const [selectedVisitStatus, setSelectedVisitStatus] =
+    useState<string>('WAITING');
+
   // Modal states
   const [step, setStep] = useState<'mobile' | 'patient-form'>('mobile');
   const [mobileNumber, setMobileNumber] = useState('');
@@ -81,11 +96,11 @@ export default function VisitsScreen() {
     const filtered = visits.filter((visit) => {
       const patient = visit.patient;
       if (!patient) return false;
-      
+
       const nameMatch = patient.name?.toLowerCase().includes(query);
       const mobileMatch = patient.mobile?.includes(query);
       const reasonMatch = visit.visit_reason?.toLowerCase().includes(query);
-      
+
       return nameMatch || mobileMatch || reasonMatch;
     });
 
@@ -100,24 +115,29 @@ export default function VisitsScreen() {
         doctorId: selectedDoctorFilter,
         visitStatus: selectedVisitStatus,
       });
-      
-      const visitStatus = selectedVisitStatus 
-        ? (selectedVisitStatus as 'WAITING' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED')
+
+      const visitStatus = selectedVisitStatus
+        ? (selectedVisitStatus as
+            | 'WAITING'
+            | 'IN_PROGRESS'
+            | 'COMPLETED'
+            | 'CANCELLED')
         : undefined;
-      
+
       // Handle "all" value for doctor filter
-      const doctorId = selectedDoctorFilter && selectedDoctorFilter !== 'all' 
-        ? selectedDoctorFilter 
-        : undefined;
-      
+      const doctorId =
+        selectedDoctorFilter && selectedDoctorFilter !== 'all'
+          ? selectedDoctorFilter
+          : undefined;
+
       const result = await visitService.getAllVisits(
-        1, 
-        50, 
+        1,
+        50,
         selectedDate,
         visitStatus,
-        doctorId
+        doctorId,
       );
-      
+
       console.log('📊 Visits loaded:', result.visits.length);
       setVisits(result.visits);
       setFilteredVisits(result.visits);
@@ -149,17 +169,19 @@ export default function VisitsScreen() {
   const handleSearchPatient = async () => {
     const phoneValidation = validatePhoneNumber(mobileNumber);
     if (!phoneValidation.isValid) {
-      setErrors({ mobile: phoneValidation.error || 'Please enter a valid mobile number' });
+      setErrors({
+        mobile: phoneValidation.error || 'Please enter a valid mobile number',
+      });
       return;
     }
 
     try {
       setSearching(true);
       setErrors({});
-      
+
       console.log('🔍 Searching for patient with mobile:', mobileNumber);
       const searchResults = await patientService.search(mobileNumber);
-      
+
       if (searchResults.length > 0) {
         // Patient found - use the first match
         const patient = searchResults[0];
@@ -199,12 +221,16 @@ export default function VisitsScreen() {
     }
     const phoneValidation = validatePhoneNumber(newPatient.mobile);
     if (!phoneValidation.isValid) {
-      newErrors.mobile = phoneValidation.error || 'Please enter a valid mobile number';
+      newErrors.mobile =
+        phoneValidation.error || 'Please enter a valid mobile number';
     }
     if (!newPatient.gender) {
       newErrors.gender = 'Gender is required';
     }
-    if (newPatient.age && (isNaN(Number(newPatient.age)) || Number(newPatient.age) < 0)) {
+    if (
+      newPatient.age &&
+      (isNaN(Number(newPatient.age)) || Number(newPatient.age) < 0)
+    ) {
       newErrors.age = 'Age must be a valid number';
     }
     if (doctors.length > 1 && !selectedDoctorId) {
@@ -261,26 +287,28 @@ export default function VisitsScreen() {
       console.log('✅ Visit created:', visit.id);
       toast.success('Visit created successfully!');
       setIsModalOpen(false);
-      
+
       // Reload visits and navigate
       await loadVisits();
       navigate(`/visit/${visit.id}`);
     } catch (error: any) {
       console.error('❌ Failed to create visit:', error);
-      
+
       // Extract validation errors if present
       if (hasValidationErrors(error)) {
         const validationErrors = extractValidationErrors(error);
-        setErrors(prevErrors => ({
+        setErrors((prevErrors) => ({
           ...prevErrors,
           ...validationErrors,
         }));
-        
+
         // Also set doctor error if present
         if (validationErrors.doctor || validationErrors.doctor_id) {
-          setDoctorError(validationErrors.doctor || validationErrors.doctor_id || '');
+          setDoctorError(
+            validationErrors.doctor || validationErrors.doctor_id || '',
+          );
         }
-        
+
         // Show general error message
         toast.error(getErrorMessage(error));
       } else {
@@ -296,9 +324,12 @@ export default function VisitsScreen() {
 
   const getStatusColor = (status: string) => {
     const s = status.toLowerCase();
-    if (s === 'waiting' || s === 'waiting') return 'bg-yellow-100 text-yellow-800';
-    if (s === 'in_progress' || s === 'in_progress') return 'bg-blue-100 text-blue-800';
-    if (s === 'completed' || s === 'completed') return 'bg-green-100 text-green-800';
+    if (s === 'waiting' || s === 'waiting')
+      return 'bg-yellow-100 text-yellow-800';
+    if (s === 'in_progress' || s === 'in_progress')
+      return 'bg-blue-100 text-blue-800';
+    if (s === 'completed' || s === 'completed')
+      return 'bg-green-100 text-green-800';
     return 'bg-gray-100 text-gray-800';
   };
 
@@ -325,14 +356,17 @@ export default function VisitsScreen() {
         <div className="mb-4 md:mb-6">
           <div className="flex items-start justify-between gap-3 mb-3">
             <div className="flex-1 min-w-0">
-              <h1 className="text-xl md:text-3xl font-bold text-teal-900">Visits</h1>
+              <h1 className="text-xl md:text-3xl font-bold text-teal-900">
+                Visits
+              </h1>
               <p className="text-xs md:text-base text-gray-600 mt-1">
-                {filteredVisits.length} {filteredVisits.length === 1 ? 'visit' : 'visits'}
+                {filteredVisits.length}{' '}
+                {filteredVisits.length === 1 ? 'visit' : 'visits'}
                 {searchQuery && ` found`}
               </p>
             </div>
-            <Button 
-              onClick={handleCreateVisit} 
+            <Button
+              onClick={handleCreateVisit}
               className="flex-shrink-0 text-sm md:text-base px-3 md:px-4"
               size="sm"
             >
@@ -360,7 +394,7 @@ export default function VisitsScreen() {
               className="w-full text-sm"
             />
           </div>
-          
+
           {/* Doctor Filter */}
           {doctors.length > 0 && (
             <div className="sm:w-48 md:w-56">
@@ -379,7 +413,7 @@ export default function VisitsScreen() {
               </Select>
             </div>
           )}
-          
+
           {/* Visit Status Filter */}
           <div className="sm:w-48 md:w-56">
             <Select
@@ -411,7 +445,7 @@ export default function VisitsScreen() {
                       <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-teal-500 to-teal-600 rounded-full flex items-center justify-center text-white font-bold text-base md:text-lg flex-shrink-0">
                         {visit.patient?.name?.charAt(0).toUpperCase() || '?'}
                       </div>
-                      
+
                       {/* Column-based layout for desktop */}
                       <div className="flex-1 min-w-0 grid grid-cols-1 md:grid-cols-[minmax(150px,1fr)_minmax(120px,auto)_minmax(140px,auto)] gap-2 md:gap-4 items-center">
                         {/* Name Column */}
@@ -420,16 +454,18 @@ export default function VisitsScreen() {
                             {visit.patient?.name || 'Unknown Patient'}
                           </h3>
                         </div>
-                        
+
                         {/* Mobile Column */}
                         <div className="min-w-0">
                           {visit.patient?.mobile ? (
-                            <span className="text-sm text-gray-600 whitespace-nowrap">📱 {visit.patient.mobile}</span>
+                            <span className="text-sm text-gray-600 whitespace-nowrap">
+                              📱 {visit.patient.mobile}
+                            </span>
                           ) : (
                             <span className="text-sm text-gray-400">—</span>
                           )}
                         </div>
-                        
+
                         {/* Token Column */}
                         <div className="min-w-0">
                           {visit?.token_number ? (
@@ -443,10 +479,12 @@ export default function VisitsScreen() {
                         </div>
                       </div>
                     </div>
-                    
+
                     {/* Status Badge */}
                     <div className="flex-shrink-0">
-                      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(visit.visit_status || visit.status)}`}>
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(visit.visit_status || visit.status)}`}
+                      >
                         {getStatusLabel(visit.visit_status || visit.status)}
                       </span>
                     </div>
@@ -467,7 +505,9 @@ export default function VisitsScreen() {
                 ) : (
                   <>
                     <p className="text-lg font-medium mb-2">No visits yet</p>
-                    <p className="text-sm mb-4">Get started by creating a new visit</p>
+                    <p className="text-sm mb-4">
+                      Get started by creating a new visit
+                    </p>
                     <Button onClick={handleCreateVisit}>+ Create Visit</Button>
                   </>
                 )}
@@ -481,25 +521,35 @@ export default function VisitsScreen() {
       <Modal
         open={isModalOpen}
         onOpenChange={setIsModalOpen}
-        title={step === 'mobile' ? 'Create Visit' : foundPatient ? 'Create Visit - Patient Found' : 'Create Visit - New Patient'}
+        title={
+          step === 'mobile'
+            ? 'Create Visit'
+            : foundPatient
+              ? 'Create Visit - Patient Found'
+              : 'Create Visit - New Patient'
+        }
         size="lg"
         footer={
           <>
-            <Button variant="outline" onClick={() => {
-              if (step === 'patient-form') {
-                setStep('mobile');
-                setErrors({});
-              } else {
-                setIsModalOpen(false);
-              }
-            }}>
+            <Button
+              variant="outline"
+              onClick={() => {
+                if (step === 'patient-form') {
+                  setStep('mobile');
+                  setErrors({});
+                } else {
+                  setIsModalOpen(false);
+                }
+              }}
+            >
               {step === 'mobile' ? 'Cancel' : 'Back'}
             </Button>
-            <Button 
-              onClick={handleCreateVisitSubmit}
-              disabled={searching}
-            >
-              {searching ? 'Searching...' : step === 'mobile' ? 'Search' : 'Create Visit'}
+            <Button onClick={handleCreateVisitSubmit} disabled={searching}>
+              {searching
+                ? 'Searching...'
+                : step === 'mobile'
+                  ? 'Search'
+                  : 'Create Visit'}
             </Button>
           </>
         }
@@ -525,50 +575,63 @@ export default function VisitsScreen() {
                 }}
               />
               <p className="text-sm text-gray-600">
-                Enter the patient's mobile number to search. If the patient exists, we'll use their information. Otherwise, you'll be asked to enter their details.
+                Enter the patient's mobile number to search. If the patient
+                exists, we'll use their information. Otherwise, you'll be asked
+                to enter their details.
               </p>
             </>
           ) : (
             <>
               {foundPatient && (
                 <div className="p-3 bg-teal-50 border border-teal-200 rounded-lg mb-4">
-                  <p className="text-sm text-teal-800 font-medium">✓ Patient found in database</p>
+                  <p className="text-sm text-teal-800 font-medium">
+                    ✓ Patient found in database
+                  </p>
                   <p className="text-xs text-teal-600 mt-1">
                     {foundPatient.name} • {foundPatient.mobile}
                   </p>
                 </div>
               )}
-              
+
               <Input
                 label="Name *"
                 value={newPatient.name}
-                onChange={(e) => setNewPatient({ ...newPatient, name: e.target.value })}
+                onChange={(e) =>
+                  setNewPatient({ ...newPatient, name: e.target.value })
+                }
                 error={errors.name}
                 placeholder="Enter patient name"
                 disabled={!!foundPatient}
                 autoFocus={!foundPatient}
               />
-              
+
               <Input
                 label="Mobile *"
                 type="tel"
                 value={newPatient.mobile}
-                onChange={(e) => setNewPatient({ ...newPatient, mobile: formatPhoneInput(e.target.value) })}
+                onChange={(e) =>
+                  setNewPatient({
+                    ...newPatient,
+                    mobile: formatPhoneInput(e.target.value),
+                  })
+                }
                 error={errors.mobile}
                 placeholder="Enter mobile number (e.g., +91 9876543210)"
                 disabled={!!foundPatient}
               />
-              
+
               <Input
                 label="Age"
                 type="number"
                 value={newPatient.age}
-                onChange={(e) => setNewPatient({ ...newPatient, age: e.target.value })}
+                onChange={(e) =>
+                  setNewPatient({ ...newPatient, age: e.target.value })
+                }
                 error={errors.age}
                 placeholder="Enter age (optional)"
                 min="0"
               />
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Gender *
@@ -580,7 +643,12 @@ export default function VisitsScreen() {
                       name="gender"
                       value="M"
                       checked={newPatient.gender === 'M'}
-                      onChange={(e) => setNewPatient({ ...newPatient, gender: e.target.value as 'M' | 'F' })}
+                      onChange={(e) =>
+                        setNewPatient({
+                          ...newPatient,
+                          gender: e.target.value as 'M' | 'F',
+                        })
+                      }
                       className="mr-2"
                       disabled={!!foundPatient}
                     />
@@ -592,7 +660,12 @@ export default function VisitsScreen() {
                       name="gender"
                       value="F"
                       checked={newPatient.gender === 'F'}
-                      onChange={(e) => setNewPatient({ ...newPatient, gender: e.target.value as 'M' | 'F' })}
+                      onChange={(e) =>
+                        setNewPatient({
+                          ...newPatient,
+                          gender: e.target.value as 'M' | 'F',
+                        })
+                      }
                       className="mr-2"
                       disabled={!!foundPatient}
                     />

@@ -5,17 +5,20 @@ A React TypeScript application for managing Outpatient Department (OPD) operatio
 ## 🚀 Quick Start
 
 ### Prerequisites
+
 - Node.js (v18 or higher)
 - npm or yarn
 
 ### Installation
 
 1. **Install dependencies:**
+
    ```bash
    npm install
    ```
 
 2. **Start the development server:**
+
    ```bash
    npm run dev
    ```
@@ -26,14 +29,15 @@ A React TypeScript application for managing Outpatient Department (OPD) operatio
 ### Other Commands
 
 - **Build for production:**
-   ```bash
-   npm run build
-   ```
+
+  ```bash
+  npm run build
+  ```
 
 - **Preview production build:**
-   ```bash
-   npm run preview
-   ```
+  ```bash
+  npm run preview
+  ```
 
 ## 📱 Progressive Web App (PWA)
 
@@ -51,6 +55,7 @@ This app is configured as a **Progressive Web App**! Users can install it on the
      - `favicon.ico`
 
 2. **Build and test:**
+
    ```bash
    npm run build
    npm run preview
@@ -74,86 +79,97 @@ This app is configured as a **Progressive Web App**! Users can install it on the
 ## 📱 App Flow & Exploration Guide
 
 ### 1. **Home Screen** (`/`)
-   - **What to see:** Clinic name and "Start OPD" button
-   - **Action:** Click "Start OPD" to begin
-   - **Keyboard:** Press Enter or click the button
+
+- **What to see:** Clinic name and "Start OPD" button
+- **Action:** Click "Start OPD" to begin
+- **Keyboard:** Press Enter or click the button
 
 ### 2. **Patient Search** (`/patient-search`)
-   - **What to see:** Search bar and "Add New Patient" button
-   - **Try this:**
-     - Type at least 2 characters to search (e.g., "ram", "9898")
-     - Click on a patient from results to open their visit
-     - Click "Add New Patient" to create a new patient
-   - **Add New Patient:**
-     - Fill in Name and Mobile (required)
-     - Optionally add Age and Gender
-     - Press Enter or click Save
-     - Automatically creates a visit and navigates to Visit Context
+
+- **What to see:** Search bar and "Add New Patient" button
+- **Try this:**
+  - Type at least 2 characters to search (e.g., "ram", "9898")
+  - Click on a patient from results to open their visit
+  - Click "Add New Patient" to create a new patient
+- **Add New Patient:**
+  - Fill in Name and Mobile (required)
+  - Optionally add Age and Gender
+  - Press Enter or click Save
+  - Automatically creates a visit and navigates to Visit Context
 
 ### 3. **Visit Context** (`/visit/:visitId`)
-   - **What to see:**
-     - Patient details (name, age, gender, mobile, date)
-     - Visit history on the left
-     - Actions panel on the right
-   - **Try this:**
-     - Toggle "Send prescription on WhatsApp" checkbox
-     - Click "Consult & Write Prescription" to proceed
-     - Click on old visits in history to view past prescriptions
+
+- **What to see:**
+  - Patient details (name, age, gender, mobile, date)
+  - Visit history on the left
+  - Actions panel on the right
+- **Try this:**
+  - Toggle "Send prescription on WhatsApp" checkbox
+  - Click "Consult & Write Prescription" to proceed
+  - Click on old visits in history to view past prescriptions
 
 ### 4. **Consultation Notes** (`/consultation/:visitId`)
-   - **What to see:** Large textarea for consultation notes
-   - **Try this:**
-     - Type consultation notes (symptoms, diagnosis, etc.)
-     - Notes auto-save after 500ms of inactivity
-     - Notes also save when you blur the field
-     - Click "Proceed to Prescription" when done
+
+- **What to see:** Large textarea for consultation notes
+- **Try this:**
+  - Type consultation notes (symptoms, diagnosis, etc.)
+  - Notes auto-save after 500ms of inactivity
+  - Notes also save when you blur the field
+  - Click "Proceed to Prescription" when done
 
 ### 5. **Prescription Screen** (`/prescription/:visitId`)
-   - **What to see:**
-     - Medicine table (initially empty)
-     - Follow-up options
-     - Sticky bottom bar with action buttons
-   - **Try this:**
-     - Click "+ Add Medicine" to add a new row
-     - Fill in Medicine name, Dosage (e.g., "1-0-1"), Duration (e.g., "5 days")
-     - Add optional notes for each medicine
-     - Remove medicines with "Remove" button
-     - Set follow-up: Choose "Follow-up after" and enter value + unit
-     - **Bottom Actions:**
-       - Toggle "Send on WhatsApp" checkbox
-       - Click "Print" to preview and print
-       - Click "Send on WhatsApp" to see preview modal
-       - Click "Save & Finish Visit" to complete the visit
+
+- **What to see:**
+  - Medicine table (initially empty)
+  - Follow-up options
+  - Sticky bottom bar with action buttons
+- **Try this:**
+  - Click "+ Add Medicine" to add a new row
+  - Fill in Medicine name, Dosage (e.g., "1-0-1"), Duration (e.g., "5 days")
+  - Add optional notes for each medicine
+  - Remove medicines with "Remove" button
+  - Set follow-up: Choose "Follow-up after" and enter value + unit
+  - **Bottom Actions:**
+    - Toggle "Send on WhatsApp" checkbox
+    - Click "Print" to preview and print
+    - Click "Send on WhatsApp" to see preview modal
+    - Click "Save & Finish Visit" to complete the visit
 
 ### 6. **Print Preview** (`/print-preview/:visitId`)
-   - **What to see:** Two tabs - A4 Prescription and Thermal
-   - **Try this:**
-     - Switch between A4 and Thermal tabs
-     - Review the formatted prescription
-     - Click "Print" button to open browser print dialog
-     - Choose your printer and print
+
+- **What to see:** Two tabs - A4 Prescription and Thermal
+- **Try this:**
+  - Switch between A4 and Thermal tabs
+  - Review the formatted prescription
+  - Click "Print" button to open browser print dialog
+  - Choose your printer and print
 
 ## 🎯 Key Features to Explore
 
 ### Search Functionality
+
 - **Debounced search:** Type in patient search - notice it waits 300ms before searching
 - **Minimum 2 characters:** Try typing just 1 character - no results
 - **Search by name or mobile:** Try searching by partial name or mobile number
 
 ### Auto-Save
+
 - **Consultation notes:** Type in consultation screen, wait 500ms, navigate away and come back - notes are saved
 - **Prescription:** Changes are saved automatically when you navigate
 
 ### Toast Notifications
+
 - **WhatsApp toggle:** Toggle the WhatsApp checkbox in Visit Context - see success toast
 - **Prescription actions:** Save, send, or complete visit - see confirmation toasts
 
 ### Keyboard Navigation
+
 - **Enter key:** Works in modals and forms
 - **Tab navigation:** Navigate through form fields
 - **Auto-focus:** Search bar and key inputs auto-focus
 
 ### Responsive Design
+
 - **Resize browser:** Try different screen sizes
 - **Mobile view:** Test on mobile or narrow browser window
 - **Sticky elements:** Notice sticky search bar and bottom action bar
@@ -161,10 +177,12 @@ This app is configured as a **Progressive Web App**! Users can install it on the
 ## 💾 Data Storage
 
 Currently, the app uses **localStorage** as a mock backend. All data persists in your browser:
+
 - Patients are stored in `clinic_patients`
 - Visits are stored in `clinic_visits`
 
 **To clear data:**
+
 - Open browser DevTools (F12)
 - Go to Application/Storage tab
 - Clear localStorage
@@ -197,16 +215,19 @@ VITE_API_BASE_URL=/api/v1
 ## 🐛 Troubleshooting
 
 **App won't start:**
+
 - Make sure you've run `npm install`
 - Check Node.js version (should be v18+)
 - Clear `node_modules` and reinstall: `rm -rf node_modules && npm install`
 
 **No data showing:**
+
 - Check browser console for errors
 - Verify localStorage is enabled
 - Try clearing localStorage and adding new data
 
 **Build errors:**
+
 - Run `npm run build` to see TypeScript errors
 - Check `tsconfig.json` configuration
 
@@ -234,9 +255,11 @@ src/
 ### Building for Production
 
 1. **Build the production bundle:**
+
    ```bash
    npm run build
    ```
+
    This creates an optimized production build in the `dist/` folder.
 
 2. **Preview the production build locally:**
@@ -250,14 +273,17 @@ src/
 #### Option 1: Vercel (Recommended - Easiest)
 
 1. **Install Vercel CLI:**
+
    ```bash
    npm install -g vercel
    ```
 
 2. **Deploy:**
+
    ```bash
    vercel
    ```
+
    Follow the prompts. Your app will be live at `https://your-app.vercel.app`
 
 3. **Or use Vercel Dashboard:**
@@ -267,6 +293,7 @@ src/
    - Vercel will auto-detect Vite and deploy
 
 **Vercel Configuration:**
+
 - Build Command: `npm run build`
 - Output Directory: `dist`
 - Install Command: `npm install`
@@ -274,11 +301,13 @@ src/
 #### Option 2: Netlify
 
 1. **Install Netlify CLI:**
+
    ```bash
    npm install -g netlify-cli
    ```
 
 2. **Deploy:**
+
    ```bash
    npm run build
    netlify deploy --prod --dir=dist
@@ -295,11 +324,13 @@ src/
 #### Option 3: GitHub Pages
 
 1. **Install gh-pages:**
+
    ```bash
    npm install --save-dev gh-pages
    ```
 
 2. **Update `package.json` scripts:**
+
    ```json
    "scripts": {
      "predeploy": "npm run build",
@@ -308,14 +339,16 @@ src/
    ```
 
 3. **Update `vite.config.ts`:**
+
    ```typescript
    export default defineConfig({
      plugins: [react()],
      base: '/your-repo-name/', // Replace with your GitHub repo name
-   })
+   });
    ```
 
 4. **Deploy:**
+
    ```bash
    npm run deploy
    ```
@@ -328,6 +361,7 @@ src/
 #### Option 4: Traditional Web Hosting (cPanel, FTP, etc.)
 
 1. **Build the app:**
+
    ```bash
    npm run build
    ```
@@ -351,6 +385,7 @@ src/
 #### Option 5: Docker Deployment
 
 1. **Create `Dockerfile`:**
+
    ```dockerfile
    # Build stage
    FROM node:18-alpine AS builder
@@ -369,6 +404,7 @@ src/
    ```
 
 2. **Create `nginx.conf`:**
+
    ```nginx
    server {
      listen 80;

@@ -1,6 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '../components/ui/Card';
 import { patientService } from '../services/patientService';
 import { visitService } from '../services/visitService';
 import { toast } from '../utils/toast';
@@ -46,7 +51,6 @@ export default function PatientDetailsScreen() {
     loadData();
   }, [patientId, navigate]);
 
-
   const handleViewVisit = (visit: Visit) => {
     navigate(`/visit/${visit.id}`);
   };
@@ -69,32 +73,46 @@ export default function PatientDetailsScreen() {
         {/* Patient Header */}
         <Card className="mb-6 border-teal-200">
           <CardHeader className="bg-gradient-to-r from-teal-50 to-white border-b border-teal-100">
-            <CardTitle className="text-2xl text-teal-900">{patient.name}</CardTitle>
+            <CardTitle className="text-2xl text-teal-900">
+              {patient.name}
+            </CardTitle>
           </CardHeader>
           <CardContent className="pt-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
               <div className="flex items-center gap-2">
                 <span className="text-teal-600 font-medium">Age:</span>
-                <span className="font-semibold text-gray-900">{patient.age !== undefined && patient.age !== null ? patient.age : 'N/A'}</span>
+                <span className="font-semibold text-gray-900">
+                  {patient.age !== undefined && patient.age !== null
+                    ? patient.age
+                    : 'N/A'}
+                </span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-teal-600 font-medium">Gender:</span>
                 <span className="font-semibold text-gray-900">
-                  {patient.gender === 'M' ? 'Male' : patient.gender === 'F' ? 'Female' : 'N/A'}
+                  {patient.gender === 'M'
+                    ? 'Male'
+                    : patient.gender === 'F'
+                      ? 'Female'
+                      : 'N/A'}
                 </span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-teal-600 font-medium">Mobile:</span>
-                <span className="font-semibold text-gray-900">{patient.mobile}</span>
+                <span className="font-semibold text-gray-900">
+                  {patient.mobile}
+                </span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-teal-600 font-medium">Joined:</span>
                 <span className="font-semibold text-gray-900">
-                  {patient.createdAt ? new Date(patient.createdAt).toLocaleDateString('en-IN', {
-                    day: '2-digit',
-                    month: 'short',
-                    year: 'numeric',
-                  }) : 'N/A'}
+                  {patient.createdAt
+                    ? new Date(patient.createdAt).toLocaleDateString('en-IN', {
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric',
+                      })
+                    : 'N/A'}
                 </span>
               </div>
             </div>
@@ -124,11 +142,13 @@ export default function PatientDetailsScreen() {
                         })}
                       </div>
                       <div className="text-xs text-gray-600 mt-1">
-                        {visit.visit_status === 'WAITING' || visit.status === 'waiting'
+                        {visit.visit_status === 'WAITING' ||
+                        visit.status === 'waiting'
                           ? 'Waiting'
-                          : visit.visit_status === 'IN_PROGRESS' || visit.status === 'in_progress'
-                          ? 'In Progress'
-                          : 'Completed'}
+                          : visit.visit_status === 'IN_PROGRESS' ||
+                              visit.status === 'in_progress'
+                            ? 'In Progress'
+                            : 'Completed'}
                         {visit.prescription &&
                           ` • ${visit.prescription.medicines.length} medicine(s)`}
                       </div>

@@ -13,13 +13,15 @@ export const appointmentService = {
       name: apiAppointment.name || '',
       mobile_number: apiAppointment.mobile_number || '',
       gender: apiAppointment.gender || 'MALE',
-      doctor: apiAppointment.doctor ? {
-        id: apiAppointment.doctor.id,
-        name: apiAppointment.doctor.name || '',
-        mobile_number: apiAppointment.doctor.mobile_number,
-        email: apiAppointment.doctor.email,
-        role: apiAppointment.doctor.role,
-      } : undefined,
+      doctor: apiAppointment.doctor
+        ? {
+            id: apiAppointment.doctor.id,
+            name: apiAppointment.doctor.name || '',
+            mobile_number: apiAppointment.doctor.mobile_number,
+            email: apiAppointment.doctor.email,
+            role: apiAppointment.doctor.role,
+          }
+        : undefined,
       clinic_id: apiAppointment.clinic_id || '',
       appointment_date_time: apiAppointment.appointment_date_time || '',
       appointment_status: apiAppointment.appointment_status || 'WAITING',
@@ -37,8 +39,13 @@ export const appointmentService = {
     page: number = 1,
     pageSize: number = 20,
     date?: string,
-    doctorId?: string
-  ): Promise<{ appointments: Appointment[]; count: number; next: string | null; previous: string | null }> {
+    doctorId?: string,
+  ): Promise<{
+    appointments: Appointment[];
+    count: number;
+    next: string | null;
+    previous: string | null;
+  }> {
     try {
       const params: Record<string, string | number> = {
         page,
@@ -56,7 +63,10 @@ export const appointmentService = {
         params.doctor_id = doctorId;
       }
 
-      const response = await apiClient.get<any>(`/appointments/all/appointments`, params);
+      const response = await apiClient.get<any>(
+        `/appointments/all/appointments`,
+        params,
+      );
 
       if (!response.success || !response.data) {
         console.error('❌ Failed to get all appointments:', response.error);
@@ -65,10 +75,11 @@ export const appointmentService = {
 
       // Handle paginated response
       const apiData = response.data;
-      const results = apiData.results || (Array.isArray(apiData) ? apiData : []);
-      
+      const results =
+        apiData.results || (Array.isArray(apiData) ? apiData : []);
+
       const appointments: Appointment[] = results.map((apiAppointment: any) =>
-        this.mapApiAppointmentToAppointment(apiAppointment)
+        this.mapApiAppointmentToAppointment(apiAppointment),
       );
 
       return {
@@ -110,18 +121,25 @@ export const appointmentService = {
 
       console.log('📤 Creating appointment with API data:', apiRequestData);
 
-      const response = await apiClient.post<any>('/appointments', apiRequestData);
+      const response = await apiClient.post<any>(
+        '/appointments',
+        apiRequestData,
+      );
 
       if (!response.success || !response.data) {
         console.error('❌ Failed to create appointment:', response.error);
         // Create error object with details for validation errors
-        const error: any = new Error(response.error?.message || 'Failed to create appointment');
+        const error: any = new Error(
+          response.error?.message || 'Failed to create appointment',
+        );
         error.code = response.error?.code;
         error.details = response.error?.details;
         throw error;
       }
 
-      const mappedAppointment = this.mapApiAppointmentToAppointment(response.data);
+      const mappedAppointment = this.mapApiAppointmentToAppointment(
+        response.data,
+      );
       console.log('✅ Appointment created successfully:', mappedAppointment);
       return mappedAppointment;
     } catch (error: any) {
@@ -136,16 +154,19 @@ export const appointmentService = {
    */
   async updateStatus(
     appointmentId: string,
-    status: 'WAITING' | 'CHECKED_IN' | 'NO_SHOW'
+    status: 'WAITING' | 'CHECKED_IN' | 'NO_SHOW',
   ): Promise<Appointment | null> {
     try {
       const response = await apiClient.put<any>(
         `/appointments/${appointmentId}`,
-        { appointment_status: status }
+        { appointment_status: status },
       );
 
       if (!response.success || !response.data) {
-        console.error('❌ Failed to update appointment status:', response.error);
+        console.error(
+          '❌ Failed to update appointment status:',
+          response.error,
+        );
         return null;
       }
 

@@ -19,7 +19,7 @@ const toasts: ToastData[] = [];
 let toastListeners: Array<(toasts: ToastData[]) => void> = [];
 
 const notifyListeners = () => {
-  toastListeners.forEach(listener => listener([...toasts]));
+  toastListeners.forEach((listener) => listener([...toasts]));
 };
 
 export const toast = {
@@ -80,7 +80,7 @@ export const toast = {
    * Dismiss a toast by ID
    */
   dismiss(id: number) {
-    const index = toasts.findIndex(t => t.id === id);
+    const index = toasts.findIndex((t) => t.id === id);
     if (index !== -1) {
       toasts.splice(index, 1);
       notifyListeners();
@@ -93,7 +93,7 @@ export const toast = {
   subscribe(listener: (toasts: ToastData[]) => void) {
     toastListeners.push(listener);
     return () => {
-      toastListeners = toastListeners.filter(l => l !== listener);
+      toastListeners = toastListeners.filter((l) => l !== listener);
     };
   },
 
@@ -129,9 +129,13 @@ export function Toaster() {
             }
           }}
         >
-          {toastData.title && <Toast.ToastTitle>{toastData.title}</Toast.ToastTitle>}
+          {toastData.title && (
+            <Toast.ToastTitle>{toastData.title}</Toast.ToastTitle>
+          )}
           {toastData.description && (
-            <Toast.ToastDescription>{toastData.description}</Toast.ToastDescription>
+            <Toast.ToastDescription>
+              {toastData.description}
+            </Toast.ToastDescription>
           )}
           <Toast.ToastClose />
         </Toast.Toast>

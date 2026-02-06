@@ -2,15 +2,18 @@ import * as React from 'react';
 import * as Label from '@radix-ui/react-label';
 import { cn } from '../../utils/cn';
 
-export interface DateFilterProps
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type'> {
+export interface DateFilterProps extends Omit<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  'type'
+> {
   label?: string;
   error?: string;
 }
 
 const DateFilter = React.forwardRef<HTMLInputElement, DateFilterProps>(
   ({ className, label, error, id, ...props }, ref) => {
-    const inputId = id || `date-filter-${Math.random().toString(36).substr(2, 9)}`;
+    const inputId =
+      id || `date-filter-${Math.random().toString(36).substr(2, 9)}`;
 
     return (
       <div className="w-full">
@@ -31,17 +34,15 @@ const DateFilter = React.forwardRef<HTMLInputElement, DateFilterProps>(
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2',
             'disabled:cursor-not-allowed disabled:opacity-50',
             error && 'border-red-500 focus-visible:ring-red-500',
-            className
+            className,
           )}
           ref={ref}
           {...props}
         />
-        {error && (
-          <p className="mt-1 text-sm text-red-600">{error}</p>
-        )}
+        {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
       </div>
     );
-  }
+  },
 );
 DateFilter.displayName = 'DateFilter';
 

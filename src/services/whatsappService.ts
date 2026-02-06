@@ -21,7 +21,7 @@ export const whatsappService = {
   }): Promise<{ success: boolean; message?: string }> {
     const response = await apiClient.post<WhatsAppResponse>(
       '/whatsapp/visit-confirmation',
-      data
+      data,
     );
 
     if (!response.success) {
@@ -47,7 +47,10 @@ export const whatsappService = {
     mobile: string;
     prescription: Prescription;
   }): Promise<{ success: boolean; message?: string }> {
-    const response = await apiClient.post<WhatsAppResponse>('/whatsapp/prescription', data);
+    const response = await apiClient.post<WhatsAppResponse>(
+      '/whatsapp/prescription',
+      data,
+    );
 
     if (!response.success) {
       return {

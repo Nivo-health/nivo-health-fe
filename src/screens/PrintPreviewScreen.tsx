@@ -37,7 +37,9 @@ export default function PrintPreviewScreen() {
       // If prescription_id exists, fetch the prescription data
       let prescription = null;
       if (currentVisit.prescription_id) {
-        prescription = await prescriptionService.getById(currentVisit.prescription_id);
+        prescription = await prescriptionService.getById(
+          currentVisit.prescription_id,
+        );
       } else if (currentVisit.prescription) {
         // Fallback to visit.prescription if it exists
         prescription = currentVisit.prescription;
@@ -97,13 +99,18 @@ export default function PrintPreviewScreen() {
         </Card>
 
         <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <h1 className="text-xl md:text-2xl font-semibold text-gray-900">Print Preview</h1>
+          <h1 className="text-xl md:text-2xl font-semibold text-gray-900">
+            Print Preview
+          </h1>
           <Button onClick={handlePrint} size="lg" className="w-full sm:w-auto">
             Print
           </Button>
         </div>
 
-        <Tabs.Root value={activeTab} onValueChange={(value) => setActiveTab(value as 'a4' | 'thermal')}>
+        <Tabs.Root
+          value={activeTab}
+          onValueChange={(value) => setActiveTab(value as 'a4' | 'thermal')}
+        >
           <Tabs.List className="flex w-full overflow-x-auto border-b border-gray-200 mb-6 -mx-4 md:mx-0 px-4 md:px-0">
             <Tabs.Trigger
               value="a4"
@@ -124,17 +131,26 @@ export default function PrintPreviewScreen() {
               <div className="max-w-[210mm] mx-auto min-w-0">
                 {/* A4 Layout */}
                 <div className="text-center mb-6 md:mb-8 pb-3 md:pb-4 border-b-2 border-black">
-                  <div className="text-lg md:text-2xl font-bold break-words">{clinicName}</div>
+                  <div className="text-lg md:text-2xl font-bold break-words">
+                    {clinicName}
+                  </div>
                 </div>
 
                 <div className="mb-6 space-y-2 text-sm md:text-base">
-                  <p className="break-words"><strong>Patient Name:</strong> {patient.name}</p>
+                  <p className="break-words">
+                    <strong>Patient Name:</strong> {patient.name}
+                  </p>
                   <p className="break-words">
                     <strong>Age:</strong> {patient.age || 'N/A'}{' '}
-                    {patient.gender && `| Gender: ${patient.gender === 'M' ? 'Male' : 'Female'}`}
+                    {patient.gender &&
+                      `| Gender: ${patient.gender === 'M' ? 'Male' : 'Female'}`}
                   </p>
-                  <p className="break-words"><strong>Mobile:</strong> {patient.mobile}</p>
-                  <p className="break-words"><strong>Date:</strong> {visitDate}</p>
+                  <p className="break-words">
+                    <strong>Mobile:</strong> {patient.mobile}
+                  </p>
+                  <p className="break-words">
+                    <strong>Date:</strong> {visitDate}
+                  </p>
                 </div>
 
                 {visit.prescription.notes && (
@@ -147,19 +163,35 @@ export default function PrintPreviewScreen() {
                   <table className="w-full border-collapse border border-gray-300 min-w-[600px]">
                     <thead>
                       <tr className="bg-gray-100">
-                        <th className="border border-gray-300 px-2 md:px-4 py-2 text-left text-sm md:text-base">Medicine</th>
-                        <th className="border border-gray-300 px-2 md:px-4 py-2 text-left text-sm md:text-base">Dosage</th>
-                        <th className="border border-gray-300 px-2 md:px-4 py-2 text-left text-sm md:text-base">Duration</th>
-                        <th className="border border-gray-300 px-2 md:px-4 py-2 text-left text-sm md:text-base">Notes</th>
+                        <th className="border border-gray-300 px-2 md:px-4 py-2 text-left text-sm md:text-base">
+                          Medicine
+                        </th>
+                        <th className="border border-gray-300 px-2 md:px-4 py-2 text-left text-sm md:text-base">
+                          Dosage
+                        </th>
+                        <th className="border border-gray-300 px-2 md:px-4 py-2 text-left text-sm md:text-base">
+                          Duration
+                        </th>
+                        <th className="border border-gray-300 px-2 md:px-4 py-2 text-left text-sm md:text-base">
+                          Notes
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
                       {visit.prescription.medicines.map((med, idx) => (
                         <tr key={idx}>
-                          <td className="border border-gray-300 px-2 md:px-4 py-2 text-sm md:text-base break-words">{med.name}</td>
-                          <td className="border border-gray-300 px-2 md:px-4 py-2 text-sm md:text-base break-words">{med.dosage}</td>
-                          <td className="border border-gray-300 px-2 md:px-4 py-2 text-sm md:text-base break-words">{med.duration}</td>
-                          <td className="border border-gray-300 px-2 md:px-4 py-2 text-sm md:text-base break-words">{med.notes || '-'}</td>
+                          <td className="border border-gray-300 px-2 md:px-4 py-2 text-sm md:text-base break-words">
+                            {med.name}
+                          </td>
+                          <td className="border border-gray-300 px-2 md:px-4 py-2 text-sm md:text-base break-words">
+                            {med.dosage}
+                          </td>
+                          <td className="border border-gray-300 px-2 md:px-4 py-2 text-sm md:text-base break-words">
+                            {med.duration}
+                          </td>
+                          <td className="border border-gray-300 px-2 md:px-4 py-2 text-sm md:text-base break-words">
+                            {med.notes || '-'}
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -168,7 +200,8 @@ export default function PrintPreviewScreen() {
 
                 {visit.prescription.followUp && (
                   <p className="mb-6">
-                    <strong>Follow-up:</strong> After {visit.prescription.followUp.value}{' '}
+                    <strong>Follow-up:</strong> After{' '}
+                    {visit.prescription.followUp.value}{' '}
                     {visit.prescription.followUp.unit}
                   </p>
                 )}
@@ -190,16 +223,31 @@ export default function PrintPreviewScreen() {
                 </div>
 
                 <div className="mb-4 space-y-1 text-xs">
-                  <div><strong>{patient.name}</strong></div>
                   <div>
-                    {patient.age !== undefined && patient.age !== null ? `Age: ${patient.age}` : 'Age: N/A'}{' '}
-                    {patient.gender && `| ${patient.gender === 'M' ? 'M' : 'F'}`}
+                    <strong>{patient.name}</strong>
                   </div>
-                  <div>{patient.mobile} | {new Date(visit.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</div>
+                  <div>
+                    {patient.age !== undefined && patient.age !== null
+                      ? `Age: ${patient.age}`
+                      : 'Age: N/A'}{' '}
+                    {patient.gender &&
+                      `| ${patient.gender === 'M' ? 'M' : 'F'}`}
+                  </div>
+                  <div>
+                    {patient.mobile} |{' '}
+                    {new Date(visit.date).toLocaleDateString('en-IN', {
+                      day: '2-digit',
+                      month: 'short',
+                      year: 'numeric',
+                    })}
+                  </div>
                 </div>
 
                 {visit.prescription.medicines.map((med, idx) => (
-                  <div key={idx} className="mb-3 pb-2 border-b border-dotted border-gray-400">
+                  <div
+                    key={idx}
+                    className="mb-3 pb-2 border-b border-dotted border-gray-400"
+                  >
                     <div className="font-bold mb-1">{med.name}</div>
                     <div className="ml-1 text-xs">
                       {med.dosage} - {med.duration}
@@ -210,7 +258,8 @@ export default function PrintPreviewScreen() {
 
                 {visit.prescription.followUp && (
                   <div className="mt-4 text-center font-bold">
-                    Follow-up: {visit.prescription.followUp.value} {visit.prescription.followUp.unit}
+                    Follow-up: {visit.prescription.followUp.value}{' '}
+                    {visit.prescription.followUp.unit}
                   </div>
                 )}
 

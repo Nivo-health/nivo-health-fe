@@ -31,12 +31,14 @@ Choose one of the deployment options below.
 ### 1. Vercel (Easiest - Recommended)
 
 **Via CLI:**
+
 ```bash
 npm install -g vercel
 vercel
 ```
 
 **Via Dashboard:**
+
 1. Push code to GitHub
 2. Go to [vercel.com](https://vercel.com)
 3. Click "New Project"
@@ -44,6 +46,7 @@ vercel
 5. Vercel auto-detects Vite - just click "Deploy"
 
 **Settings:**
+
 - Framework Preset: Vite
 - Build Command: `npm run build`
 - Output Directory: `dist`
@@ -56,6 +59,7 @@ vercel
 ### 2. Netlify
 
 **Via CLI:**
+
 ```bash
 npm install -g netlify-cli
 npm run build
@@ -63,6 +67,7 @@ netlify deploy --prod --dir=dist
 ```
 
 **Via Dashboard:**
+
 1. Push code to GitHub
 2. Go to [netlify.com](https://netlify.com)
 3. Click "Add new site" > "Import an existing project"
@@ -79,11 +84,13 @@ netlify deploy --prod --dir=dist
 ### 3. GitHub Pages
 
 **Setup:**
+
 ```bash
 npm install --save-dev gh-pages
 ```
 
 **Update `package.json`:**
+
 ```json
 {
   "scripts": {
@@ -94,19 +101,22 @@ npm install --save-dev gh-pages
 ```
 
 **Update `vite.config.ts`:**
+
 ```typescript
 export default defineConfig({
   plugins: [react()],
   base: '/your-repo-name/', // Replace with your actual repo name
-})
+});
 ```
 
 **Deploy:**
+
 ```bash
 npm run deploy
 ```
 
 **Enable Pages:**
+
 1. Go to your GitHub repo
 2. Settings > Pages
 3. Source: `gh-pages` branch
@@ -119,17 +129,20 @@ npm run deploy
 ### 4. Traditional Web Hosting (cPanel, FTP)
 
 **Build:**
+
 ```bash
 npm run build
 ```
 
 **Upload:**
+
 1. Upload all files from the `dist/` folder to your web server
 2. Place them in `public_html` or `www` directory
 
 **Configure for SPA Routing:**
 
 Create `.htaccess` file in the `dist/` folder (for Apache):
+
 ```apache
 <IfModule mod_rewrite.c>
   RewriteEngine On
@@ -142,6 +155,7 @@ Create `.htaccess` file in the `dist/` folder (for Apache):
 ```
 
 For Nginx, add to your server config:
+
 ```nginx
 location / {
   try_files $uri $uri/ /index.html;
@@ -155,6 +169,7 @@ location / {
 ### 5. Docker
 
 **Create `Dockerfile`:**
+
 ```dockerfile
 FROM node:18-alpine AS builder
 WORKDIR /app
@@ -171,6 +186,7 @@ CMD ["nginx", "-g", "daemon off;"]
 ```
 
 **Create `nginx.conf`:**
+
 ```nginx
 server {
   listen 80;
@@ -184,6 +200,7 @@ server {
 ```
 
 **Build and run:**
+
 ```bash
 docker build -t clinic-app .
 docker run -p 80:80 clinic-app
@@ -205,15 +222,18 @@ Set these in your hosting platform's environment variables section:
 ## Troubleshooting
 
 ### Build Fails
+
 - Check Node.js version: `node --version` (should be 18+)
 - Clear cache: `rm -rf node_modules package-lock.json && npm install`
 - Check for TypeScript errors: `npm run build`
 
 ### 404 Errors on Routes
+
 - Ensure SPA routing is configured (see options above)
 - All routes should redirect to `index.html`
 
 ### API Not Working
+
 - Check CORS settings on your backend
 - Verify `VITE_API_BASE_URL` is set correctly
 - Check browser console for errors

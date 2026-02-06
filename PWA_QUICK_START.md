@@ -21,6 +21,7 @@ npm run preview
 ```
 
 Open http://localhost:4173 and check:
+
 - DevTools → Application → Service Workers (should see registered)
 - DevTools → Application → Manifest (should see manifest with icons)
 - Try "Add to Home Screen" on mobile
@@ -44,6 +45,7 @@ npm run preview
 ```
 
 Open http://localhost:4173 and check:
+
 - DevTools → Application → Service Workers (should see registered)
 - DevTools → Application → Manifest (should see manifest)
 - Try "Add to Home Screen" on mobile
@@ -55,17 +57,21 @@ Deploy as normal - PWA features work automatically!
 ## 📱 Installing the App
 
 **Android:**
+
 - Chrome → Menu (3 dots) → "Add to Home screen"
 
 **iOS:**
+
 - Safari → Share → "Add to Home Screen"
 
 **Desktop:**
+
 - Look for install icon in address bar
 
 ## 🔧 Customization
 
 Edit `vite.config.ts` to change:
+
 - App name: `manifest.name`
 - Short name: `manifest.short_name`
 - Theme color: `manifest.theme_color`

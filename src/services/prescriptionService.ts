@@ -12,8 +12,12 @@ export const prescriptionService = {
    * Map API prescription format to frontend format
    */
   mapApiPrescriptionToPrescription(apiPrescription: any): Prescription {
-    const medicines: Medicine[] = (apiPrescription.prescription_items || []).map((item: any) => ({
-      id: item.id || `medicine_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+    const medicines: Medicine[] = (
+      apiPrescription.prescription_items || []
+    ).map((item: any) => ({
+      id:
+        item.id ||
+        `medicine_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       name: item.medicine || '',
       dosage: item.dosage || '',
       duration: item.duration || '',
@@ -23,9 +27,9 @@ export const prescriptionService = {
     let followUp: FollowUp | undefined = undefined;
     if (apiPrescription.follow_up && apiPrescription.follow_up_unit) {
       const unitMap: Record<string, 'days' | 'weeks' | 'months'> = {
-        'DAYS': 'days',
-        'WEEKS': 'weeks',
-        'MONTHS': 'months',
+        DAYS: 'days',
+        WEEKS: 'weeks',
+        MONTHS: 'months',
       };
       followUp = {
         value: apiPrescription.follow_up,
@@ -44,15 +48,20 @@ export const prescriptionService = {
    * Map frontend prescription format to API format
    */
   mapPrescriptionToApi(prescription: Prescription): any {
-    const unitMap: Record<'days' | 'weeks' | 'months', 'DAYS' | 'WEEKS' | 'MONTHS'> = {
-      'days': 'DAYS',
-      'weeks': 'WEEKS',
-      'months': 'MONTHS',
+    const unitMap: Record<
+      'days' | 'weeks' | 'months',
+      'DAYS' | 'WEEKS' | 'MONTHS'
+    > = {
+      days: 'DAYS',
+      weeks: 'WEEKS',
+      months: 'MONTHS',
     };
 
     return {
       follow_up: prescription.followUp?.value || null,
-      follow_up_unit: prescription.followUp ? unitMap[prescription.followUp.unit] : null,
+      follow_up_unit: prescription.followUp
+        ? unitMap[prescription.followUp.unit]
+        : null,
       notes: prescription.notes ?? '',
       prescription_items: prescription.medicines
         .filter((med) => med.name.trim() !== '')
@@ -71,7 +80,9 @@ export const prescriptionService = {
    */
   async getById(prescriptionId: string): Promise<Prescription | null> {
     try {
-      const response = await apiClient.get<any>(`/visits/prescription/${prescriptionId}`);
+      const response = await apiClient.get<any>(
+        `/visits/prescription/${prescriptionId}`,
+      );
 
       if (!response.success || !response.data) {
         console.error('❌ Failed to get prescription:', response.error);
@@ -89,18 +100,26 @@ export const prescriptionService = {
    * Create prescription for a visit
    * POST /api/visits/:visitId/prescription
    */
-  async create(visitId: string, prescription: Prescription): Promise<string | null> {
+  async create(
+    visitId: string,
+    prescription: Prescription,
+  ): Promise<string | null> {
     try {
       const apiData = this.mapPrescriptionToApi(prescription);
 
       console.log('📤 Creating prescription with API data:', apiData);
 
-      const response = await apiClient.post<any>(`/visits/${visitId}/prescription`, apiData);
+      const response = await apiClient.post<any>(
+        `/visits/${visitId}/prescription`,
+        apiData,
+      );
 
       if (!response.success || !response.data) {
         console.error('❌ Failed to create prescription:', response.error);
         // Create error object with details for validation errors
-        const error: any = new Error(response.error?.message || 'Failed to create prescription');
+        const error: any = new Error(
+          response.error?.message || 'Failed to create prescription',
+        );
         error.code = response.error?.code;
         error.details = response.error?.details;
         throw error;
@@ -118,18 +137,26 @@ export const prescriptionService = {
    * Update prescription
    * PUT /api/visits/prescription/:prescriptionId
    */
-  async update(prescriptionId: string, prescription: Prescription): Promise<boolean> {
+  async update(
+    prescriptionId: string,
+    prescription: Prescription,
+  ): Promise<boolean> {
     try {
       const apiData = this.mapPrescriptionToApi(prescription);
 
       console.log('📤 Updating prescription with API data:', apiData);
 
-      const response = await apiClient.put<any>(`/visits/prescription/${prescriptionId}`, apiData);
+      const response = await apiClient.put<any>(
+        `/visits/prescription/${prescriptionId}`,
+        apiData,
+      );
 
       if (!response.success) {
         console.error('❌ Failed to update prescription:', response.error);
         // Create error object with details for validation errors
-        const error: any = new Error(response.error?.message || 'Failed to update prescription');
+        const error: any = new Error(
+          response.error?.message || 'Failed to update prescription',
+        );
         error.code = response.error?.code;
         error.details = response.error?.details;
         throw error;
@@ -147,7 +174,10 @@ export const prescriptionService = {
    * Save prescription to a visit (creates or updates based on prescription_id)
    * This is the main method used by PrescriptionScreen
    */
-  async saveToVisit(visitId: string, prescription: Prescription): Promise<boolean> {
+  async saveToVisit(
+    visitId: string,
+    prescription: Prescription,
+  ): Promise<boolean> {
     try {
       // Get the visit to check if prescription_id exists
       const visit = await visitService.getById(visitId);

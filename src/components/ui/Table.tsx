@@ -12,7 +12,7 @@ const Table = React.forwardRef<HTMLTableElement, TableProps>(
         {...props}
       />
     </div>
-  )
+  ),
 );
 Table.displayName = 'Table';
 
@@ -44,7 +44,7 @@ const TableFooter = React.forwardRef<
     ref={ref}
     className={cn(
       'border-t bg-gray-50/50 font-medium [&>tr]:last:border-b-0',
-      className
+      className,
     )}
     {...props}
   />
@@ -59,7 +59,7 @@ const TableRow = React.forwardRef<
     ref={ref}
     className={cn(
       'border-b transition-colors hover:bg-gray-50/50 data-[state=selected]:bg-gray-50',
-      className
+      className,
     )}
     {...props}
   />
@@ -74,7 +74,7 @@ const TableHead = React.forwardRef<
     ref={ref}
     className={cn(
       'h-12 px-4 text-left align-middle font-medium text-gray-500 [&:has([role=checkbox])]:pr-0',
-      className
+      className,
     )}
     {...props}
   />

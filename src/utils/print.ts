@@ -10,7 +10,7 @@ export const printUtils = {
     patient: Patient,
     visit: Visit,
     prescription: Prescription,
-    clinicName: string = 'Clinic OPD Management'
+    clinicName: string = 'Clinic OPD Management',
   ): string {
     const date = new Date(visit.date).toLocaleDateString('en-IN', {
       day: '2-digit',
@@ -27,7 +27,7 @@ export const printUtils = {
         <td class="border px-4 py-2">${med.duration}</td>
         <td class="border px-4 py-2">${med.notes || '-'}</td>
       </tr>
-    `
+    `,
       )
       .join('');
 
@@ -138,7 +138,7 @@ export const printUtils = {
     patient: Patient,
     visit: Visit,
     prescription: Prescription,
-    clinicName: string = 'Clinic OPD Management'
+    clinicName: string = 'Clinic OPD Management',
   ): string {
     const date = new Date(visit.date).toLocaleDateString('en-IN', {
       day: '2-digit',
@@ -153,7 +153,7 @@ export const printUtils = {
         <div class="medicine-name">${med.name}</div>
         <div class="medicine-details">${med.dosage} - ${med.duration}${med.notes ? ` (${med.notes})` : ''}</div>
       </div>
-    `
+    `,
       )
       .join('');
 
@@ -250,8 +250,18 @@ export const printUtils = {
   /**
    * Print prescription in A4 format
    */
-  printA4(patient: Patient, visit: Visit, prescription: Prescription, clinicName?: string) {
-    const html = this.generateA4Prescription(patient, visit, prescription, clinicName);
+  printA4(
+    patient: Patient,
+    visit: Visit,
+    prescription: Prescription,
+    clinicName?: string,
+  ) {
+    const html = this.generateA4Prescription(
+      patient,
+      visit,
+      prescription,
+      clinicName,
+    );
     const printWindow = window.open('', '_blank');
     if (printWindow) {
       printWindow.document.write(html);
@@ -265,8 +275,18 @@ export const printUtils = {
   /**
    * Print prescription in Thermal format
    */
-  printThermal(patient: Patient, visit: Visit, prescription: Prescription, clinicName?: string) {
-    const html = this.generateThermalPrescription(patient, visit, prescription, clinicName);
+  printThermal(
+    patient: Patient,
+    visit: Visit,
+    prescription: Prescription,
+    clinicName?: string,
+  ) {
+    const html = this.generateThermalPrescription(
+      patient,
+      visit,
+      prescription,
+      clinicName,
+    );
     const printWindow = window.open('', '_blank');
     if (printWindow) {
       printWindow.document.write(html);

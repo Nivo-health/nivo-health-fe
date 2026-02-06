@@ -29,7 +29,10 @@ export const authService = {
       let loginData: LoginResponse;
       if (response.success && response.data) {
         loginData = response.data;
-      } else if (response.data && (response.data.access || response.data.refresh)) {
+      } else if (
+        response.data &&
+        (response.data.access || response.data.refresh)
+      ) {
         // Direct response format
         loginData = response.data;
       } else {

@@ -4,8 +4,15 @@ import { Input, Button, Modal } from '../components/ui';
 import { patientService } from '../services/patientService';
 import { visitService } from '../services/visitService';
 import type { Patient } from '../types';
-import { validatePhoneNumber, formatPhoneInput } from '../utils/phoneValidation';
-import { extractValidationErrors, getErrorMessage, hasValidationErrors } from '../utils/errorHandler';
+import {
+  validatePhoneNumber,
+  formatPhoneInput,
+} from '../utils/phoneValidation';
+import {
+  extractValidationErrors,
+  getErrorMessage,
+  hasValidationErrors,
+} from '../utils/errorHandler';
 
 export default function PatientSearchScreen() {
   const navigate = useNavigate();
@@ -58,9 +65,9 @@ export default function PatientSearchScreen() {
   const handleStartVisit = async (e: React.MouseEvent, patient: Patient) => {
     e.stopPropagation(); // Prevent card click
     try {
-      const visit = await visitService.create({ 
+      const visit = await visitService.create({
         patientId: patient.id,
-        status: 'waiting'
+        status: 'waiting',
       });
       navigate(`/visit/${visit.id}`);
     } catch (error) {
@@ -81,9 +88,13 @@ export default function PatientSearchScreen() {
     }
     const phoneValidation = validatePhoneNumber(newPatient.mobile);
     if (!phoneValidation.isValid) {
-      newErrors.mobile = phoneValidation.error || 'Please enter a valid mobile number';
+      newErrors.mobile =
+        phoneValidation.error || 'Please enter a valid mobile number';
     }
-    if (newPatient.age && (isNaN(Number(newPatient.age)) || Number(newPatient.age) < 0)) {
+    if (
+      newPatient.age &&
+      (isNaN(Number(newPatient.age)) || Number(newPatient.age) < 0)
+    ) {
       newErrors.age = 'Age must be a valid number';
     }
     setErrors(newErrors);
@@ -104,19 +115,19 @@ export default function PatientSearchScreen() {
       });
 
       // Create visit for new patient with waiting status
-      const visit = await visitService.create({ 
+      const visit = await visitService.create({
         patientId: patient.id,
-        status: 'waiting'
+        status: 'waiting',
       });
       setIsModalOpen(false);
       navigate(`/visit/${visit.id}`);
     } catch (error: any) {
       console.error('Failed to create patient:', error);
-      
+
       // Extract validation errors if present
       if (hasValidationErrors(error)) {
         const validationErrors = extractValidationErrors(error);
-        setErrors(prevErrors => ({
+        setErrors((prevErrors) => ({
           ...prevErrors,
           ...validationErrors,
         }));
@@ -147,7 +158,7 @@ export default function PatientSearchScreen() {
           />
           <Button onClick={handleAddNewPatient} className="w-40">
             + Add Patient
-          </Button>  
+          </Button>
         </div>
       </div>
 
@@ -163,11 +174,14 @@ export default function PatientSearchScreen() {
                 >
                   <div className="flex justify-between items-center gap-3">
                     <div className="flex-1">
-                      <div className="font-medium text-gray-900">{patient.name}</div>
+                      <div className="font-medium text-gray-900">
+                        {patient.name}
+                      </div>
                       <div className="text-sm text-gray-500">
                         {maskMobile(patient.mobile)}
                         {patient.age && ` • Age: ${patient.age}`}
-                        {patient.gender && ` • ${patient.gender === 'M' ? 'Male' : 'Female'}`}
+                        {patient.gender &&
+                          ` • ${patient.gender === 'M' ? 'Male' : 'Female'}`}
                       </div>
                     </div>
                     <Button
@@ -221,7 +235,9 @@ export default function PatientSearchScreen() {
           <Input
             label="Name *"
             value={newPatient.name}
-            onChange={(e) => setNewPatient({ ...newPatient, name: e.target.value })}
+            onChange={(e) =>
+              setNewPatient({ ...newPatient, name: e.target.value })
+            }
             error={errors.name}
             placeholder="Enter patient name"
             autoFocus
@@ -235,7 +251,12 @@ export default function PatientSearchScreen() {
             label="Mobile *"
             type="tel"
             value={newPatient.mobile}
-            onChange={(e) => setNewPatient({ ...newPatient, mobile: formatPhoneInput(e.target.value) })}
+            onChange={(e) =>
+              setNewPatient({
+                ...newPatient,
+                mobile: formatPhoneInput(e.target.value),
+              })
+            }
             error={errors.mobile}
             placeholder="Enter mobile number (e.g., +91 9876543210)"
             onKeyDown={(e) => {
@@ -248,7 +269,9 @@ export default function PatientSearchScreen() {
             label="Age"
             type="number"
             value={newPatient.age}
-            onChange={(e) => setNewPatient({ ...newPatient, age: e.target.value })}
+            onChange={(e) =>
+              setNewPatient({ ...newPatient, age: e.target.value })
+            }
             error={errors.age}
             placeholder="Enter age (optional)"
             min="0"
@@ -269,7 +292,12 @@ export default function PatientSearchScreen() {
                   name="gender"
                   value="M"
                   checked={newPatient.gender === 'M'}
-                  onChange={(e) => setNewPatient({ ...newPatient, gender: e.target.value as 'M' | 'F' })}
+                  onChange={(e) =>
+                    setNewPatient({
+                      ...newPatient,
+                      gender: e.target.value as 'M' | 'F',
+                    })
+                  }
                   className="mr-2"
                 />
                 Male
@@ -280,7 +308,12 @@ export default function PatientSearchScreen() {
                   name="gender"
                   value="F"
                   checked={newPatient.gender === 'F'}
-                  onChange={(e) => setNewPatient({ ...newPatient, gender: e.target.value as 'M' | 'F' })}
+                  onChange={(e) =>
+                    setNewPatient({
+                      ...newPatient,
+                      gender: e.target.value as 'M' | 'F',
+                    })
+                  }
                   className="mr-2"
                 />
                 Female

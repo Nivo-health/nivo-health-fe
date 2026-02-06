@@ -9,7 +9,10 @@ interface AppLayoutProps {
   showSidebar?: boolean;
 }
 
-export default function AppLayout({ children, showSidebar = true }: AppLayoutProps) {
+export default function AppLayout({
+  children,
+  showSidebar = true,
+}: AppLayoutProps) {
   return (
     <div className="min-h-screen bg-gray-50 overflow-x-hidden">
       <Header />
@@ -24,7 +27,7 @@ export default function AppLayout({ children, showSidebar = true }: AppLayoutPro
           className={cn(
             'flex-1 transition-all duration-300',
             'pb-16 md:pb-0', // Add bottom padding on mobile for bottom nav
-            showSidebar ? 'md:ml-64 ml-0' : 'ml-0'
+            showSidebar ? 'md:ml-64 ml-0' : 'ml-0',
           )}
         >
           {children}

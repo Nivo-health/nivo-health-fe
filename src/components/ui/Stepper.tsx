@@ -17,10 +17,7 @@ export interface StepperProps {
 const Stepper = React.forwardRef<HTMLDivElement, StepperProps>(
   ({ steps, currentStep, className }, ref) => {
     return (
-      <div
-        ref={ref}
-        className={cn('w-full', className)}
-      >
+      <div ref={ref} className={cn('w-full', className)}>
         <div className="flex items-center justify-between">
           {steps.map((step, index) => {
             const isCompleted = index < currentStep;
@@ -38,8 +35,8 @@ const Stepper = React.forwardRef<HTMLDivElement, StepperProps>(
                         isCompleted
                           ? 'bg-teal-600 border-teal-600 text-white'
                           : isActive
-                          ? 'bg-teal-50 border-teal-600 text-teal-600'
-                          : 'bg-white border-gray-300 text-gray-400'
+                            ? 'bg-teal-50 border-teal-600 text-teal-600'
+                            : 'bg-white border-gray-300 text-gray-400',
                       )}
                     >
                       {isCompleted ? (
@@ -57,7 +54,9 @@ const Stepper = React.forwardRef<HTMLDivElement, StepperProps>(
                           />
                         </svg>
                       ) : (
-                        <span className="text-xs font-semibold">{index + 1}</span>
+                        <span className="text-xs font-semibold">
+                          {index + 1}
+                        </span>
                       )}
                     </div>
                   </div>
@@ -69,14 +68,16 @@ const Stepper = React.forwardRef<HTMLDivElement, StepperProps>(
                         isActive
                           ? 'text-teal-600'
                           : isCompleted
-                          ? 'text-gray-900'
-                          : 'text-gray-500'
+                            ? 'text-gray-900'
+                            : 'text-gray-500',
                       )}
                     >
                       {step.label}
                     </div>
                     {step.description && (
-                      <div className="text-[10px] text-gray-500 mt-0.5">{step.description}</div>
+                      <div className="text-[10px] text-gray-500 mt-0.5">
+                        {step.description}
+                      </div>
                     )}
                   </div>
                 </div>
@@ -85,7 +86,7 @@ const Stepper = React.forwardRef<HTMLDivElement, StepperProps>(
                   <div
                     className={cn(
                       'flex-1 h-0.5 mx-1.5 transition-colors',
-                      index < currentStep ? 'bg-teal-600' : 'bg-gray-300'
+                      index < currentStep ? 'bg-teal-600' : 'bg-gray-300',
                     )}
                   />
                 )}
@@ -95,7 +96,7 @@ const Stepper = React.forwardRef<HTMLDivElement, StepperProps>(
         </div>
       </div>
     );
-  }
+  },
 );
 Stepper.displayName = 'Stepper';
 
