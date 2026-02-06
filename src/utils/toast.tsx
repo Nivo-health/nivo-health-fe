@@ -1,7 +1,7 @@
 // Toast notification utilities
 // This provides a simple API for showing toast notifications
 
-import * as Toast from '../components/ui/Toast';
+import * as Toast from '../components/ui_old/Toast';
 import { useEffect, useState } from 'react';
 
 // Toast state management

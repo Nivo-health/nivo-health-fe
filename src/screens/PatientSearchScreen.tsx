@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Input, Button, Modal } from '../components/ui';
+import { Input, Button, Modal } from '../components/ui_old';
 import { patientService } from '../services/patientService';
 import { visitService } from '../services/visitService';
 import type { Patient } from '../types';

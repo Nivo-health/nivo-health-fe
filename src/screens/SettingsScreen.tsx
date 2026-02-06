@@ -4,8 +4,8 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-} from '../components/ui/Card';
-import { Input, Button } from '../components/ui';
+} from '../components/ui_old/Card';
+import { Input, Button } from '../components/ui_old';
 import { useClinic } from '../hooks/useClinic';
 import { authService } from '../services/authService';
 import { toast } from '../utils/toast';

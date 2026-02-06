@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, DatePicker } from '../components/ui';
+import { Button, DatePicker } from '../components/ui_old';
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from '../components/ui/Card';
+} from '../components/ui_old/Card';
 import { useClinic } from '../hooks/useClinic';
 import { clinicService } from '../services/clinicService';
+import { toast } from '@/utils/toast';
 
 export default function HomeScreen() {
   const navigate = useNavigate();
@@ -73,6 +74,7 @@ export default function HomeScreen() {
 
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-gray-50 p-3 md:p-6 overflow-x-hidden w-full">
+      <Button>Button</Button>
       <div className="max-w-7xl mx-auto w-full">
         {/* Header - Compact on Mobile */}
         <div className="mb-4 md:mb-6">

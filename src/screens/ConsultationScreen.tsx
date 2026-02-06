@@ -1,13 +1,13 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Button } from '../components/ui/Button';
+import { Button } from '../components/ui_old/button';
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from '../components/ui/Card';
-import { Stepper } from '../components/ui/Stepper';
+} from '../components/ui_old/Card';
+import { Stepper } from '../components/ui/stepper';
 import { visitService } from '../services/visitService';
 import { prescriptionService } from '../services/prescriptionService';
 import { getVisitStep, visitSteps } from '../utils/visitStepper';

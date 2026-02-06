@@ -45,10 +45,10 @@ function App() {
                     element={<PatientDetailsScreen />}
                   />
                   <Route path="/visits" element={<VisitsScreen />} />
-                  <Route
+                  {/* <Route
                     path="/appointments"
                     element={<AppointmentsScreen />}
-                  />
+                  /> */}
                   <Route
                     path="/visit/:visitId"
                     element={<VisitContextScreen />}

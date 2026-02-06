@@ -1,13 +1,4 @@
 import { useState, useEffect } from 'react';
-import {
-  Input,
-  Button,
-  Modal,
-  DatePicker,
-  Select,
-  SelectItem,
-} from '../components/ui';
-import { Card, CardContent } from '../components/ui/Card';
 import { appointmentService } from '../services/appointmentService';
 import { patientService } from '../services/patientService';
 import { toast } from '../utils/toast';

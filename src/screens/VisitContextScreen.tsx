@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Button } from '../components/ui/Button';
+import { Button } from '../components/ui_old/button';
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from '../components/ui/Card';
+} from '../components/ui_old/Card';
 import { patientService } from '../services/patientService';
 import { visitService } from '../services/visitService';
 import { prescriptionService } from '../services/prescriptionService';

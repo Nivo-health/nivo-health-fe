@@ -6,7 +6,7 @@ import {
   Modal,
   NotesInput,
   MedicationInput,
-} from '../components/ui';
+} from '../components/ui_old';
 import {
   Table,
   TableBody,
@@ -14,9 +14,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '../components/ui/Table';
-import { Stepper } from '../components/ui/Stepper';
-import { Card, CardContent } from '../components/ui/Card';
+} from '../components/ui_old/table';
+import { Stepper } from '../components/ui/stepper';
+import { Card, CardContent } from '../components/ui_old/Card';
 import { visitService } from '../services/visitService';
 import { prescriptionService } from '../services/prescriptionService';
 import { whatsappService } from '../services/whatsappService';

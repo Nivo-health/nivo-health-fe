@@ -3,7 +3,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-} from '../components/ui/Card';
+} from '../components/ui_old/Card';
 
 export default function StatsScreen() {
   return (

@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import * as Tabs from '@radix-ui/react-tabs';
-import { Button } from '../components/ui/Button';
-import { Card, CardContent } from '../components/ui/Card';
-import { Stepper } from '../components/ui/Stepper';
+import { Button } from '../components/ui_old/button';
+import { Card, CardContent } from '../components/ui_old/Card';
+import { Stepper } from '../components/ui/stepper';
 import { visitService } from '../services/visitService';
 import { patientService } from '../services/patientService';
 import { prescriptionService } from '../services/prescriptionService';

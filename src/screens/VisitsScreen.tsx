@@ -7,8 +7,8 @@ import {
   DatePicker,
   Select,
   SelectItem,
-} from '../components/ui';
-import { Card, CardContent } from '../components/ui/Card';
+} from '../components/ui_old';
+import { Card, CardContent } from '../components/ui_old/Card';
 import { patientService } from '../services/patientService';
 import { visitService } from '../services/visitService';
 import { toast } from '../utils/toast';

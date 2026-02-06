@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Input, Button } from '../components/ui';
+import { Input, Button } from '../components/ui_old';
 import { authService } from '../services/authService';
 import { toast } from '../utils/toast';
 

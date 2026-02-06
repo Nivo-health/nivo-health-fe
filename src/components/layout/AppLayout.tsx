@@ -2,7 +2,7 @@ import { ReactNode } from 'react';
 import Header from './Header';
 import Sidebar from './Sidebar';
 import BottomNav from './BottomNav';
-import { cn } from '../../utils/cn';
+import { cn } from '@/lib/utils';
 
 interface AppLayoutProps {
   children: ReactNode;
