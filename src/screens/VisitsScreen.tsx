@@ -407,41 +407,52 @@ export default function VisitsScreen() {
               className="w-full text-sm"
             />
           </div>
-
-          {/* Doctor Filter */}
           {doctors.length > 0 && (
-            <div className="sm:w-48 md:w-56">
-              {/* TODO: */}
-              {/* <Select
+            <div className="flex flex-col items-start gap-2 sm:w-48 md:w-56">
+              <Label>Doctor</Label>
+
+              <Select.Root
                 value={selectedDoctorFilter || undefined}
-                onValueChange={(value) => setSelectedDoctorFilter(value || '')}
-                placeholder="All Doctors"
-                className="w-full text-sm"
+                onValueChange={(value) => {
+                  setSelectedDoctorFilter(value === 'all' ? '' : value || '');
+                }}
               >
-                <SelectItem value="all">All Doctors</SelectItem>
-                {doctors.map((doc) => (
-                  <SelectItem key={doc.id} value={doc.id}>
-                    {doc.name}
-                  </SelectItem>
-                ))}
-              </Select> */}
+                <Select.Trigger className="w-full text-sm">
+                  <Select.Value placeholder="All Doctors" />
+                </Select.Trigger>
+
+                <Select.Popup>
+                  <Select.Item value="all">All Doctors</Select.Item>
+
+                  {doctors.map((doc) => (
+                    <Select.Item key={doc.id} value={doc.id}>
+                      {doc.name}
+                    </Select.Item>
+                  ))}
+                </Select.Popup>
+              </Select.Root>
             </div>
           )}
 
           {/* Visit Status Filter */}
-          <div className="sm:w-48 md:w-56">
-            {/* TODO */}
-            {/* <Select
-              value={selectedVisitStatus}
-              onValueChange={(value) => setSelectedVisitStatus(value)}
-              placeholder="All Statuses"
-              className="w-full text-sm"
+          <div className="flex flex-col items-start gap-2 sm:w-48 md:w-56">
+            <Label>Status</Label>
+
+            <Select.Root
+              value={selectedVisitStatus || undefined}
+              onValueChange={(value) => setSelectedVisitStatus(value || '')}
             >
-              <SelectItem value="WAITING">Waiting</SelectItem>
-              <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
-              <SelectItem value="COMPLETED">Completed</SelectItem>
-              <SelectItem value="CANCELLED">Cancelled</SelectItem>
-            </Select> */}
+              <Select.Trigger className="w-full text-sm">
+                <Select.Value placeholder="All Statuses" />
+              </Select.Trigger>
+
+              <Select.Popup>
+                <Select.Item value="WAITING">Waiting</Select.Item>
+                <Select.Item value="IN_PROGRESS">In Progress</Select.Item>
+                <Select.Item value="COMPLETED">Completed</Select.Item>
+                <Select.Item value="CANCELLED">Cancelled</Select.Item>
+              </Select.Popup>
+            </Select.Root>
           </div>
         </div>
 

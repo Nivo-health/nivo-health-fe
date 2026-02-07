@@ -21,6 +21,7 @@ import { NotesInput } from '@/components/ui/notes-input';
 import { Table } from '@/components/ui/table';
 import { Dialog } from '@/components/ui/dialog';
 import { toast } from '@/components/ui/toast';
+import { Select } from '@/components/ui/select';
 
 export default function PrescriptionScreen() {
   const { visitId } = useParams<{ visitId: string }>();
@@ -789,19 +790,25 @@ export default function PrescriptionScreen() {
                     className="w-24 sm:w-32"
                     min="1"
                   />
-                  <select
+
+                  <Select.Root
                     value={followUpUnit}
-                    onChange={(e) =>
+                    onValueChange={(value) =>
                       handleFollowUpUnitChange(
-                        e.target.value as 'days' | 'weeks' | 'months',
+                        value as 'days' | 'weeks' | 'months',
                       )
                     }
-                    className="h-10 px-3 border border-teal-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white text-gray-900 flex-1 sm:flex-initial sm:w-auto"
                   >
-                    <option value="days">Days</option>
-                    <option value="weeks">Weeks</option>
-                    <option value="months">Months</option>
-                  </select>
+                    <Select.Trigger className="flex-1 sm:flex-initial sm:w-auto">
+                      <Select.Value placeholder="Unit" />
+                    </Select.Trigger>
+
+                    <Select.Popup>
+                      <Select.Item value="days">Days</Select.Item>
+                      <Select.Item value="weeks">Weeks</Select.Item>
+                      <Select.Item value="months">Months</Select.Item>
+                    </Select.Popup>
+                  </Select.Root>
                 </div>
               )}
             </div>

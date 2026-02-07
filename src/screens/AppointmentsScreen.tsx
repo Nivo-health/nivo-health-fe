@@ -19,6 +19,7 @@ import { Card } from '@/components/ui/card';
 import { Dialog } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { toast } from '@/components/ui/toast';
+import { Select } from '@/components/ui/select';
 
 export default function AppointmentsScreen() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -431,26 +432,32 @@ export default function AppointmentsScreen() {
               className="w-full text-sm"
             />
           </div>
+          {doctors.length > 0 && (
+            <div className="flex flex-col items-start gap-2 sm:w-48 md:w-56">
+              <Label>All Doctors</Label>
 
-          {/* Doctor Filter */}
-          {/* TODO: @sandeep fix this */}
-          {/* {doctors.length > 0 && (
-            <div className="sm:w-48 md:w-56">
               <Select.Root
                 value={selectedDoctorFilter || undefined}
-                onValueChange={(value) => setSelectedDoctorFilter(value || '')}
-                placeholder="All Doctors"
-                className="w-full text-sm"
+                onValueChange={(value) => {
+                  setSelectedDoctorFilter(value || '');
+                }}
               >
-                <SelectItem value="all">All Doctors</SelectItem>
-                {doctors.map((doc) => (
-                  <SelectItem key={doc.id} value={doc.id}>
-                    {doc.name}
-                  </SelectItem>
-                ))}
+                <Select.Trigger className="w-full text-sm">
+                  <Select.Value placeholder="All Doctors" />
+                </Select.Trigger>
+
+                <Select.Popup>
+                  <Select.Item value="all">All Doctors</Select.Item>
+
+                  {doctors.map((doc) => (
+                    <Select.Item key={doc.id} value={doc.id}>
+                      {doc.name}
+                    </Select.Item>
+                  ))}
+                </Select.Popup>
               </Select.Root>
             </div>
-          )} */}
+          )}
         </div>
 
         {filteredAppointments.length > 0 ? (
@@ -762,27 +769,34 @@ export default function AppointmentsScreen() {
 
                   {/* Doctor Selection - Only show if more than one doctor */}
                   {doctors.length > 1 && (
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Select Doctor *
-                      </label>
-                      {/* TODO: @sandeep fix  Select */}
-                      {/* <Select
+                    <div className="flex flex-col items-start gap-2">
+                      <Label>Select Doctor *</Label>
+
+                      <Select.Root
                         value={selectedDoctorId || undefined}
                         onValueChange={(value) => {
-                          setSelectedDoctorId(value || '');
-                          setDoctorError('');
+                          if (value) {
+                            setSelectedDoctorId(value);
+                            setDoctorError('');
+                          }
                         }}
-                        placeholder="Select doctor"
-                        className="w-full"
-                        error={doctorError}
                       >
-                        {doctors.map((doc) => (
-                          <SelectItem key={doc.id} value={doc.id}>
-                            {doc.name}
-                          </SelectItem>
-                        ))}
-                      </Select> */}
+                        <Select.Trigger className="w-full">
+                          <Select.Value placeholder="Select doctor" />
+                        </Select.Trigger>
+
+                        <Select.Popup>
+                          {doctors.map((doc) => (
+                            <Select.Item key={doc.id} value={doc.id}>
+                              {doc.name}
+                            </Select.Item>
+                          ))}
+                        </Select.Popup>
+                      </Select.Root>
+
+                      {doctorError && (
+                        <p className="text-sm text-red-500">{doctorError}</p>
+                      )}
                     </div>
                   )}
 
