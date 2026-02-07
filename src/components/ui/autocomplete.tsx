@@ -6,9 +6,8 @@ import { ChevronsUpDownIcon, XIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { ComponentType } from 'react';
 
-function Root(props: ComponentType<typeof AutocompletePrimitive.Root>) {
+function Root(props: React.ComponentProps<typeof AutocompletePrimitive.Root>) {
   return <AutocompletePrimitive.Root data-slot="autocomplete" {...props} />;
 }
 

@@ -48,7 +48,10 @@ function Group({ className, ...props }: NumberFieldPrimitive.Group.Props) {
   );
 }
 
-function Decrement({ className, ...props }: NumberFieldPrimitive.Decrement.Props) {
+function Decrement({
+  className,
+  ...props
+}: NumberFieldPrimitive.Decrement.Props) {
   return (
     <NumberFieldPrimitive.Decrement
       className={cn(
@@ -63,7 +66,10 @@ function Decrement({ className, ...props }: NumberFieldPrimitive.Decrement.Props
   );
 }
 
-function Increment({ className, ...props }: NumberFieldPrimitive.Increment.Props) {
+function Increment({
+  className,
+  ...props
+}: NumberFieldPrimitive.Increment.Props) {
   return (
     <NumberFieldPrimitive.Increment
       className={cn(

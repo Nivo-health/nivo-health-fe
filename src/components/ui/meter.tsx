@@ -41,10 +41,7 @@ function Track({ className, ...props }: MeterPrimitive.Track.Props) {
   );
 }
 
-function Indicator({
-  className,
-  ...props
-}: MeterPrimitive.Indicator.Props) {
+function Indicator({ className, ...props }: MeterPrimitive.Indicator.Props) {
   return (
     <MeterPrimitive.Indicator
       className={cn('bg-primary transition-all duration-500', className)}

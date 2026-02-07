@@ -4,17 +4,7 @@ import { Dialog as CommandDialogPrimitive } from '@base-ui/react/dialog';
 import { SearchIcon } from 'lucide-react';
 import type * as React from 'react';
 import { cn } from '@/lib/utils';
-import {
-  Autocomplete,
-  AutocompleteCollection,
-  AutocompleteEmpty,
-  AutocompleteGroup,
-  AutocompleteGroupLabel,
-  AutocompleteInput,
-  AutocompleteItem,
-  AutocompleteList,
-  AutocompleteSeparator,
-} from '@/components/ui/autocomplete';
+import { Autocomplete } from '@/components/ui/autocomplete';
 
 const CommandDialog = CommandDialogPrimitive.Root;
 
@@ -91,12 +81,12 @@ function Command({
   autoHighlight = 'always',
   keepHighlight = true,
   ...props
-}: React.ComponentProps<typeof Autocomplete>) {
+}: React.ComponentProps<typeof Autocomplete.Root>) {
   return (
-    <Autocomplete
+    <Autocomplete.Root
       autoHighlight={autoHighlight}
-      inline
       keepHighlight={keepHighlight}
+      inline
       open
       {...props}
     />
@@ -107,10 +97,10 @@ function CommandInput({
   className,
   placeholder = undefined,
   ...props
-}: React.ComponentProps<typeof AutocompleteInput>) {
+}: React.ComponentProps<typeof Autocomplete.Input>) {
   return (
     <div className="px-2.5 py-1.5">
-      <AutocompleteInput
+      <Autocomplete.Input
         autoFocus
         className={cn(
           'border-transparent! bg-transparent! shadow-none before:hidden has-focus-visible:ring-0',
@@ -128,9 +118,9 @@ function CommandInput({
 function CommandList({
   className,
   ...props
-}: React.ComponentProps<typeof AutocompleteList>) {
+}: React.ComponentProps<typeof Autocomplete.List>) {
   return (
-    <AutocompleteList
+    <Autocomplete.List
       className={cn('not-empty:scroll-py-2 not-empty:p-2', className)}
       data-slot="command-list"
       {...props}
@@ -141,9 +131,9 @@ function CommandList({
 function CommandEmpty({
   className,
   ...props
-}: React.ComponentProps<typeof AutocompleteEmpty>) {
+}: React.ComponentProps<typeof Autocomplete.Empty>) {
   return (
-    <AutocompleteEmpty
+    <Autocomplete.Empty
       className={cn('not-empty:py-6', className)}
       data-slot="command-empty"
       {...props}
@@ -163,9 +153,9 @@ function CommandPanel({ className, ...props }: React.ComponentProps<'div'>) {
 function CommandGroup({
   className,
   ...props
-}: React.ComponentProps<typeof AutocompleteGroup>) {
+}: React.ComponentProps<typeof Autocomplete.Group>) {
   return (
-    <AutocompleteGroup
+    <Autocomplete.Group
       className={className}
       data-slot="command-group"
       {...props}
@@ -176,9 +166,9 @@ function CommandGroup({
 function CommandGroupLabel({
   className,
   ...props
-}: React.ComponentProps<typeof AutocompleteGroupLabel>) {
+}: React.ComponentProps<typeof Autocomplete.GroupLabel>) {
   return (
-    <AutocompleteGroupLabel
+    <Autocomplete.GroupLabel
       className={className}
       data-slot="command-group-label"
       {...props}
@@ -188,16 +178,16 @@ function CommandGroupLabel({
 
 function CommandCollection({
   ...props
-}: React.ComponentProps<typeof AutocompleteCollection>) {
-  return <AutocompleteCollection data-slot="command-collection" {...props} />;
+}: React.ComponentProps<typeof Autocomplete.Collection>) {
+  return <Autocomplete.Collection data-slot="command-collection" {...props} />;
 }
 
 function CommandItem({
   className,
   ...props
-}: React.ComponentProps<typeof AutocompleteItem>) {
+}: React.ComponentProps<typeof Autocomplete.Item>) {
   return (
-    <AutocompleteItem
+    <Autocomplete.Item
       className={cn('py-1.5', className)}
       data-slot="command-item"
       {...props}
@@ -208,9 +198,9 @@ function CommandItem({
 function CommandSeparator({
   className,
   ...props
-}: React.ComponentProps<typeof AutocompleteSeparator>) {
+}: React.ComponentProps<typeof Autocomplete.Separator>) {
   return (
-    <AutocompleteSeparator
+    <Autocomplete.Separator
       className={cn('my-2', className)}
       data-slot="command-separator"
       {...props}

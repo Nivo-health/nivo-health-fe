@@ -45,10 +45,7 @@ function Track({ className, ...props }: ProgressPrimitive.Track.Props) {
   );
 }
 
-function Indicator({
-  className,
-  ...props
-}: ProgressPrimitive.Indicator.Props) {
+function Indicator({ className, ...props }: ProgressPrimitive.Indicator.Props) {
   return (
     <ProgressPrimitive.Indicator
       className={cn('bg-primary transition-all duration-500', className)}
