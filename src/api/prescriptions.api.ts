@@ -4,6 +4,7 @@
 // GET /api/visits/prescription/:prescriptionId (get)
 
 import { apiClient } from './client';
+import { ApiError } from '@/lib/queryClient';
 import type { Prescription, Medicine, FollowUp } from '../types';
 import { visitService } from './visits.api';
 
@@ -116,13 +117,12 @@ export const prescriptionService = {
 
       if (!response.success || !response.data) {
         console.error('❌ Failed to create prescription:', response.error);
-        // Create error object with details for validation errors
-        const error: any = new Error(
+        throw new ApiError(
           response.error?.message || 'Failed to create prescription',
+          response.error?.code || 'PRESCRIPTION_CREATE_ERROR',
+          response.error?.statusCode,
+          response.error?.details,
         );
-        error.code = response.error?.code;
-        error.details = response.error?.details;
-        throw error;
       }
 
       console.log('✅ Prescription created successfully:', response.data.id);
@@ -153,13 +153,12 @@ export const prescriptionService = {
 
       if (!response.success) {
         console.error('❌ Failed to update prescription:', response.error);
-        // Create error object with details for validation errors
-        const error: any = new Error(
+        throw new ApiError(
           response.error?.message || 'Failed to update prescription',
+          response.error?.code || 'PRESCRIPTION_UPDATE_ERROR',
+          response.error?.statusCode,
+          response.error?.details,
         );
-        error.code = response.error?.code;
-        error.details = response.error?.details;
-        throw error;
       }
 
       console.log('✅ Prescription updated successfully');

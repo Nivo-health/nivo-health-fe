@@ -27,10 +27,16 @@ function Label({ className, ...props }: FieldPrimitive.Label.Props) {
   );
 }
 
-function Item({ className, ...props }: FieldPrimitive.Item.Props) {
+function Item({
+  className,
+  block = false,
+  ...props
+}: FieldPrimitive.Item.Props & {
+  block?: boolean;
+}) {
   return (
     <FieldPrimitive.Item
-      className={cn('flex', className)}
+      className={cn('flex', className, { 'w-full': block })}
       data-slot="field-item"
       {...props}
     />

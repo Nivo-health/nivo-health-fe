@@ -5,7 +5,7 @@ import type { Visit } from '../types';
  * Steps: 0 = Add Notes, 1 = Generate Prescription, 2 = Print
  */
 export function getVisitStep(
-  visit: Visit | null,
+  visit: Visit | null | undefined,
   currentScreen?: 'consultation' | 'prescription' | 'print',
 ): number {
   if (!visit) return 0;

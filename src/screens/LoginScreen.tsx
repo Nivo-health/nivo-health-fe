@@ -1,77 +1,68 @@
-import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Form } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { toast } from '@/components/ui/toast';
+import { LoginFormValues, loginSchema } from '@/schema/login.schema';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { useLogin } from '../queries/auth.queries';
 import { useAuthStore } from '../stores/auth.store';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { toast } from '@/components/ui/toast';
+
+import { Field } from '@/components/ui/field';
+import { Fieldset } from '@/components/ui/fieldset';
 
 export default function LoginScreen() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [errors, setErrors] = useState<Record<string, string>>({});
   const loginMutation = useLogin();
   const setTokens = useAuthStore((state) => state.setTokens);
-  const loading = loginMutation.isPending;
 
-  const validateForm = (): boolean => {
-    const newErrors: Record<string, string> = {};
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+  });
 
-    if (!email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      newErrors.email = 'Please enter a valid email address';
-    }
-
-    if (!password.trim()) {
-      newErrors.password = 'Password is required';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
-
+  const onSubmit = async (data: LoginFormValues) => {
     try {
-      setErrors({});
-
       const result = await loginMutation.mutateAsync({
-        email: email.trim(),
-        password: password,
+        email: data.email.trim(),
+        password: data.password,
       });
+
       setTokens(result.access, result.refresh);
 
       toast.add({
         title: 'Login successful!',
         type: 'success',
       });
+
       navigate('/');
-    } catch (error: any) {
-      console.error('Login failed:', error);
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'Login failed. Please check your credentials.';
       toast.add({
-        title: error?.message || 'Login failed. Please check your credentials.',
+        title: errorMessage,
         type: 'error',
       });
-      setErrors({
-        form: error?.message || 'Login failed. Please check your credentials.',
-      });
-    } finally {
     }
   };
 
+  const loading = isSubmitting || loginMutation.isPending;
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-teal-50 to-white flex items-center justify-center px-4">
+    <div className="min-h-screen bg-linear-to-br from-teal-50 to-white flex items-center justify-center px-4">
       <div className="w-full max-w-md">
         <div className="bg-white rounded-lg shadow-lg border border-teal-200 p-6 md:p-8">
-          {/* Logo/Title */}
+          {/* Title */}
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-teal-900 mb-2">
               Clinic Management
@@ -79,50 +70,62 @@ export default function LoginScreen() {
             <p className="text-gray-600">Sign in to continue</p>
           </div>
 
-          {/* Login Form */}
-          <form onSubmit={handleLogin} className="space-y-5">
-            {errors.form && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-md text-sm text-red-600">
-                {errors.form}
-              </div>
-            )}
-            <div className="flex flex-col items-start gap-2">
-              <Label htmlFor="email">Email *</Label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  setErrors({ ...errors, email: '' });
-                }}
-                // error={errors.email}
-                placeholder="Enter your email"
-                autoFocus
-                disabled={loading}
-              />
-            </div>
+          <Form onSubmit={handleSubmit(onSubmit)}>
+            <Fieldset.Root className="w-full">
+              <Field.Root name="email">
+                <Field.Label htmlFor="email">Email *</Field.Label>
 
-            <div className="flex flex-col items-start gap-2">
-              <Label htmlFor="password">Password *</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => {
-                  setPassword(e.target.value);
-                  setErrors({ ...errors, password: '' });
-                }}
-                // error={errors.password}
-                placeholder="Enter your password"
-                disabled={loading}
-              />
-            </div>
+                <Field.Item block>
+                  <Field.Control
+                    id="email"
+                    render={
+                      <Input
+                        size="lg"
+                        id="email"
+                        type="email"
+                        placeholder="Enter your email"
+                        autoFocus
+                        disabled={loading}
+                        {...register('email')}
+                      />
+                    }
+                  />
+                </Field.Item>
 
-            <Button type="submit" className="w-full" disabled={loading}>
+                {errors.email && (
+                  <Field.Error>{errors.email.message}</Field.Error>
+                )}
+              </Field.Root>
+
+              <Field.Root name="password">
+                <Field.Label htmlFor="password">Password *</Field.Label>
+
+                <Field.Item block>
+                  <Field.Control
+                    id="password"
+                    render={
+                      <Input
+                        id="password"
+                        type="password"
+                        placeholder="Enter your password"
+                        disabled={loading}
+                        {...register('password')}
+                      />
+                    }
+                  />
+                </Field.Item>
+
+                {errors.password && (
+                  <Field.Error>{errors.password.message}</Field.Error>
+                )}
+              </Field.Root>
+            </Fieldset.Root>
+
+            {/* Submit */}
+            <Button type="submit" className="w-full mt-6" disabled={loading}>
               {loading ? 'Signing in...' : 'Sign In'}
             </Button>
-          </form>
+          </Form>
         </div>
       </div>
     </div>

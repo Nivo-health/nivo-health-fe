@@ -1,8 +1,7 @@
-import { ReactNode } from 'react';
-import Header from './Header';
-import Sidebar from './Sidebar';
-import BottomNav from './BottomNav';
 import { cn } from '@/lib/utils';
+import { ReactNode } from 'react';
+import BottomNav from './BottomNav';
+import Sidebar from './Sidebar';
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -15,8 +14,7 @@ export default function AppLayout({
 }: AppLayoutProps) {
   return (
     <div className="min-h-screen bg-gray-50 overflow-x-hidden">
-      <Header />
-      <div className="flex pt-16">
+      <div className="flex">
         {/* Sidebar - hidden on mobile, visible on desktop */}
         {showSidebar && (
           <div className="hidden md:block">

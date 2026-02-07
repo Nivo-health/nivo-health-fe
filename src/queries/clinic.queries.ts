@@ -1,17 +1,41 @@
-import { useQuery } from '@tanstack/react-query';
+// TanStack Query v5: Clinic Queries
+// Best practices: queryOptions factory, proper typing
+
+import { useQuery, queryOptions } from '@tanstack/react-query';
 import { clinicService } from '../api/clinic.api';
+import type { Clinic } from '../types';
 import { queryKeys } from './queryKeys';
 
+// ============================================
+// Query Options (v5 pattern for reusability)
+// ============================================
+
+export const clinicQueryOptions = {
+  current: () =>
+    queryOptions<Clinic | null>({
+      queryKey: queryKeys.clinic(),
+      queryFn: () => clinicService.getCurrentClinic(),
+      // Clinic data rarely changes, can have longer staleTime
+      staleTime: 1000 * 60 * 10, // 10 minutes
+    }),
+
+  stats: (dateRange?: { start: string; end: string }) =>
+    queryOptions({
+      queryKey: queryKeys.clinicStats(dateRange),
+      queryFn: () => clinicService.getStats(undefined, dateRange),
+      // Stats should refresh more frequently
+      staleTime: 1000 * 60 * 2, // 2 minutes
+    }),
+};
+
+// ============================================
+// Query Hooks
+// ============================================
+
 export function useCurrentClinic() {
-  return useQuery({
-    queryKey: queryKeys.clinic,
-    queryFn: () => clinicService.getCurrentClinic(),
-  });
+  return useQuery(clinicQueryOptions.current());
 }
 
 export function useClinicStats(dateRange?: { start: string; end: string }) {
-  return useQuery({
-    queryKey: [...queryKeys.clinic, 'stats', dateRange?.start, dateRange?.end],
-    queryFn: () => clinicService.getStats(undefined, dateRange),
-  });
+  return useQuery(clinicQueryOptions.stats(dateRange));
 }

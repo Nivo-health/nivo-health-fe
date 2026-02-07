@@ -1,30 +1,72 @@
-import { Button } from '@/components/ui/button';
+import { QuickActionButton } from '@/components/dashboard/quick-action-button';
+import { StatCard } from '@/components/dashboard/stats-card';
 import { Card } from '@/components/ui/card';
 import { DatePicker } from '@/components/ui/date-picker';
-import { useState } from 'react';
+import { toast } from '@/components/ui/toast';
+import { useFilters } from '@/hooks/useFilters';
+import dayjs from 'dayjs';
+import {
+  Calendar,
+  CalendarDays,
+  CheckCircle,
+  ClipboardList,
+  Clock,
+  TrendingUp,
+  UserPlus,
+  Users,
+} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useClinic } from '../hooks/useClinic';
 import { useClinicStats } from '../queries/clinic.queries';
+
+const today = dayjs().format('YYYY-MM-DD');
 
 export default function HomeScreen() {
   const navigate = useNavigate();
   const { clinic } = useClinic();
   const clinicName = clinic?.name || 'Clinic OPD Management';
 
-  // Date range state - default to today
-  const [startDate, setStartDate] = useState<string>(() => {
-    const today = new Date();
-    return today.toISOString().split('T')[0]; // YYYY-MM-DD
+  const { values, updateFilter } = useFilters({
+    initialValue: {
+      startDate: today,
+      endDate: today,
+    },
+    useQueryParams: true,
   });
-  const [endDate, setEndDate] = useState<string>(() => {
-    const today = new Date();
-    return today.toISOString().split('T')[0]; // YYYY-MM-DD
-  });
+
+  const { startDate, endDate } = values;
 
   const { data: statsData, isLoading: loading } = useClinicStats({
     start: startDate,
     end: endDate,
   });
+
+  const validateRange = (start: string, end: string) => {
+    if (start > end) {
+      toast.add({
+        title: 'Start date cannot be after end date',
+        type: 'error',
+      });
+      return false;
+    }
+    return true;
+  };
+
+  const handleStartDateChange = (value: string | null) => {
+    if (!value) return;
+
+    if (!validateRange(value, endDate)) return;
+
+    updateFilter('startDate', value);
+  };
+
+  const handleEndDateChange = (value: string | null) => {
+    if (!value) return;
+
+    if (!validateRange(startDate, value)) return;
+
+    updateFilter('endDate', value);
+  };
 
   const stats = {
     totalPatients: statsData?.total_patients || 0,
@@ -37,228 +79,210 @@ export default function HomeScreen() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-gray-50 p-3 md:p-6 overflow-x-hidden w-full">
-      <div className="max-w-7xl mx-auto w-full">
-        {/* Header - Compact on Mobile */}
-        <div className="mb-4 md:mb-6">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-3 md:mb-4 w-full">
-            <div className="flex-1 min-w-0 w-full sm:w-auto">
-              <h1 className="text-xl md:text-3xl font-bold text-teal-900 truncate">
-                Welcome to {clinicName}
-              </h1>
-              <p className="text-xs md:text-base text-gray-600 mt-1 hidden sm:block">
-                Manage your outpatient department efficiently
+    <div className="min-h-screen bg-background">
+      {/* Header - Compact on Mobile */}
+      <header className="border-b border-border/50 bg-card/80 backdrop-blur-sm sticky top-0 z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center gap-3">
+              <div>
+                <h1 className="text-lg font-semibold text-foreground">
+                  {clinicName}
+                </h1>
+                <p className="text-xs text-muted-foreground hidden sm:block">
+                  OPD Management System
+                </p>
+              </div>
+            </div>
+
+            <div className="flex gap-2 w-full sm:w-auto">
+              <DatePicker
+                value={startDate}
+                onChange={handleStartDateChange}
+                className="w-full sm:w-36"
+              />
+              <DatePicker
+                value={endDate}
+                onChange={handleEndDateChange}
+                className="w-full sm:w-36"
+              />
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
+        {/* Greeting Banner */}
+        <div className="mb-6 lg:mb-8">
+          <div
+            className="relative overflow-hidden rounded-2xl p-6 lg:p-8 text-accent"
+            style={{
+              background: 'var(--gradient-primary)',
+              boxShadow: 'var(--shadow-lg)',
+            }}
+          >
+            <div className="relative z-10">
+              <h2 className="text-2xl lg:text-3xl font-bold italic text-dashboard-foreground mb-2">
+                Good {getGreeting()}, Doctor!
+              </h2>
+              <p className="text-dashboard-foreground/80 max-w-lg">
+                You have{' '}
+                <span className="font-semibold text-dashboard-foreground">
+                  {stats.totalPendingVisits} patients
+                </span>{' '}
+                waiting and{' '}
+                <span className="font-semibold text-dashboard-foreground">
+                  {stats.totalPendingAppointments} appointments
+                </span>{' '}
+                scheduled today.
               </p>
             </div>
-            {/* Date Range Filter - Right Corner */}
-            <div className="flex flex-row gap-2 shrink-0 w-full sm:w-auto">
-              <div className="flex-1 sm:flex-initial sm:w-32 md:w-36 min-w-0">
-                <DatePicker
-                  value={startDate}
-                  onChange={(value) => {
-                    if (value) {
-                      setStartDate(value);
-                      // If end date is before start date, update end date
-                      if (endDate && value > endDate) {
-                        setEndDate(value);
-                      }
-                    }
-                  }}
-                  placeholder="Start date"
-                  className="w-full text-sm"
+            <div className="absolute right-0 top-0 w-64 h-64 opacity-10">
+              <svg viewBox="0 0 200 200" className="w-full h-full">
+                <circle
+                  cx="100"
+                  cy="100"
+                  r="80"
+                  fill="currentColor"
+                  className="text-dashboard-foreground"
                 />
-              </div>
-              <div className="flex-1 sm:flex-initial sm:w-32 md:w-36 min-w-0">
-                <DatePicker
-                  value={endDate}
-                  onChange={(value) => {
-                    if (value) {
-                      setEndDate(value);
-                      // If start date is after end date, update start date
-                      if (startDate && value < startDate) {
-                        setStartDate(value);
-                      }
-                    }
-                  }}
-                  placeholder="End date"
-                  className="w-full text-sm"
+                <circle
+                  cx="150"
+                  cy="50"
+                  r="40"
+                  fill="currentColor"
+                  className="text-dashboard-foreground"
                 />
-              </div>
+              </svg>
             </div>
           </div>
         </div>
 
-        {/* Overview Stats - Total Patients and Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4 lg:gap-6 mb-4 md:mb-6 w-full">
-          <Card.Root className="border-teal-200 hover:shadow-md transition-shadow h-full flex flex-col w-full min-w-0">
-            <Card.Header className="bg-linear-to-r from-teal-50 to-white border-b border-teal-100 py-2 md:py-3">
-              <Card.Title className="text-teal-900 text-xs md:text-sm truncate">
-                Total Patients
-              </Card.Title>
-            </Card.Header>
-            <Card.Panel className="pt-3 md:pt-6 pb-3 md:pb-6 flex-1 flex flex-col justify-center">
-              <div className="text-2xl md:text-3xl font-bold text-teal-600 truncate">
-                {loading ? '...' : stats.totalPatients}
-              </div>
-              <p className="text-xs md:text-sm text-gray-600 mt-1 truncate">
-                Registered
-              </p>
-            </Card.Panel>
-          </Card.Root>
-          <Card.Root className="border-teal-200 h-full flex flex-col w-full min-w-0">
-            <Card.Header className="bg-linear-to-r from-teal-50 to-white border-b border-teal-100 py-2 md:py-3">
-              <Card.Title className="text-teal-900 text-xs md:text-sm md:text-base truncate">
-                Quick Actions
-              </Card.Title>
-            </Card.Header>
-            <Card.Panel className="pt-3 md:pt-6 pb-3 md:pb-6 flex-1 flex flex-col justify-center min-w-0">
-              <div className="grid grid-cols-3 md:grid-cols-1 gap-2 md:gap-3 w-full">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex flex-col md:flex-row items-center justify-center md:justify-start h-16 md:h-auto md:py-3 text-xs md:text-sm gap-2"
-                  onClick={() => navigate('/appointments')}
-                >
-                  <span className="text-lg md:text-xl md:mb-0 mb-1">📅</span>
-                  <span>Appointments</span>
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex flex-col md:flex-row items-center justify-center md:justify-start h-16 md:h-auto md:py-3 text-xs md:text-sm gap-2"
-                  onClick={() => navigate('/visits')}
-                >
-                  <span className="text-lg md:text-xl md:mb-0 mb-1">👥</span>
-                  <span>Queue</span>
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex flex-col md:flex-row items-center justify-center md:justify-start h-16 md:h-auto md:py-3 text-xs md:text-sm gap-2"
-                  onClick={() => navigate('/patients')}
-                >
-                  <span className="text-lg md:text-xl md:mb-0 mb-1">👤</span>
-                  <span>Patients</span>
-                </Button>
-              </div>
-            </Card.Panel>
-          </Card.Root>
+        {/* Total Patients + Quick Actions Row */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
+          <div className="lg:col-span-1">
+            <StatCard
+              title="Total Patients"
+              value={stats.totalPatients.toLocaleString()}
+              subtitle="Registered in system"
+              icon={<Users className="w-4 h-4 text-primary" />}
+              loading={loading}
+            />
+          </div>
+          {/* Quick Actions */}
+          <div className="lg:col-span-3">
+            <Card.Root className="overflow-hidden border-primary/10 ">
+              <Card.Header
+                className="relative border border-b flex items-center justify-between px-4 py-3 border-b-primary/10 border-x-0 border-t-0"
+                style={{
+                  background: 'var(--gradient-header)',
+                }}
+              >
+                <Card.Title className="text-sm font-medium text-muted-foreground">
+                  Quick Actions
+                </Card.Title>
+              </Card.Header>
+              <Card.Panel className="px-4 relative">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <QuickActionButton
+                    icon={<CalendarDays className="w-5 h-5 text-blue-400" />}
+                    label="Manage Appointments"
+                    onClick={() => navigate('/appointments')}
+                  />
+                  <QuickActionButton
+                    icon={<ClipboardList className="w-5 h-5 text-orange-400" />}
+                    label="View Patient Queue"
+                    onClick={() => navigate('/visits')}
+                  />
+                  <QuickActionButton
+                    icon={<UserPlus className="w-5 h-5 text-primary" />}
+                    label="Register Patient"
+                    onClick={() => navigate('/patients')}
+                  />
+                </div>
+              </Card.Panel>
+            </Card.Root>
+          </div>
         </div>
 
-        {/* Quick Actions - First Row After Total Patients */}
+        {/* Visits Overview Section */}
+        <div className="mb-6 lg:mb-8">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-1 h-6 rounded-full bg-primary" />
+            <TrendingUp className="w-5 h-5 text-primary" />
+            <h2 className="text-lg font-semibold text-dashboard-accent-foreground">
+              Visits Overview
+            </h2>
+          </div>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-5">
+            <StatCard
+              title="Total Visits"
+              value={stats.totalVisits.toLocaleString()}
+              subtitle="All time"
+              icon={<TrendingUp className="w-4 h-4 text-primary" />}
+              loading={loading}
+            />
 
-        {/* Visits Section */}
-        <div className="mb-4 md:mb-6 w-full">
-          <h2 className="text-lg md:text-xl font-semibold text-teal-900 mb-3 md:mb-4">
-            Visits
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4 lg:gap-6 w-full">
-            <Card.Root className="border-teal-200 hover:shadow-md transition-shadow w-full min-w-0">
-              <Card.Header className="bg-linear-to-r from-teal-50 to-white border-b border-teal-100 py-2 md:py-3">
-                <Card.Title className="text-teal-900 text-xs md:text-sm truncate">
-                  Total Visits
-                </Card.Title>
-              </Card.Header>
-              <Card.Panel className="pt-3 md:pt-6 pb-3 md:pb-6">
-                <div className="text-2xl md:text-3xl font-bold text-teal-600 truncate">
-                  {loading ? '...' : stats.totalVisits}
-                </div>
-                <p className="text-xs md:text-sm text-gray-600 mt-1 truncate">
-                  All time
-                </p>
-              </Card.Panel>
-            </Card.Root>
+            <StatCard
+              title="In Progress"
+              value={stats.totalInProgressVisits.toLocaleString()}
+              subtitle="Currently active"
+              icon={<Clock className="w-4 h-4 text-orange-500" />}
+              loading={loading}
+            />
 
-            <Card.Root className="border-teal-200 hover:shadow-md transition-shadow w-full min-w-0">
-              <Card.Header className="bg-linear-to-r from-teal-50 to-white border-b border-teal-100 py-2 md:py-3">
-                <Card.Title className="text-teal-900 text-xs md:text-sm truncate">
-                  In Progress
-                </Card.Title>
-              </Card.Header>
-              <Card.Panel className="pt-3 md:pt-6 pb-3 md:pb-6">
-                <div className="text-2xl md:text-3xl font-bold text-teal-600 truncate">
-                  {loading ? '...' : stats.totalInProgressVisits}
-                </div>
-                <p className="text-xs md:text-sm text-gray-600 mt-1 truncate">
-                  Active
-                </p>
-              </Card.Panel>
-            </Card.Root>
+            <StatCard
+              title="Completed"
+              value={stats.totalCompletedVisits.toLocaleString()}
+              subtitle="Successfully finished"
+              icon={<CheckCircle className="w-4 h-4 text-green-700" />}
+              loading={loading}
+            />
 
-            <Card.Root className="border-teal-200 hover:shadow-md transition-shadow w-full min-w-0">
-              <Card.Header className="bg-linear-to-r from-teal-50 to-white border-b border-teal-100 py-2 md:py-3">
-                <Card.Title className="text-teal-900 text-xs md:text-sm truncate">
-                  Completed
-                </Card.Title>
-              </Card.Header>
-              <Card.Panel className="pt-3 md:pt-6 pb-3 md:pb-6">
-                <div className="text-2xl md:text-3xl font-bold text-teal-600 truncate">
-                  {loading ? '...' : stats.totalCompletedVisits}
-                </div>
-                <p className="text-xs md:text-sm text-gray-600 mt-1 truncate">
-                  Finished
-                </p>
-              </Card.Panel>
-            </Card.Root>
-
-            <Card.Root className="border-teal-200 hover:shadow-md transition-shadow w-full min-w-0">
-              <Card.Header className="bg-linear-to-r from-teal-50 to-white border-b border-teal-100 py-2 md:py-3">
-                <Card.Title className="text-teal-900 text-xs md:text-sm truncate">
-                  Pending
-                </Card.Title>
-              </Card.Header>
-              <Card.Panel className="pt-3 md:pt-6 pb-3 md:pb-6">
-                <div className="text-2xl md:text-3xl font-bold text-teal-600 truncate">
-                  {loading ? '...' : stats.totalPendingVisits}
-                </div>
-                <p className="text-xs md:text-sm text-gray-600 mt-1 truncate">
-                  Waiting
-                </p>
-              </Card.Panel>
-            </Card.Root>
+            <StatCard
+              title="Pending"
+              value={stats.totalPendingVisits.toLocaleString()}
+              subtitle="Awaiting attention"
+              icon={<Clock className="w-4 h-4 text-blue-400" />}
+              loading={loading}
+            />
           </div>
         </div>
 
         {/* Appointments Section */}
-        <div className="mb-4 md:mb-6 w-full">
-          <h2 className="text-lg md:text-xl font-semibold text-teal-900 mb-3 md:mb-4">
-            Appointments
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4 lg:gap-6 w-full">
-            <Card.Root className="border-teal-200 hover:shadow-md transition-shadow w-full min-w-0">
-              <Card.Header className="bg-linear-to-r from-teal-50 to-white border-b border-teal-100 py-2 md:py-3">
-                <Card.Title className="text-teal-900 text-xs md:text-sm truncate">
-                  Total Appointments
-                </Card.Title>
-              </Card.Header>
-              <Card.Panel className="pt-3 md:pt-6 pb-3 md:pb-6">
-                <div className="text-2xl md:text-3xl font-bold text-teal-600 truncate">
-                  {loading ? '...' : stats.totalAppointments}
-                </div>
-                <p className="text-xs md:text-sm text-gray-600 mt-1 truncate">
-                  All time
-                </p>
-              </Card.Panel>
-            </Card.Root>
-
-            <Card.Root className="border-teal-200 hover:shadow-md transition-shadow w-full min-w-0">
-              <Card.Header className="bg-linear-to-r from-teal-50 to-white border-b border-teal-100 py-2 md:py-3">
-                <Card.Title className="text-teal-900 text-xs md:text-sm truncate">
-                  Pending
-                </Card.Title>
-              </Card.Header>
-              <Card.Panel className="pt-3 md:pt-6 pb-3 md:pb-6">
-                <div className="text-2xl md:text-3xl font-bold text-teal-600 truncate">
-                  {loading ? '...' : stats.totalPendingAppointments}
-                </div>
-                <p className="text-xs md:text-sm text-gray-600 mt-1 truncate">
-                  Waiting
-                </p>
-              </Card.Panel>
-            </Card.Root>
+        <div className="mb-6 lg:mb-8">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-1 h-6 rounded-full bg-primary" />
+            <Calendar className="w-5 h-5 text-primary" />
+            <h2 className="text-lg font-semibold text-dashboard-accent-foreground">
+              Appointments
+            </h2>
+          </div>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-5">
+            <StatCard
+              title="Total Appointments"
+              value={stats.totalAppointments.toLocaleString()}
+              subtitle="Scheduled"
+              icon={<Calendar className="w-4 h-4 text-primary" />}
+              loading={loading}
+            />
+            <StatCard
+              title="Pending Today"
+              value={stats.totalPendingAppointments.toLocaleString()}
+              subtitle="Need confirmation"
+              icon={<Clock className="w-4 h-4 text-orange-500" />}
+              loading={loading}
+            />
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
+}
+function getGreeting(): string {
+  const hour = new Date().getHours();
+  if (hour < 12) return 'Morning';
+  if (hour < 17) return 'Afternoon';
+  return 'Evening';
 }

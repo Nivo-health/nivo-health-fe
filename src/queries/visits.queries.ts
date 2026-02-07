@@ -1,83 +1,117 @@
+// TanStack Query v5: Visit Queries
+// Best practices: queryOptions factory, proper invalidation
+
 import {
   QueryClient,
   useMutation,
   useQuery,
   useQueryClient,
+  queryOptions,
 } from '@tanstack/react-query';
 import { visitService } from '../api/visits.api';
 import type { Visit } from '../types';
 import { queryKeys } from './queryKeys';
 
+// ============================================
+// Types
+// ============================================
+
+interface VisitListParams {
+  page?: number;
+  pageSize?: number;
+  date?: string;
+  visitStatus?: 'WAITING' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+  doctorId?: string;
+}
+
+interface CreateVisitData {
+  patientId: string;
+  visitReason?: string;
+  status?: 'waiting' | 'in_progress' | 'completed';
+  doctorId?: string;
+}
+
+// ============================================
+// Query Options (v5 pattern for reusability)
+// ============================================
+
+export const visitQueryOptions = {
+  detail: (id: string) =>
+    queryOptions({
+      queryKey: queryKeys.visit(id),
+      queryFn: () => visitService.getById(id),
+      enabled: Boolean(id),
+    }),
+
+  byPatient: (patientId: string, limit = 50) =>
+    queryOptions({
+      queryKey: queryKeys.visitsByPatient(patientId),
+      queryFn: () => visitService.getByPatientId(patientId, limit),
+      enabled: Boolean(patientId),
+    }),
+
+  waiting: () =>
+    queryOptions({
+      queryKey: queryKeys.visitsWaiting(),
+      queryFn: () => visitService.getWaitingVisits(),
+    }),
+
+  list: (params?: VisitListParams) =>
+    queryOptions({
+      queryKey: queryKeys.visitsList(params),
+      queryFn: () =>
+        visitService.getAllVisits(
+          params?.page ?? 1,
+          params?.pageSize ?? 20,
+          params?.date,
+          params?.visitStatus,
+          params?.doctorId,
+        ),
+    }),
+};
+
+// ============================================
+// Query Hooks
+// ============================================
+
 export function useVisit(id: string) {
-  return useQuery({
-    queryKey: queryKeys.visit(id),
-    queryFn: () => visitService.getById(id),
-    enabled: Boolean(id),
-  });
+  return useQuery(visitQueryOptions.detail(id));
 }
 
 export function useVisitsByPatient(patientId: string, limit = 50) {
-  return useQuery({
-    queryKey: queryKeys.visitsByPatient(patientId),
-    queryFn: () => visitService.getByPatientId(patientId, limit),
-    enabled: Boolean(patientId),
-  });
+  return useQuery(visitQueryOptions.byPatient(patientId, limit));
 }
+
+export function useWaitingVisits() {
+  return useQuery(visitQueryOptions.waiting());
+}
+
+export function useVisitsList(params?: VisitListParams) {
+  return useQuery(visitQueryOptions.list(params));
+}
+
+// ============================================
+// Prefetch Functions (for SSR/preloading)
+// ============================================
 
 export function fetchVisitsByPatient(
   queryClient: QueryClient,
   patientId: string,
   limit = 50,
 ) {
-  return queryClient.fetchQuery({
-    queryKey: queryKeys.visitsByPatient(patientId),
-    queryFn: () => visitService.getByPatientId(patientId, limit),
-  });
+  return queryClient.fetchQuery(visitQueryOptions.byPatient(patientId, limit));
 }
 
-export function useWaitingVisits() {
-  return useQuery({
-    queryKey: [...queryKeys.visits, 'waiting'],
-    queryFn: () => visitService.getWaitingVisits(),
-  });
-}
-
-export function useVisitsList(params?: {
-  page?: number;
-  pageSize?: number;
-  date?: string;
-  visitStatus?: 'WAITING' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
-  doctorId?: string;
-}) {
-  const page = params?.page ?? 1;
-  const pageSize = params?.pageSize ?? 20;
-  const date = params?.date;
-  const visitStatus = params?.visitStatus;
-  const doctorId = params?.doctorId;
-
-  return useQuery({
-    queryKey: [
-      ...queryKeys.visits,
-      page,
-      pageSize,
-      date,
-      visitStatus,
-      doctorId,
-    ],
-    queryFn: () =>
-      visitService.getAllVisits(page, pageSize, date, visitStatus, doctorId),
-  });
-}
+// ============================================
+// Mutation Hooks
+// ============================================
 
 export function useCreateVisit() {
   const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: (data: {
-      patientId: string;
-      visitReason?: string;
-      status?: 'waiting' | 'in_progress' | 'completed';
-      doctorId?: string;
-    }) => visitService.create(data),
+    mutationKey: ['visits', 'create'],
+    mutationFn: (data: CreateVisitData) => visitService.create(data),
     onSuccess: (created) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.visits });
       if (created?.patientId) {
@@ -91,7 +125,9 @@ export function useCreateVisit() {
 
 export function useUpdateVisitStatus() {
   const queryClient = useQueryClient();
+
   return useMutation({
+    mutationKey: ['visits', 'updateStatus'],
     mutationFn: (data: { id: string; status: Visit['status'] }) =>
       visitService.updateStatus(data.id, data.status),
     onSuccess: (updated) => {
@@ -112,7 +148,9 @@ export function useUpdateVisitStatus() {
 
 export function useUpdateVisitNotes() {
   const queryClient = useQueryClient();
+
   return useMutation({
+    mutationKey: ['visits', 'updateNotes'],
     mutationFn: (data: { id: string; notes: string }) =>
       visitService.updateNotes(data.id, data.notes),
     onSuccess: (updated) => {
@@ -133,7 +171,9 @@ export function useUpdateVisitNotes() {
 
 export function useUpdateVisitPrescription() {
   const queryClient = useQueryClient();
+
   return useMutation({
+    mutationKey: ['visits', 'updatePrescription'],
     mutationFn: (data: { id: string; prescription: Visit['prescription'] }) =>
       visitService.updatePrescription(data.id, data.prescription),
     onSuccess: (updated) => {
@@ -154,7 +194,9 @@ export function useUpdateVisitPrescription() {
 
 export function useCompleteVisit() {
   const queryClient = useQueryClient();
+
   return useMutation({
+    mutationKey: ['visits', 'complete'],
     mutationFn: (id: string) => visitService.complete(id),
     onSuccess: (updated) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.visits });

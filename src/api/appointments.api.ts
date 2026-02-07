@@ -1,6 +1,7 @@
 // Appointment service - Handles appointment API calls
 
 import { apiClient } from './client';
+import { ApiError } from '@/lib/queryClient';
 import type { Appointment } from '@/types';
 
 export const appointmentService = {
@@ -128,13 +129,12 @@ export const appointmentService = {
 
       if (!response.success || !response.data) {
         console.error('❌ Failed to create appointment:', response.error);
-        // Create error object with details for validation errors
-        const error: any = new Error(
+        throw new ApiError(
           response.error?.message || 'Failed to create appointment',
+          response.error?.code || 'APPOINTMENT_CREATE_ERROR',
+          response.error?.statusCode,
+          response.error?.details,
         );
-        error.code = response.error?.code;
-        error.details = response.error?.details;
-        throw error;
       }
 
       const mappedAppointment = this.mapApiAppointmentToAppointment(
@@ -162,12 +162,12 @@ export const appointmentService = {
     );
 
     if (!response.success || !response.data) {
-      const error: any = new Error(
+      throw new ApiError(
         response.error?.message || 'Failed to update appointment status',
+        response.error?.code || 'APPOINTMENT_UPDATE_ERROR',
+        response.error?.statusCode,
+        response.error?.details,
       );
-      error.code = response.error?.code;
-      error.details = response.error?.details;
-      throw error; // ✅ THROW
     }
 
     return this.mapApiAppointmentToAppointment(response.data);

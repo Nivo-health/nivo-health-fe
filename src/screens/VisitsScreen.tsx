@@ -395,8 +395,6 @@ export default function VisitsScreen() {
 
           {/* Visit Status Filter */}
           <div className="flex flex-col items-start gap-2 sm:w-48 md:w-56">
-            <Label>Status</Label>
-
             <Select.Root
               value={selectedVisitStatus || undefined}
               onValueChange={(value) => {
@@ -494,7 +492,7 @@ export default function VisitsScreen() {
                     </div>
 
                     {/* Status Badge */}
-                    <div className="flex-shrink-0">
+                    <div className="shrink-0">
                       <span
                         className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(visit.visit_status || visit.status)}`}
                       >

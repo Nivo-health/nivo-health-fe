@@ -4,5 +4,5 @@ export default {
   theme: {
     extend: {},
   },
-  plugins: [],
+  plugins: [require('tw-animate-css')],
 };

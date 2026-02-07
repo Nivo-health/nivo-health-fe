@@ -2,6 +2,7 @@
 // Currently uses mock API client (localStorage), ready for backend integration
 
 import { apiClient } from './client';
+import { ApiError } from '@/lib/queryClient';
 import type { Visit, Patient } from '../types';
 
 export const visitService = {
@@ -74,13 +75,12 @@ export const visitService = {
 
       if (!response.success || !response.data) {
         console.error('❌ Failed to create visit:', response.error);
-        // Create error object with details for validation errors
-        const error: any = new Error(
+        throw new ApiError(
           response.error?.message || 'Failed to create visit',
+          response.error?.code || 'VISIT_CREATE_ERROR',
+          response.error?.statusCode,
+          response.error?.details,
         );
-        error.code = response.error?.code;
-        error.details = response.error?.details;
-        throw error;
       }
 
       const apiVisit = response.data;

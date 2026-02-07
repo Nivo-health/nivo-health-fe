@@ -2,6 +2,7 @@
 // Currently uses mock API client (localStorage), ready for backend integration
 
 import { apiClient } from './client';
+import { ApiError } from '@/lib/queryClient';
 import type { Patient } from '../types';
 
 export interface PatientSearchResult extends Patient {
@@ -110,13 +111,12 @@ export const patientService = {
 
       if (!response.success || !response.data) {
         console.error('❌ Failed to create patient:', response.error);
-        // Create error object with details for validation errors
-        const error: any = new Error(
+        throw new ApiError(
           response.error?.message || 'Failed to create patient',
+          response.error?.code || 'PATIENT_CREATE_ERROR',
+          response.error?.statusCode,
+          response.error?.details,
         );
-        error.code = response.error?.code;
-        error.details = response.error?.details;
-        throw error;
       }
 
       // Map API response back to our Patient format

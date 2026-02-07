@@ -13,7 +13,6 @@ import PrintPreviewScreen from '@/screens/PrintPreviewScreen';
 import SettingsScreen from '@/screens/SettingsScreen';
 import AppointmentsScreen from '@/screens/AppointmentsScreen';
 import { useAuthStore } from '@/stores/auth.store';
-import { ToastProvider } from '@/components/ui/toast';
 
 function App() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -65,7 +64,6 @@ function App() {
                   <Route path="/settings" element={<SettingsScreen />} />
                   <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
-                <ToastProvider />
               </AppLayout>
             </ProtectedRoute>
           }
