@@ -156,24 +156,20 @@ export const appointmentService = {
     appointmentId: string,
     status: 'WAITING' | 'CHECKED_IN' | 'NO_SHOW',
   ): Promise<Appointment | null> {
-    try {
-      const response = await apiClient.put<any>(
-        `/appointments/${appointmentId}`,
-        { appointment_status: status },
+    const response = await apiClient.put<any>(
+      `/appointments/${appointmentId}`,
+      { appointment_status: status },
+    );
+
+    if (!response.success || !response.data) {
+      const error: any = new Error(
+        response.error?.message || 'Failed to update appointment status',
       );
-
-      if (!response.success || !response.data) {
-        console.error(
-          '❌ Failed to update appointment status:',
-          response.error,
-        );
-        return null;
-      }
-
-      return this.mapApiAppointmentToAppointment(response.data);
-    } catch (error: any) {
-      console.error('❌ Error updating appointment status:', error);
-      return null;
+      error.code = response.error?.code;
+      error.details = response.error?.details;
+      throw error; // ✅ THROW
     }
+
+    return this.mapApiAppointmentToAppointment(response.data);
   },
 };

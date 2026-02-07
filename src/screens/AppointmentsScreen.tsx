@@ -238,7 +238,6 @@ export default function AppointmentsScreen() {
         type: 'success',
       });
       setIsModalOpen(false);
-
     } catch (error: any) {
       console.error('❌ Failed to create appointment:', error);
 
@@ -276,30 +275,19 @@ export default function AppointmentsScreen() {
     appointmentId: string,
     e: React.MouseEvent,
   ) => {
-    e.stopPropagation(); // Prevent card click
-    try {
-      const updated = await updateAppointmentStatusMutation.mutateAsync({
+    e.stopPropagation();
+
+    await toast.promise(
+      updateAppointmentStatusMutation.mutateAsync({
         appointmentId,
         status: 'CHECKED_IN',
-      });
-      if (updated) {
-        toast.add({
-          title: 'ppointment marked as checked in',
-          type: 'success',
-        });
-      } else {
-        toast.add({
-          title: 'Failed to mark check in',
-          type: 'error',
-        });
-      }
-    } catch (error: any) {
-      console.error('❌ Failed to mark check in:', error);
-      toast.add({
-        title: error?.message || 'Failed to mark check in',
-        type: 'error',
-      });
-    }
+      }),
+      {
+        loading: 'Marking appointment as checked in...',
+        success: 'Appointment marked as checked in',
+        error: (err: any) => err?.message || 'Failed to mark check in',
+      },
+    );
   };
 
   const formatDateTime = (dateTime: string) => {
@@ -389,8 +377,6 @@ export default function AppointmentsScreen() {
           </div>
           {doctors.length > 0 && (
             <div className="flex flex-col items-start gap-2 sm:w-48 md:w-56">
-              <Label>All Doctors</Label>
-
               <Select.Root
                 value={selectedDoctorFilter || undefined}
                 onValueChange={(value) => {
@@ -496,6 +482,9 @@ export default function AppointmentsScreen() {
                         {appointment.appointment_status === 'WAITING' && (
                           <div className="pt-1">
                             <Button
+                              disabled={
+                                updateAppointmentStatusMutation.isPending
+                              }
                               size="sm"
                               onClick={(e) =>
                                 handleMarkCheckIn(appointment.id, e)
@@ -565,6 +554,9 @@ export default function AppointmentsScreen() {
                           {appointment.appointment_status === 'WAITING' && (
                             <Button
                               size="sm"
+                              disabled={
+                                updateAppointmentStatusMutation.isPending
+                              }
                               onClick={(e) =>
                                 handleMarkCheckIn(appointment.id, e)
                               }

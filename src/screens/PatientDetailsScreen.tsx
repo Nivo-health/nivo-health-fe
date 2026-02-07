@@ -24,7 +24,9 @@ export default function PatientDetailsScreen() {
     }
     if (!patientLoading && !patient) {
       toast.add({
-        title: patientError ? 'Failed to load patient data' : 'Patient not found',
+        title: patientError
+          ? 'Failed to load patient data'
+          : 'Patient not found',
         type: 'error',
       });
       navigate('/patients');

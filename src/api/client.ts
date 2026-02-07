@@ -360,6 +360,7 @@ class ApiClient {
           result?.message?.toLowerCase?.().includes('token expired');
 
         if (unauthorized && !retry) {
+          console.log('run refreshAccessToken', unauthorized, !retry);
           const newAccess = await this.refreshAccessToken();
           if (newAccess) {
             return this.realRequest<T>(method, endpoint, data, params, true);

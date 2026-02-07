@@ -34,10 +34,12 @@ export function useCreateAppointment() {
 export function useUpdateAppointmentStatus() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: {
+    mutationFn: async (data: {
       appointmentId: string;
       status: 'WAITING' | 'CHECKED_IN' | 'NO_SHOW';
-    }) => appointmentService.updateStatus(data.appointmentId, data.status),
+    }) => {
+      return appointmentService.updateStatus(data.appointmentId, data.status);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.appointments });
     },

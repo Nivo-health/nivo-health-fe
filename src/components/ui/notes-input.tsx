@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Popover } from '@base-ui/react/popover';
 import { cn } from '@/lib/utils';
+import { Input } from './input';
 
 export interface NotesInputProps extends Omit<
   React.InputHTMLAttributes<HTMLInputElement>,
@@ -129,54 +130,41 @@ const NotesInput = React.forwardRef<HTMLInputElement, NotesInputProps>(
             </label>
           )}
 
+          <Popover.Trigger
+            render={
+              <Input
+                type="text"
+                id={inputId}
+                ref={inputRef}
+                value={value}
+                onChange={handleInputChange}
+                onFocus={handleInputFocus}
+                onKeyDown={handleInputKeyDown}
+                {...props}
+              />
+            }
+          ></Popover.Trigger>
+
           <Popover.Portal>
             <Popover.Positioner
               align="start"
               sideOffset={4}
               collisionPadding={8}
             >
-              <Popover.Arrow
-                render={
-                  <div className="relative">
-                    <input
-                      type="text"
-                      id={inputId}
-                      ref={inputRef}
-                      value={value}
-                      onChange={handleInputChange}
-                      onFocus={handleInputFocus}
-                      onKeyDown={handleInputKeyDown}
-                      className={cn(
-                        'flex h-10 w-full rounded-md border border-teal-300 bg-white px-3 py-2 text-sm',
-                        'ring-offset-white placeholder:text-gray-400',
-                        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2',
-                        'disabled:cursor-not-allowed disabled:opacity-50',
-                        error && 'border-red-500 focus-visible:ring-red-500',
-                        className,
-                      )}
-                      {...props}
-                    />
-                  </div>
-                }
-              />
               <Popover.Popup
                 className={cn(
-                  'z-[9999] w-[var(--radix-popover-trigger-width)] max-h-48 overflow-auto rounded-md border border-teal-200 bg-white shadow-lg',
-                  'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
-                  'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2',
-                  'data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
+                  'w-[--popover-trigger-width]',
+                  'max-h-48 overflow-auto rounded-md border bg-white shadow-lg',
                 )}
               >
                 {filteredOptions.map((option, index) => (
                   <button
-                    key={index}
+                    key={option}
                     type="button"
                     onClick={() => handleSelectOption(option)}
                     className={cn(
-                      'w-full text-left px-3 py-2 text-sm hover:bg-teal-50 focus:bg-teal-50 focus:outline-none transition-colors',
+                      'w-full text-left px-3 py-2 text-sm hover:bg-teal-50',
                       index === selectedIndex && 'bg-teal-50',
-                      index === 0 && 'rounded-t-md',
-                      index === filteredOptions.length - 1 && 'rounded-b-md',
                     )}
                   >
                     {option}
@@ -186,6 +174,7 @@ const NotesInput = React.forwardRef<HTMLInputElement, NotesInputProps>(
             </Popover.Positioner>
           </Popover.Portal>
         </div>
+
         {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
       </Popover.Root>
     );
