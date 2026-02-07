@@ -10,7 +10,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "generate-icons": "npx @vite-pwa/assets-generator --preset minimal public/icon-source.svg",
+    "generate-icons": "npx @vite-pwa/assets-generator --preset minimal public/favicon.svg",
     "format": "prettier --write .",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
