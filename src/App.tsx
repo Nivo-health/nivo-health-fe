@@ -13,6 +13,7 @@ import PrintPreviewScreen from '@/screens/PrintPreview';
 import SettingsScreen from '@/screens/Settings';
 import AppointmentsScreen from '@/screens/Appointments';
 import { useAuthStore } from '@/stores/auth.store';
+import DoctorScheduleSettingsScreen from './screens/DoctorScheduleSettings';
 
 function App() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -62,6 +63,10 @@ function App() {
                     element={<PrintPreviewScreen />}
                   />
                   <Route path="/settings" element={<SettingsScreen />} />
+                  <Route
+                    path="/doc-settings"
+                    element={<DoctorScheduleSettingsScreen />}
+                  />
                   <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
               </AppLayout>

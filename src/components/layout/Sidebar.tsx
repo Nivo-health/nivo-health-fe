@@ -4,6 +4,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Separator } from '../ui/separator';
 import {
   CalendarDays,
+  ClipboardClock,
   ClipboardList,
   Home,
   Settings,
@@ -36,6 +37,11 @@ const navItems: NavItem[] = [
     name: 'All Patients',
     path: '/patients',
     icon: <Users className="w-5 h-5" />,
+  },
+  {
+    name: 'Doc Settings',
+    path: '/doc-settings',
+    icon: <ClipboardClock className="w-5 h-5" />,
   },
   {
     name: 'Settings',

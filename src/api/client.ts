@@ -24,8 +24,7 @@ class ApiClient {
 
   constructor() {
     this.baseURL =
-      import.meta.env.VITE_API_BASE_URL ||
-      'https://clinics-api-13266793207.us-central1.run.app/api';
+      import.meta.env.VITE_API_BASE_URL || 'https://api.nivohealth.in/api';
   }
 
   private buildURL(

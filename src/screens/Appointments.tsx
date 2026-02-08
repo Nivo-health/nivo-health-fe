@@ -12,6 +12,8 @@ import {
   useUpdateAppointmentStatus,
 } from '@/queries/appointments.queries';
 import { useCurrentClinic } from '@/queries/clinic.queries';
+import { formatTimeShort } from '@/utils/dateFormat';
+import type { Appointment } from '@/types';
 import dayjs from 'dayjs';
 import { useMemo } from 'react';
 
@@ -31,8 +33,6 @@ export default function AppointmentsScreen() {
     },
     useQueryParams: true,
   });
-
-  console.log({ values });
 
   const doctorId =
     values.DOCTOR_ID && values.DOCTOR_ID !== 'all'
@@ -82,19 +82,29 @@ export default function AppointmentsScreen() {
     );
   };
 
-  const formatDateTime = (dateTime: string) => {
-    try {
-      const date = new Date(dateTime);
-      return date.toLocaleString('en-IN', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-      });
-    } catch {
-      return dateTime;
+  const formatAppointmentTime = (appointment: Appointment) => {
+    if (appointment.slot) {
+      const date = dayjs(appointment.slot.date).format('DD MMM YYYY');
+      const time = formatTimeShort(appointment.slot.start_time);
+      return `${date} | ${time}`;
     }
+    if (appointment.appointment_date_time) {
+      try {
+        return new Date(appointment.appointment_date_time).toLocaleString(
+          'en-IN',
+          {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+          },
+        );
+      } catch {
+        return appointment.appointment_date_time;
+      }
+    }
+    return null;
   };
 
   const getStatusColor = (status: string) => {
@@ -120,6 +130,8 @@ export default function AppointmentsScreen() {
       </div>
     );
   }
+
+  const selectedDoc = doctors.find((doc) => doc.id === values.DOCTOR_ID);
 
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-gray-50 overflow-x-hidden">
@@ -174,7 +186,9 @@ export default function AppointmentsScreen() {
                 }}
               >
                 <Select.Trigger className="w-full text-sm">
-                  <Select.Value placeholder="All Doctors" />
+                  <Select.Value placeholder="All Doctors">
+                    {selectedDoc?.name}
+                  </Select.Value>
                 </Select.Trigger>
 
                 <Select.Popup>
@@ -260,10 +274,9 @@ export default function AppointmentsScreen() {
                         )}
 
                         {/* Appointment Time */}
-                        {appointment.appointment_date_time && (
+                        {formatAppointmentTime(appointment) && (
                           <div className="text-sm text-gray-600">
-                            🕐{' '}
-                            {formatDateTime(appointment.appointment_date_time)}
+                            🕐 {formatAppointmentTime(appointment)}
                           </div>
                         )}
 
@@ -288,7 +301,7 @@ export default function AppointmentsScreen() {
 
                       {/* Desktop View - Column-based layout */}
                       <div className="hidden md:flex items-center gap-4 w-full">
-                        <div className="flex-1 min-w-0 grid grid-cols-[minmax(150px,1fr)_minmax(120px,auto)_minmax(180px,auto)_minmax(200px,auto)] gap-4 items-center">
+                        <div className="flex-1 min-w-0 grid grid-cols-[minmax(150px,1fr)_minmax(80px,auto)_minmax(180px,auto)_minmax(200px,auto)] gap-4 items-center">
                           {/* Name Column */}
                           <div className="min-w-0">
                             <h3 className="text-lg font-semibold text-gray-900 truncate">
@@ -300,7 +313,7 @@ export default function AppointmentsScreen() {
                           <div className="min-w-0">
                             {appointment.mobile_number ? (
                               <span className="text-sm text-gray-600 whitespace-nowrap">
-                                📱 {appointment.mobile_number}
+                                {appointment.mobile_number}
                               </span>
                             ) : (
                               <span className="text-sm text-gray-400">—</span>
@@ -311,7 +324,7 @@ export default function AppointmentsScreen() {
                           <div className="min-w-0">
                             {appointment.doctor ? (
                               <span className="text-sm text-gray-600 whitespace-nowrap">
-                                👨‍⚕️ {appointment.doctor.name}
+                                {appointment.doctor.name}
                               </span>
                             ) : (
                               <span className="text-sm text-gray-400">—</span>
@@ -320,12 +333,9 @@ export default function AppointmentsScreen() {
 
                           {/* Appointment Time Column */}
                           <div className="min-w-0">
-                            {appointment.appointment_date_time ? (
+                            {formatAppointmentTime(appointment) ? (
                               <span className="text-sm text-gray-600 whitespace-nowrap">
-                                🕐{' '}
-                                {formatDateTime(
-                                  appointment.appointment_date_time,
-                                )}
+                                {formatAppointmentTime(appointment)}
                               </span>
                             ) : (
                               <span className="text-sm text-gray-400">—</span>

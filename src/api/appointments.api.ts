@@ -24,7 +24,18 @@ export const appointmentService = {
           }
         : undefined,
       clinic_id: apiAppointment.clinic_id || '',
-      appointment_date_time: apiAppointment.appointment_date_time || '',
+      slot: apiAppointment.slot
+        ? {
+            id: apiAppointment.slot.id,
+            date: apiAppointment.slot.date,
+            start_time: apiAppointment.slot.start_time,
+            end_time: apiAppointment.slot.end_time,
+            slot_status: apiAppointment.slot.slot_status,
+            created_at: apiAppointment.slot.created_at,
+            updated_at: apiAppointment.slot.updated_at,
+          }
+        : null,
+      appointment_date_time: apiAppointment.appointment_date_time || undefined,
       appointment_status: apiAppointment.appointment_status || 'WAITING',
       source: apiAppointment.source || 'PHONE',
       created_at: apiAppointment.created_at,

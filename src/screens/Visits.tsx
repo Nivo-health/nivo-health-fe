@@ -351,7 +351,6 @@ export default function VisitsScreen() {
               placeholder="Search by name, mobile, or reason..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full text-sm md:text-base"
             />
           </div>
           <div className="sm:w-40 md:w-48">
@@ -367,8 +366,6 @@ export default function VisitsScreen() {
           </div>
           {clinicDoctors.length > 0 && (
             <div className="flex flex-col items-start gap-2 sm:w-48 md:w-56">
-              <Label>Doctor</Label>
-
               <Select.Root
                 value={selectedDoctorFilter || undefined}
                 onValueChange={(value) => {

@@ -54,4 +54,22 @@ export const queryKeys = {
   prescriptions: ['prescriptions'] as const,
   prescription: (id: string) =>
     [...queryKeys.prescriptions, 'detail', id] as const,
+
+  // Doctor Schedule
+  doctorSchedule: ['doctorSchedule'] as const,
+  workingHours: (doctorId?: string) =>
+    [...queryKeys.doctorSchedule, 'workingHours', doctorId] as const,
+  offDays: (params?: {
+    doctorId?: string;
+    startDate?: string;
+    endDate?: string;
+  }) => [...queryKeys.doctorSchedule, 'offDays', params] as const,
+
+  // Slots
+  slots: ['slots'] as const,
+  availableSlots: (params: {
+    doctorId: string;
+    startDate: string;
+    endDate: string;
+  }) => [...queryKeys.slots, 'available', params] as const,
 } as const;
