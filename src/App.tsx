@@ -1,19 +1,31 @@
+import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import AppLayout from '@/components/layout/AppLayout';
-import ProtectedRoute from '@/components/ProtectedRoute';
-import LoginScreen from '@/screens/Login';
-import HomeScreen from '@/screens/Dashboard';
-import AllPatientsScreen from '@/screens/AllPatients';
-import PatientDetailsScreen from '@/screens/PatientDetails';
-import VisitsScreen from '@/screens/Visits';
-import VisitContextScreen from '@/screens/VisitContext';
-import ConsultationScreen from '@/screens/Consultation';
-import PrescriptionScreen from '@/screens/Prescription';
-import PrintPreviewScreen from '@/screens/PrintPreview';
-import SettingsScreen from '@/screens/Settings';
-import AppointmentsScreen from '@/screens/Appointments';
+import AppLayout from '@/components/layout/app-layout';
+import ProtectedRoute from '@/components/protected-route';
 import { useAuthStore } from '@/stores/auth.store';
-import DoctorScheduleSettingsScreen from './screens/DoctorScheduleSettings';
+
+const LoginScreen = lazy(() => import('@/screens/login'));
+const HomeScreen = lazy(() => import('@/screens/dashboard'));
+const AllPatientsScreen = lazy(() => import('@/screens/all-patients'));
+const PatientDetailsScreen = lazy(() => import('@/screens/patient-details'));
+const VisitsScreen = lazy(() => import('@/screens/visits'));
+const VisitContextScreen = lazy(() => import('@/screens/visit-context'));
+const ConsultationScreen = lazy(() => import('@/screens/consultation'));
+const PrescriptionScreen = lazy(() => import('@/screens/prescription'));
+const PrintPreviewScreen = lazy(() => import('@/screens/print-preview'));
+const SettingsScreen = lazy(() => import('@/screens/settings'));
+const AppointmentsScreen = lazy(() => import('@/screens/appointments'));
+const DoctorScheduleSettingsScreen = lazy(
+  () => import('@/screens/doctor-schedule-settings'),
+);
+
+function RouteLoader() {
+  return (
+    <div className="min-h-[calc(100vh-4rem)] bg-background flex items-center justify-center">
+      <div className="text-muted-foreground">Loading...</div>
+    </div>
+  );
+}
 
 function App() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -24,7 +36,13 @@ function App() {
         <Route
           path="/login"
           element={
-            isAuthenticated ? <Navigate to="/" replace /> : <LoginScreen />
+            isAuthenticated ? (
+              <Navigate to="/" replace />
+            ) : (
+              <Suspense fallback={<RouteLoader />}>
+                <LoginScreen />
+              </Suspense>
+            )
           }
         />
 
@@ -34,41 +52,43 @@ function App() {
           element={
             <ProtectedRoute>
               <AppLayout>
-                <Routes>
-                  <Route path="/" element={<HomeScreen />} />
-                  <Route path="/patients" element={<AllPatientsScreen />} />
-                  <Route
-                    path="/patient/:patientId"
-                    element={<PatientDetailsScreen />}
-                  />
-                  <Route path="/visits" element={<VisitsScreen />} />
-                  <Route
-                    path="/appointments"
-                    element={<AppointmentsScreen />}
-                  />
-                  <Route
-                    path="/visit/:visitId"
-                    element={<VisitContextScreen />}
-                  />
-                  <Route
-                    path="/consultation/:visitId"
-                    element={<ConsultationScreen />}
-                  />
-                  <Route
-                    path="/prescription/:visitId"
-                    element={<PrescriptionScreen />}
-                  />
-                  <Route
-                    path="/print-preview/:visitId"
-                    element={<PrintPreviewScreen />}
-                  />
-                  <Route path="/settings" element={<SettingsScreen />} />
-                  <Route
-                    path="/doctor-schedule"
-                    element={<DoctorScheduleSettingsScreen />}
-                  />
-                  <Route path="*" element={<Navigate to="/" replace />} />
-                </Routes>
+                <Suspense fallback={<RouteLoader />}>
+                  <Routes>
+                    <Route path="/" element={<HomeScreen />} />
+                    <Route path="/patients" element={<AllPatientsScreen />} />
+                    <Route
+                      path="/patient/:patientId"
+                      element={<PatientDetailsScreen />}
+                    />
+                    <Route path="/visits" element={<VisitsScreen />} />
+                    <Route
+                      path="/appointments"
+                      element={<AppointmentsScreen />}
+                    />
+                    <Route
+                      path="/visit/:visitId"
+                      element={<VisitContextScreen />}
+                    />
+                    <Route
+                      path="/consultation/:visitId"
+                      element={<ConsultationScreen />}
+                    />
+                    <Route
+                      path="/prescription/:visitId"
+                      element={<PrescriptionScreen />}
+                    />
+                    <Route
+                      path="/print-preview/:visitId"
+                      element={<PrintPreviewScreen />}
+                    />
+                    <Route path="/settings" element={<SettingsScreen />} />
+                    <Route
+                      path="/doctor-schedule"
+                      element={<DoctorScheduleSettingsScreen />}
+                    />
+                    <Route path="*" element={<Navigate to="/" replace />} />
+                  </Routes>
+                </Suspense>
               </AppLayout>
             </ProtectedRoute>
           }

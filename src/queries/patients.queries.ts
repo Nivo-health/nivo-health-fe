@@ -6,12 +6,12 @@ import {
 } from '@tanstack/react-query';
 import { patientService, PatientSearchResult } from '../api/patients.api';
 import type { Patient } from '../types';
-import { queryKeys } from './queryKeys';
+import { queryKeys } from './query-keys';
 
 export const patientQueryOptions = {
   search: (query: string, limit = 20) =>
     queryOptions({
-      queryKey: queryKeys.patientSearch(query),
+      queryKey: queryKeys.patientSearch(query, limit),
       queryFn: () => patientService.search(query, limit),
       enabled: query.trim().length >= 2,
       staleTime: 1000 * 30, // 30 seconds for search results

@@ -5,7 +5,7 @@ import {
   queryOptions,
 } from '@tanstack/react-query';
 import { slotsService } from '../api/slots.api';
-import { queryKeys } from './queryKeys';
+import { queryKeys } from './query-keys';
 import type { Appointment, AppointmentSlot } from '@/types/api';
 
 // ─── Query Options ───

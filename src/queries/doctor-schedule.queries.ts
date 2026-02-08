@@ -5,7 +5,7 @@ import {
   queryOptions,
 } from '@tanstack/react-query';
 import { doctorScheduleService } from '../api/doctor-schedule.api';
-import { queryKeys } from './queryKeys';
+import { queryKeys } from './query-keys';
 
 // ─── Query Options ───
 

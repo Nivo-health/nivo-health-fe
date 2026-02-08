@@ -1,6 +1,6 @@
 import { apiClient } from './client';
-import { ApiError } from '@/lib/queryClient';
-import { toApiDateFormat } from '@/utils/dateFormat';
+import { ApiError } from '@/lib/query-client';
+import { toApiDateFormat } from '@/utils/date-format';
 import { appointmentService } from './appointments.api';
 import type {
   AvailableSlotsResponse,

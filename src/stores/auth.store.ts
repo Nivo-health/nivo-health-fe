@@ -6,7 +6,7 @@ import {
   getAccessToken,
   getRefreshToken,
   setTokens as setStoredTokens,
-} from '../lib/authTokens';
+} from '../lib/auth-tokens';
 
 interface AuthState {
   isAuthenticated: boolean;

@@ -2,8 +2,9 @@
 // Currently uses mock API client (localStorage), ready for backend integration
 
 import { apiClient } from './client';
-import { ApiError } from '@/lib/queryClient';
+import { ApiError } from '@/lib/query-client';
 import type { Visit, Patient } from '../types';
+import dayjs from 'dayjs';
 
 export const visitService = {
   mapApiVisitToVisit(apiVisit: any, fallbackPatientId?: string): Visit {
@@ -12,7 +13,7 @@ export const visitService = {
       patientId:
         apiVisit.patient?.id || apiVisit.patient_id || fallbackPatientId || '',
       date:
-        apiVisit.visit_date || apiVisit.created_at || new Date().toISOString(),
+        apiVisit.visit_date || apiVisit.created_at || dayjs().toISOString(),
       status: this.mapVisitStatus(apiVisit.visit_status),
       // Notes saved from ConsultationScreen (if backend returns them)
       notes: apiVisit.notes || undefined,
@@ -126,7 +127,7 @@ export const visitService = {
 
     // Client-side limit (backend may not support it here)
     return mapped
-      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+      .toSorted((a, b) => dayjs(b.date).valueOf() - dayjs(a.date).valueOf())
       .slice(0, limit);
   },
 
@@ -314,7 +315,7 @@ export const visitService = {
         date:
           apiVisit.visit_date ||
           apiVisit.created_at ||
-          new Date().toISOString(),
+          dayjs().toISOString(),
         status: this.mapVisitStatus(apiVisit.visit_status),
         notes: undefined,
         prescription: undefined,
@@ -393,7 +394,7 @@ export const visitService = {
       createdAt:
         apiPatient.created_at ||
         apiPatient.createdAt ||
-        new Date().toISOString(),
+        dayjs().toISOString(),
     };
   },
 };

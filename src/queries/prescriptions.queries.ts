@@ -8,7 +8,7 @@ import {
 import { prescriptionService } from '../api/prescriptions.api';
 import { visitService } from '../api/visits.api';
 import type { Prescription, Visit } from '../types';
-import { queryKeys } from './queryKeys';
+import { queryKeys } from './query-keys';
 
 export const prescriptionQueryOptions = {
   detail: (prescriptionId: string) =>

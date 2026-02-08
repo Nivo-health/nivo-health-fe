@@ -6,13 +6,13 @@ import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { toast } from '@/components/ui/toast';
 import { useFilters } from '@/hooks';
-import { useModal } from '@/hooks/useModal';
+import { useModal } from '@/hooks/use-modal';
 import {
   useAppointments,
   useUpdateAppointmentStatus,
 } from '@/queries/appointments.queries';
 import { useCurrentClinic } from '@/queries/clinic.queries';
-import { formatTimeShort } from '@/utils/dateFormat';
+import { formatTimeShort } from '@/utils/date-format';
 import type { Appointment } from '@/types';
 import dayjs from 'dayjs';
 import { useMemo } from 'react';
@@ -90,15 +90,8 @@ export default function AppointmentsScreen() {
     }
     if (appointment.appointment_date_time) {
       try {
-        return new Date(appointment.appointment_date_time).toLocaleString(
-          'en-IN',
-          {
-            day: '2-digit',
-            month: 'short',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-          },
+        return dayjs(appointment.appointment_date_time).format(
+          'DD MMM YYYY | hh:mm A',
         );
       } catch {
         return appointment.appointment_date_time;
@@ -125,8 +118,8 @@ export default function AppointmentsScreen() {
 
   if (loading) {
     return (
-      <div className="min-h-[calc(100vh-4rem)] bg-gray-50 flex items-center justify-center">
-        <div className="text-gray-500">Loading appointments...</div>
+      <div className="min-h-[calc(100vh-4rem)] bg-background flex items-center justify-center">
+        <div className="text-muted-foreground">Loading appointments...</div>
       </div>
     );
   }
@@ -134,16 +127,16 @@ export default function AppointmentsScreen() {
   const selectedDoc = doctors.find((doc) => doc.id === values.DOCTOR_ID);
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-gray-50 overflow-x-hidden">
+    <div className="min-h-[calc(100vh-4rem)] bg-background overflow-x-hidden">
       <div className="max-w-7xl mx-auto px-3 md:px-6 py-4 md:py-6">
         {/* Header - Compact on Mobile */}
         <div className="mb-4 md:mb-6">
           <div className="flex items-start justify-between gap-3 mb-3">
             <div className="flex-1 min-w-0">
-              <h1 className="text-xl md:text-3xl font-bold text-teal-900">
+              <h1 className="text-xl md:text-3xl font-bold text-foreground">
                 Appointments
               </h1>
-              <p className="text-xs md:text-base text-gray-600 mt-1">
+              <p className="text-xs md:text-base text-muted-foreground mt-1">
                 {filteredAppointments.length}{' '}
                 {filteredAppointments.length === 1
                   ? 'appointment'
@@ -261,22 +254,22 @@ export default function AppointmentsScreen() {
 
                         {/* Mobile Number */}
                         {appointment.mobile_number && (
-                          <div className="text-sm text-gray-600">
-                            📱 {appointment.mobile_number}
+                          <div className="text-sm text-muted-foreground">
+                            Mobile: {appointment.mobile_number}
                           </div>
                         )}
 
                         {/* Doctor */}
                         {appointment.doctor && (
-                          <div className="text-sm text-gray-600">
-                            👨‍⚕️ {appointment.doctor.name}
+                          <div className="text-sm text-muted-foreground">
+                            Doctor: {appointment.doctor.name}
                           </div>
                         )}
 
                         {/* Appointment Time */}
                         {formatAppointmentTime(appointment) && (
-                          <div className="text-sm text-gray-600">
-                            🕐 {formatAppointmentTime(appointment)}
+                          <div className="text-sm text-muted-foreground">
+                            Time: {formatAppointmentTime(appointment)}
                           </div>
                         )}
 

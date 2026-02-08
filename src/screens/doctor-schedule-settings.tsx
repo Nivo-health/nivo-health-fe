@@ -1,28 +1,28 @@
+import WorkingHourModal from '@/components/doctor-schedule/modals/working-hour-modal';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { DatePicker } from '@/components/ui/date-picker';
-import { Dialog } from '@/components/ui/dialog';
-import { Field } from '@/components/ui/field';
-import { Fieldset } from '@/components/ui/fieldset';
-import { Form } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { toast } from '@/components/ui/toast';
-import { useModal } from '@/hooks/useModal';
+import { useModal } from '@/hooks/use-modal';
 import { useCurrentClinic } from '@/queries/clinic.queries';
 import {
-  useWorkingHours,
+  useCreateOffDay,
   useCreateWorkingHour,
-  useUpdateWorkingHour,
+  useDeleteOffDay,
   useDeleteWorkingHour,
   useOffDays,
-  useCreateOffDay,
-  useDeleteOffDay,
+  useUpdateWorkingHour,
+  useWorkingHours,
 } from '@/queries/doctor-schedule.queries';
-import { formatTimeShort } from '@/utils/dateFormat';
 import type { DoctorWorkingHour } from '@/types/api';
+import { formatTimeShort } from '@/utils/date-format';
 import dayjs from 'dayjs';
-import { Clock, Trash2, Plus, Edit2 } from 'lucide-react';
+import Clock from 'lucide-react/dist/esm/icons/clock';
+import Edit2 from 'lucide-react/dist/esm/icons/edit-2';
+import Plus from 'lucide-react/dist/esm/icons/plus';
+import Trash2 from 'lucide-react/dist/esm/icons/trash-2';
 import { useMemo, useState } from 'react';
 
 const DAY_LABELS = [
@@ -387,123 +387,19 @@ export default function DoctorScheduleSettingsScreen() {
         )}
       </div>
 
-      {/* Working Hour Dialog */}
-      <Dialog.Root open={whDialog.isOpen} onOpenChange={() => whDialog.close()}>
-        <Dialog.Popup>
-          <Dialog.Header>
-            <Dialog.Title>
-              {editingWH ? 'Edit Working Hour' : 'Add Working Hour'}
-            </Dialog.Title>
-          </Dialog.Header>
-          <Dialog.Panel>
-            <Form
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleSaveWH();
-              }}
-            >
-              <Fieldset.Root>
-                {!editingWH && (
-                  <Field.Root name="dayOfWeek">
-                    <Field.Label>Day</Field.Label>
-                    <Field.Item block>
-                      <Input value={DAY_LABELS[whForm.dayOfWeek]} disabled />
-                    </Field.Item>
-                  </Field.Root>
-                )}
-
-                <Field.Root name="startTime">
-                  <Field.Label htmlFor="wh-start">Start Time *</Field.Label>
-                  <Field.Item block>
-                    <Field.Control
-                      id="wh-start"
-                      render={
-                        <Input
-                          id="wh-start"
-                          type="time"
-                          value={whForm.startTime}
-                          onChange={(e) =>
-                            setWhForm((f) => ({
-                              ...f,
-                              startTime: e.target.value,
-                            }))
-                          }
-                        />
-                      }
-                    />
-                  </Field.Item>
-                </Field.Root>
-
-                <Field.Root name="endTime">
-                  <Field.Label htmlFor="wh-end">End Time *</Field.Label>
-                  <Field.Item block>
-                    <Field.Control
-                      id="wh-end"
-                      render={
-                        <Input
-                          id="wh-end"
-                          type="time"
-                          value={whForm.endTime}
-                          onChange={(e) =>
-                            setWhForm((f) => ({
-                              ...f,
-                              endTime: e.target.value,
-                            }))
-                          }
-                        />
-                      }
-                    />
-                  </Field.Item>
-                </Field.Root>
-
-                <Field.Root name="slotDuration">
-                  <Field.Label htmlFor="wh-duration">
-                    Slot Duration (minutes)
-                  </Field.Label>
-                  <Field.Item block>
-                    <Field.Control
-                      id="wh-duration"
-                      render={
-                        <Input
-                          id="wh-duration"
-                          type="number"
-                          min={5}
-                          max={120}
-                          value={whForm.slotDuration}
-                          onChange={(e) =>
-                            setWhForm((f) => ({
-                              ...f,
-                              slotDuration: parseInt(e.target.value) || 15,
-                            }))
-                          }
-                        />
-                      }
-                    />
-                  </Field.Item>
-                </Field.Root>
-              </Fieldset.Root>
-            </Form>
-          </Dialog.Panel>
-          <Dialog.Footer>
-            <Button variant="outline" onClick={() => whDialog.close()}>
-              Cancel
-            </Button>
-            <Button
-              onClick={handleSaveWH}
-              loading={
-                createWorkingHourMutation.isPending ||
-                updateWorkingHourMutation.isPending
-              }
-              disabled={
-                createWorkingHourMutation.isPending ||
-                updateWorkingHourMutation.isPending
-              }
-            >
-              {editingWH ? 'Update' : 'Add'}
-            </Button>
-          </Dialog.Footer>
-        </Dialog.Popup>
-      </Dialog.Root>
+      <WorkingHourModal
+        open={whDialog.isOpen}
+        editing={Boolean(editingWH)}
+        dayLabels={DAY_LABELS}
+        value={whForm}
+        onChange={setWhForm}
+        onClose={whDialog.close}
+        onSave={handleSaveWH}
+        isSaving={
+          createWorkingHourMutation.isPending ||
+          updateWorkingHourMutation.isPending
+        }
+      />
     </div>
   );
 }

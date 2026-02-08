@@ -1,6 +1,6 @@
 import { useQuery, queryOptions } from '@tanstack/react-query';
 import { medicationService } from '../api/medications.api';
-import { queryKeys } from './queryKeys';
+import { queryKeys } from './query-keys';
 
 export const medicationQueryOptions = {
   search: (query: string) =>

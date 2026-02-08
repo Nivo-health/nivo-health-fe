@@ -2,13 +2,13 @@
 // TanStack Query v5 best practices
 
 import { apiClient } from './client';
-import { ApiError } from '@/lib/queryClient';
+import { ApiError } from '@/lib/query-client';
 import {
   clearTokens,
   getAccessToken,
   getRefreshToken,
   setTokens,
-} from '../lib/authTokens';
+} from '../lib/auth-tokens';
 
 export interface LoginCredentials {
   email: string;

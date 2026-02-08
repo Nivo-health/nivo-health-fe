@@ -7,7 +7,7 @@ import {
 } from '@tanstack/react-query';
 import { visitService } from '../api/visits.api';
 import type { Visit } from '../types';
-import { queryKeys } from './queryKeys';
+import { queryKeys } from './query-keys';
 
 interface VisitListParams {
   page?: number;
@@ -34,7 +34,7 @@ export const visitQueryOptions = {
 
   byPatient: (patientId: string, limit = 50) =>
     queryOptions({
-      queryKey: queryKeys.visitsByPatient(patientId),
+      queryKey: queryKeys.visitsByPatient(patientId, limit),
       queryFn: () => visitService.getByPatientId(patientId, limit),
       enabled: Boolean(patientId),
     }),

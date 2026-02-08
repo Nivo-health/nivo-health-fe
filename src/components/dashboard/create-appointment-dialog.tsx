@@ -6,7 +6,7 @@ import { Form } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { toast } from '@/components/ui/toast';
-import { ModalControl } from '@/hooks/useModal';
+import { ModalControl } from '@/hooks/use-modal';
 import { useCurrentClinic } from '@/queries/clinic.queries';
 import { usePatientSearchLazy } from '@/queries/patients.queries';
 import { useAvailableSlots, useBookSlot } from '@/queries/slots.queries';
@@ -17,13 +17,13 @@ import {
   getErrorMessage,
   hasValidationErrors,
   extractValidationErrors,
-} from '@/utils/errorHandler';
+} from '@/utils/error-handler';
 import {
   formatTimeShort,
   getSlotDateRange,
   groupSlotsByPeriod,
-} from '@/utils/dateFormat';
-import { formatPhoneInput } from '@/utils/phoneValidation';
+} from '@/utils/date-format';
+import { formatPhoneInput } from '@/utils/phone-validation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import dayjs from 'dayjs';
 import { useMemo, useState } from 'react';
@@ -298,6 +298,9 @@ export default function CreateAppointmentDialog(
                         <Input
                           id="mobile"
                           type="tel"
+                          inputMode="tel"
+                          autoComplete="tel"
+                          pattern="^[+0-9\\s()-]{8,20}$"
                           placeholder="Enter mobile number (e.g., +91 9876543210)"
                           autoFocus
                           disabled={searching}
@@ -505,6 +508,9 @@ export default function CreateAppointmentDialog(
                         <Input
                           id="patientMobile"
                           type="tel"
+                          inputMode="tel"
+                          autoComplete="tel"
+                          pattern="^[+0-9\\s()-]{8,20}$"
                           placeholder="Enter mobile number"
                           disabled={!!foundPatient}
                           {...patientForm.register('mobile', {

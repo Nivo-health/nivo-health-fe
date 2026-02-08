@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { useClinic } from '../hooks/useClinic';
+import { useClinic } from '../hooks/use-clinic';
 import { useAuthStore } from '../stores/auth.store';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';

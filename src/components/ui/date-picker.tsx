@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Popover } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
+import dayjs, { Dayjs } from 'dayjs';
 
 export interface DatePickerProps {
   value?: string;
@@ -15,51 +16,39 @@ const DatePicker = React.forwardRef<HTMLButtonElement, DatePickerProps>(
     ref,
   ) => {
     const [open, setOpen] = React.useState(false);
-    const [selectedDate, setSelectedDate] = React.useState<Date | null>(() => {
-      if (value) {
-        const date = new Date(value);
-        return isNaN(date.getTime()) ? null : date;
-      }
-      return null;
-    });
+    const [selectedDate, setSelectedDate] = React.useState<Dayjs | null>(() =>
+      value && dayjs(value).isValid() ? dayjs(value) : null,
+    );
 
     React.useEffect(() => {
-      if (value) {
-        const date = new Date(value);
-        setSelectedDate(isNaN(date.getTime()) ? null : date);
-      } else {
-        setSelectedDate(null);
-      }
+      setSelectedDate(value && dayjs(value).isValid() ? dayjs(value) : null);
     }, [value]);
 
-    const formatDate = (date: Date | null): string => {
-      if (!date) return '';
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const day = String(date.getDate()).padStart(2, '0');
-      return `${year}-${month}-${day}`;
-    };
+    const formatDate = (date: Dayjs | null): string =>
+      date ? date.format('YYYY-MM-DD') : '';
 
-    const displayDate = (date: Date | null): string => {
-      if (!date) return placeholder;
-      return formatDate(date);
-    };
+    const displayDate = (date: Dayjs | null): string =>
+      date ? formatDate(date) : placeholder;
 
-    const handleDateSelect = (date: Date) => {
+    const handleDateSelect = (date: Dayjs) => {
       setSelectedDate(date);
       const formatted = formatDate(date);
       onChange?.(formatted);
       setOpen(false);
     };
 
-    const today = new Date();
-    const currentYear = today.getFullYear();
-    const currentMonth = today.getMonth();
-    const selectedYear = selectedDate?.getFullYear() || currentYear;
-    const selectedMonth = selectedDate?.getMonth() || currentMonth;
+    const today = dayjs();
+    const currentYear = today.year();
+    const currentMonth = today.month();
+    const selectedYear = selectedDate?.year() ?? currentYear;
+    const selectedMonth = selectedDate?.month() ?? currentMonth;
 
-    const daysInMonth = new Date(selectedYear, selectedMonth + 1, 0).getDate();
-    const firstDayOfMonth = new Date(selectedYear, selectedMonth, 1).getDay();
+    const calendarMonth = dayjs()
+      .year(selectedYear)
+      .month(selectedMonth)
+      .date(1);
+    const daysInMonth = calendarMonth.daysInMonth();
+    const firstDayOfMonth = calendarMonth.day();
 
     const monthNames = [
       'January',
@@ -79,30 +68,18 @@ const DatePicker = React.forwardRef<HTMLButtonElement, DatePickerProps>(
     const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
     const navigateMonth = (direction: 'prev' | 'next') => {
-      const newDate = new Date(
-        selectedYear,
-        selectedMonth + (direction === 'next' ? 1 : -1),
-        1,
-      );
+      const newDate = calendarMonth.add(direction === 'next' ? 1 : -1, 'month');
       setSelectedDate(newDate);
     };
 
     const isToday = (day: number) => {
-      const date = new Date(selectedYear, selectedMonth, day);
-      return (
-        date.getDate() === today.getDate() &&
-        date.getMonth() === today.getMonth() &&
-        date.getFullYear() === today.getFullYear()
-      );
+      const date = calendarMonth.date(day);
+      return date.isSame(today, 'day');
     };
 
     const isSelected = (day: number) => {
       if (!selectedDate) return false;
-      return (
-        day === selectedDate.getDate() &&
-        selectedMonth === selectedDate.getMonth() &&
-        selectedYear === selectedDate.getFullYear()
-      );
+      return calendarMonth.date(day).isSame(selectedDate, 'day');
     };
 
     return (
@@ -113,9 +90,9 @@ const DatePicker = React.forwardRef<HTMLButtonElement, DatePickerProps>(
               type="button"
               ref={ref}
               className={cn(
-                'flex h-8 w-full items-center justify-between rounded-md border border-teal-300 bg-white px-3 py-2 text-sm',
-                'ring-offset-white placeholder:text-gray-400',
-                'focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2',
+                'flex h-8 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground',
+                'ring-offset-background placeholder:text-muted-foreground',
+                'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
                 'disabled:cursor-not-allowed disabled:opacity-50',
                 className,
               )}
@@ -146,7 +123,7 @@ const DatePicker = React.forwardRef<HTMLButtonElement, DatePickerProps>(
           align="start"
           sideOffset={4}
           className={cn(
-            'z-50 w-70 rounded-md border border-teal-200 bg-white p-4 shadow-md',
+            'z-50 w-70 rounded-md border border-border bg-popover text-popover-foreground p-4 shadow-md',
             'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0',
             'data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
             'data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2',
@@ -159,7 +136,8 @@ const DatePicker = React.forwardRef<HTMLButtonElement, DatePickerProps>(
               <button
                 type="button"
                 onClick={() => navigateMonth('prev')}
-                className="rounded-md p-1 hover:bg-teal-50 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                aria-label="Previous month"
+                className="rounded-md p-1 hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -174,13 +152,14 @@ const DatePicker = React.forwardRef<HTMLButtonElement, DatePickerProps>(
                   <path d="m15 18-6-6 6-6" />
                 </svg>
               </button>
-              <div className="font-semibold text-gray-900">
+              <div className="font-semibold text-foreground">
                 {monthNames[selectedMonth]} {selectedYear}
               </div>
               <button
                 type="button"
                 onClick={() => navigateMonth('next')}
-                className="rounded-md p-1 hover:bg-teal-50 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                aria-label="Next month"
+                className="rounded-md p-1 hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -200,7 +179,7 @@ const DatePicker = React.forwardRef<HTMLButtonElement, DatePickerProps>(
             {/* Calendar Grid */}
             <div className="space-y-2">
               {/* Week day headers */}
-              <div className="grid grid-cols-7 gap-1 text-center text-xs font-medium text-gray-500">
+              <div className="grid grid-cols-7 gap-1 text-center text-xs font-medium text-muted-foreground">
                 {weekDays.map((day) => (
                   <div key={day} className="py-1">
                     {day}
@@ -224,20 +203,16 @@ const DatePicker = React.forwardRef<HTMLButtonElement, DatePickerProps>(
                       <button
                         key={day}
                         type="button"
-                        onClick={() =>
-                          handleDateSelect(
-                            new Date(selectedYear, selectedMonth, day),
-                          )
-                        }
+                        onClick={() => handleDateSelect(calendarMonth.date(day))}
                         className={cn(
                           'h-8 rounded-md text-sm transition-colors',
-                          'hover:bg-teal-50 focus:outline-none focus:ring-2 focus:ring-teal-500',
+                          'hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring',
                           isDaySelected
-                            ? 'bg-teal-500 text-white hover:bg-teal-600 focus:ring-teal-500'
-                            : 'text-gray-900',
+                            ? 'bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-ring'
+                            : 'text-foreground',
                           isDayToday &&
                             !isDaySelected &&
-                            'font-semibold text-teal-600',
+                            'font-semibold text-primary',
                         )}
                       >
                         {day}
@@ -253,7 +228,7 @@ const DatePicker = React.forwardRef<HTMLButtonElement, DatePickerProps>(
               <button
                 type="button"
                 onClick={() => handleDateSelect(today)}
-                className="text-xs text-teal-600 hover:text-teal-700 hover:underline"
+                className="text-xs text-primary hover:underline"
               >
                 Today
               </button>

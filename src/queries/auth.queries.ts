@@ -1,6 +1,6 @@
 import { useMutation, useQuery, queryOptions } from '@tanstack/react-query';
 import { authService, LoginCredentials, LoginResponse } from '../api/auth.api';
-import { queryKeys } from './queryKeys';
+import { queryKeys } from './query-keys';
 
 export const authQueryOptions = {
   isAuthenticated: () =>

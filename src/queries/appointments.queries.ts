@@ -6,7 +6,7 @@ import {
 } from '@tanstack/react-query';
 import { appointmentService } from '../api/appointments.api';
 import type { Appointment } from '../types';
-import { queryKeys } from './queryKeys';
+import { queryKeys } from './query-keys';
 
 interface AppointmentListParams {
   page?: number;

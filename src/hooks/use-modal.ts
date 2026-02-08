@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useShow } from './useShow';
+import { useShow } from './use-show';
 export type ModalClose = (
   // Boolean added just because we call close on onOpenChangeEvent for Modal component
   arg?: boolean | (Partial<React.MouseEvent> & { takeConfirmation?: boolean }),

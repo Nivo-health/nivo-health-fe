@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useQueryParams, useUpdateQueryParams } from './useQueryParams';
+import { useQueryParams, useUpdateQueryParams } from './use-query-params';
 
 export type UpdateFilterFn<T> = <K extends keyof T>(
   name: K,

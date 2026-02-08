@@ -1,10 +1,10 @@
 // API Client - Production-ready HTTP client
 // All requests go directly to the real API
 
-import { ApiError } from '@/lib/queryClient';
+import { ApiError } from '@/lib/query-client';
 
 // Re-export ApiError for consumers that import from client.ts
-export { ApiError } from '@/lib/queryClient';
+export { ApiError } from '@/lib/query-client';
 
 export interface ApiResponse<T> {
   success: boolean;

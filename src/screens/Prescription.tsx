@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Stepper } from '../components/ui/stepper';
-import { getVisitStep, visitSteps } from '../utils/visitStepper';
+import { getVisitStep, visitSteps } from '../utils/visit-stepper';
 import type { Medicine, Prescription, FollowUp } from '../types';
 import { useVisit, useUpdateVisitStatus } from '../queries/visits.queries';
 import {
@@ -14,7 +14,7 @@ import {
   extractValidationErrors,
   getErrorMessage,
   hasValidationErrors,
-} from '../utils/errorHandler';
+} from '../utils/error-handler';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { MedicationInput } from '@/components/ui/medication-input';
@@ -22,7 +22,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { NotesInput } from '@/components/ui/notes-input';
 import { Table } from '@/components/ui/table';
-import { Dialog } from '@/components/ui/dialog';
+import SendWhatsappModal from '@/components/prescription/modals/send-whatsapp-modal';
 import { toast } from '@/components/ui/toast';
 import { Select } from '@/components/ui/select';
 
@@ -844,60 +844,13 @@ export default function PrescriptionScreen() {
         </div>
       </div>
 
-      {/* WhatsApp Modal */}
-      <Dialog.Root
+      <SendWhatsappModal
         open={isWhatsAppModalOpen}
         onOpenChange={setIsWhatsAppModalOpen}
-        // TODO
-        // size="lg"
-      >
-        <Dialog.Popup>
-          <Dialog.Header>
-            <Dialog.Title>Send Prescription on WhatsApp</Dialog.Title>
-          </Dialog.Header>
-          <Dialog.Panel>
-            <div className="space-y-4">
-              <p className="text-sm text-gray-600">
-                Preview of prescription to be sent:
-              </p>
-              <div className="bg-gray-50 p-4 rounded-lg max-h-96 overflow-y-auto">
-                {prescriptionPreview.length > 0 ? (
-                  <div className="space-y-3">
-                    {prescriptionPreview.map((med, idx) => (
-                      <div key={idx} className="border-b border-gray-200 pb-2">
-                        <div className="font-medium">{med.name}</div>
-                        <div className="text-sm text-gray-600">
-                          {med.dosage} - {med.duration}
-                          {med.notes && ` (${med.notes})`}
-                        </div>
-                      </div>
-                    ))}
-                    {followUp && (
-                      <div className="mt-3 pt-2 border-t border-gray-300">
-                        <strong>Follow-up:</strong> After {followUp.value}{' '}
-                        {followUp.unit}
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <p className="text-gray-500">No medicines added</p>
-                )}
-              </div>
-            </div>
-          </Dialog.Panel>
-          <Dialog.Footer>
-            <>
-              <Button
-                variant="outline"
-                onClick={() => setIsWhatsAppModalOpen(false)}
-              >
-                Cancel
-              </Button>
-              <Button onClick={handleSendWhatsApp}>Send</Button>
-            </>
-          </Dialog.Footer>
-        </Dialog.Popup>
-      </Dialog.Root>
+        medicines={prescriptionPreview}
+        followUp={followUp}
+        onSend={handleSendWhatsApp}
+      />
     </div>
   );
 }

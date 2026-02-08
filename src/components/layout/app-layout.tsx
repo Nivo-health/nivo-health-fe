@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils';
 import { ReactNode } from 'react';
-import BottomNav from './BottomNav';
-import Sidebar from './Sidebar';
+import BottomNav from './bottom-nav';
+import Sidebar from './sidebar';
 
 interface AppLayoutProps {
   children: ReactNode;

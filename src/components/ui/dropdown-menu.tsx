@@ -4,7 +4,8 @@ import * as React from 'react';
 import { Menu as MenuPrimitive } from '@base-ui/react/menu';
 
 import { cn } from '@/lib/utils';
-import { ChevronRightIcon, CheckIcon } from 'lucide-react';
+import CheckIcon from 'lucide-react/dist/esm/icons/check';
+import ChevronRightIcon from 'lucide-react/dist/esm/icons/chevron-right';
 
 function Root({ ...props }: MenuPrimitive.Root.Props) {
   return <MenuPrimitive.Root data-slot="dropdown-menu" {...props} />;

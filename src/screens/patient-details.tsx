@@ -5,6 +5,7 @@ import { useVisitsByPatient } from '../queries/visits.queries';
 import type { Visit } from '../types';
 import { Card } from '@/components/ui/card';
 import { toast } from '@/components/ui/toast';
+import dayjs from 'dayjs';
 
 export default function PatientDetailsScreen() {
   const { patientId } = useParams<{ patientId: string }>();
@@ -39,8 +40,8 @@ export default function PatientDetailsScreen() {
 
   if (patientLoading || visitsLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-gray-500">Loading...</div>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-muted-foreground">Loading...</div>
       </div>
     );
   }
@@ -50,7 +51,7 @@ export default function PatientDetailsScreen() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-gray-50 overflow-x-hidden">
+    <div className="min-h-[calc(100vh-4rem)] bg-background overflow-x-hidden">
       <div className="max-w-7xl mx-auto px-6 py-6">
         {/* Patient Header */}
         <Card.Root className="mb-6 border-teal-200">
@@ -111,17 +112,14 @@ export default function PatientDetailsScreen() {
               {visitHistory.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                   {visitHistory.map((visit) => (
-                    <div
+                    <button
                       key={visit.id}
+                      type="button"
                       className="p-3 rounded-lg border bg-white border-teal-200 hover:bg-teal-50 cursor-pointer transition-colors"
                       onClick={() => handleViewVisit(visit)}
                     >
                       <div className="text-sm font-medium text-gray-900">
-                        {new Date(visit.date).toLocaleDateString('en-IN', {
-                          day: '2-digit',
-                          month: 'short',
-                          year: 'numeric',
-                        })}
+                        {dayjs(visit.date).format('DD MMM YYYY')}
                       </div>
                       <div className="text-xs text-gray-600 mt-1">
                         {visit.visit_status === 'WAITING' ||
@@ -139,7 +137,7 @@ export default function PatientDetailsScreen() {
                           {visit.visit_reason}
                         </div>
                       )}
-                    </div>
+                    </button>
                   ))}
                 </div>
               ) : (

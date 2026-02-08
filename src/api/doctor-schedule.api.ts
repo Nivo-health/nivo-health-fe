@@ -1,6 +1,6 @@
 import { apiClient } from './client';
-import { ApiError } from '@/lib/queryClient';
-import { toApiDateFormat } from '@/utils/dateFormat';
+import { ApiError } from '@/lib/query-client';
+import { toApiDateFormat } from '@/utils/date-format';
 import type { DoctorWorkingHour, DoctorOffDay } from '@/types/api';
 
 export const doctorScheduleService = {

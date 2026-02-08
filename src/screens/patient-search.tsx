@@ -10,19 +10,15 @@ import { useFiltersStore } from '../stores/filters.store';
 import { useCreateVisit } from '../queries/visits.queries';
 import { useQueryClient } from '@tanstack/react-query';
 import { fetchVisitsByPatient } from '../queries/visits.queries';
-import {
-  validatePhoneNumber,
-  formatPhoneInput,
-} from '../utils/phoneValidation';
+import { validatePhoneNumber } from '../utils/phone-validation';
 import {
   extractValidationErrors,
   getErrorMessage,
   hasValidationErrors,
-} from '../utils/errorHandler';
+} from '../utils/error-handler';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Dialog } from '@/components/ui/dialog';
+import AddPatientModal from '@/components/patient-search/modals/add-patient-modal';
 
 export default function PatientSearchScreen() {
   const navigate = useNavigate();
@@ -146,7 +142,7 @@ export default function PatientSearchScreen() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-gray-50 overflow-x-hidden">
+    <div className="min-h-[calc(100vh-4rem)] bg-background overflow-x-hidden">
       <div className="sticky z-10 bg-white border-b border-teal-100 shadow-sm">
         <div className="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center gap-4">
           <Input
@@ -170,21 +166,24 @@ export default function PatientSearchScreen() {
               {results.map((patient) => (
                 <li
                   key={patient.id}
-                  onClick={() => handlePatientClick(patient)}
-                  className="px-4 py-3 hover:bg-teal-50 cursor-pointer transition-colors"
+                  className="px-4 py-3 hover:bg-teal-50 transition-colors"
                 >
                   <div className="flex justify-between items-center gap-3">
-                    <div className="flex-1">
+                    <button
+                      type="button"
+                      onClick={() => handlePatientClick(patient)}
+                      className="flex-1 text-left"
+                    >
                       <div className="font-medium text-gray-900">
                         {patient.name}
                       </div>
                       <div className="text-sm text-gray-500">
-                        {maskMobile(patient.mobile)}
+                        Mobile: {maskMobile(patient.mobile)}
                         {patient.age && ` • Age: ${patient.age}`}
                         {patient.gender &&
                           ` • ${patient.gender === 'M' ? 'Male' : 'Female'}`}
                       </div>
-                    </div>
+                    </button>
                     <Button
                       onClick={(e) => handleStartVisit(e, patient)}
                       size="sm"
@@ -218,129 +217,14 @@ export default function PatientSearchScreen() {
         )}
       </div>
 
-      <Dialog.Root
+      <AddPatientModal
         open={isModalOpen}
         onOpenChange={setIsModalOpen}
-        // TODO: @sandeep add size
-        // size="lg"
-      >
-        <Dialog.Popup>
-          <Dialog.Header>
-            <Dialog.Title>Add New Patient</Dialog.Title>
-          </Dialog.Header>
-          <Dialog.Panel>
-            <div className="space-y-5">
-              <div className="flex flex-col items-start gap-2">
-                <Label htmlFor="name">Name *</Label>
-                <Input
-                  id="name"
-                  value={newPatient.name}
-                  onChange={(e) =>
-                    setNewPatient({ ...newPatient, name: e.target.value })
-                  }
-                  // error={errors.name}
-                  placeholder="Enter patient name"
-                  autoFocus
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      handleSavePatient();
-                    }
-                  }}
-                />
-              </div>
-              <div className="flex flex-col items-start gap-2">
-                <Label htmlFor="mobile">Mobile *</Label>
-                <Input
-                  id="mobile"
-                  type="tel"
-                  value={newPatient.mobile}
-                  onChange={(e) =>
-                    setNewPatient({
-                      ...newPatient,
-                      mobile: formatPhoneInput(e.target.value),
-                    })
-                  }
-                  // TODO
-                  // error={errors.mobile}
-                  placeholder="Enter mobile number (e.g., +91 9876543210)"
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      handleSavePatient();
-                    }
-                  }}
-                />
-              </div>
-              <div className="flex flex-col items-start gap-2">
-                <Label htmlFor="age">Age</Label>
-                <Input
-                  id="age"
-                  type="number"
-                  value={newPatient.age}
-                  onChange={(e) =>
-                    setNewPatient({ ...newPatient, age: e.target.value })
-                  }
-                  // TODO
-                  // error={errors.age}
-                  placeholder="Enter age (optional)"
-                  min="0"
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      handleSavePatient();
-                    }
-                  }}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Gender (optional)
-                </label>
-                <div className="flex gap-4">
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      name="gender"
-                      value="M"
-                      checked={newPatient.gender === 'M'}
-                      onChange={(e) =>
-                        setNewPatient({
-                          ...newPatient,
-                          gender: e.target.value as 'M' | 'F',
-                        })
-                      }
-                      className="mr-2"
-                    />
-                    Male
-                  </label>
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      name="gender"
-                      value="F"
-                      checked={newPatient.gender === 'F'}
-                      onChange={(e) =>
-                        setNewPatient({
-                          ...newPatient,
-                          gender: e.target.value as 'M' | 'F',
-                        })
-                      }
-                      className="mr-2"
-                    />
-                    Female
-                  </label>
-                </div>
-              </div>
-            </div>
-          </Dialog.Panel>
-          <Dialog.Footer>
-            <>
-              <Button variant="outline" onClick={() => setIsModalOpen(false)}>
-                Cancel
-              </Button>
-              <Button onClick={handleSavePatient}>Save Patient</Button>
-            </>
-          </Dialog.Footer>
-        </Dialog.Popup>
-      </Dialog.Root>
+        patient={newPatient}
+        errors={errors}
+        onPatientChange={setNewPatient}
+        onSave={handleSavePatient}
+      />
     </div>
   );
 }

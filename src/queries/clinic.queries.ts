@@ -1,7 +1,7 @@
 import { useQuery, queryOptions } from '@tanstack/react-query';
 import { clinicService } from '../api/clinic.api';
 import type { Clinic } from '../types';
-import { queryKeys } from './queryKeys';
+import { queryKeys } from './query-keys';
 
 export const clinicQueryOptions = {
   current: () =>

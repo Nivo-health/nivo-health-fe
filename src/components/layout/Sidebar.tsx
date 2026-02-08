@@ -1,15 +1,13 @@
 import { useClinic } from '@/hooks';
 import { cn } from '@/lib/utils';
+import CalendarDays from 'lucide-react/dist/esm/icons/calendar-days';
+import ClipboardClock from 'lucide-react/dist/esm/icons/clipboard-clock';
+import ClipboardList from 'lucide-react/dist/esm/icons/clipboard-list';
+import Home from 'lucide-react/dist/esm/icons/home';
+import Settings from 'lucide-react/dist/esm/icons/settings';
+import Users from 'lucide-react/dist/esm/icons/users';
 import { Link, useLocation } from 'react-router-dom';
 import { Separator } from '../ui/separator';
-import {
-  CalendarDays,
-  ClipboardClock,
-  ClipboardList,
-  Home,
-  Settings,
-  Users,
-} from 'lucide-react';
 
 interface NavItem {
   name: string;

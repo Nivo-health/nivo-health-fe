@@ -1,4 +1,4 @@
-import { validatePhoneNumber } from '@/utils/phoneValidation';
+import { validatePhoneNumber } from '@/utils/phone-validation';
 import { z } from 'zod';
 
 export const createAppointmentSchema = z.object({

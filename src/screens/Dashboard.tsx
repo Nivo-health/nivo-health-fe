@@ -3,20 +3,18 @@ import { StatCard } from '@/components/dashboard/stats-card';
 import { Card } from '@/components/ui/card';
 import { DatePicker } from '@/components/ui/date-picker';
 import { toast } from '@/components/ui/toast';
-import { useFilters } from '@/hooks/useFilters';
+import { useFilters } from '@/hooks/use-filters';
 import dayjs from 'dayjs';
-import {
-  Calendar,
-  CalendarDays,
-  CheckCircle,
-  ClipboardList,
-  Clock,
-  TrendingUp,
-  UserPlus,
-  Users,
-} from 'lucide-react';
+import Calendar from 'lucide-react/dist/esm/icons/calendar';
+import CalendarDays from 'lucide-react/dist/esm/icons/calendar-days';
+import CheckCircle from 'lucide-react/dist/esm/icons/check-circle';
+import ClipboardList from 'lucide-react/dist/esm/icons/clipboard-list';
+import Clock from 'lucide-react/dist/esm/icons/clock';
+import TrendingUp from 'lucide-react/dist/esm/icons/trending-up';
+import UserPlus from 'lucide-react/dist/esm/icons/user-plus';
+import Users from 'lucide-react/dist/esm/icons/users';
 import { useNavigate } from 'react-router-dom';
-import { useClinic } from '../hooks/useClinic';
+import { useClinic } from '../hooks/use-clinic';
 import { useClinicStats } from '../queries/clinic.queries';
 
 const today = dayjs().format('YYYY-MM-DD');

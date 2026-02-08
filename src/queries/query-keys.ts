@@ -11,8 +11,10 @@ export const queryKeys = {
   patients: ['patients'] as const,
   patientsList: () => [...queryKeys.patients, 'list'] as const,
   patient: (id: string) => [...queryKeys.patients, 'detail', id] as const,
-  patientSearch: (query: string) =>
-    [...queryKeys.patients, 'search', query] as const,
+  patientSearch: (query: string, limit?: number) =>
+    limit === undefined
+      ? ([...queryKeys.patients, 'search', query] as const)
+      : ([...queryKeys.patients, 'search', query, limit] as const),
   patientsRecent: (limit: number) =>
     [...queryKeys.patients, 'recent', limit] as const,
 
@@ -26,8 +28,10 @@ export const queryKeys = {
     doctorId?: string;
   }) => [...queryKeys.visits, 'list', params] as const,
   visit: (id: string) => [...queryKeys.visits, 'detail', id] as const,
-  visitsByPatient: (patientId: string) =>
-    [...queryKeys.visits, 'patient', patientId] as const,
+  visitsByPatient: (patientId: string, limit?: number) =>
+    limit === undefined
+      ? ([...queryKeys.visits, 'patient', patientId] as const)
+      : ([...queryKeys.visits, 'patient', patientId, limit] as const),
   visitsWaiting: () => [...queryKeys.visits, 'waiting'] as const,
 
   // Clinics

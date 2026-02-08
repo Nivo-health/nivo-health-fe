@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Stepper } from '../components/ui/stepper';
 import { useVisit } from '../queries/visits.queries';
 import { usePrescription } from '../queries/prescriptions.queries';
-import { getVisitStep, visitSteps } from '../utils/visitStepper';
+import { getVisitStep, visitSteps } from '../utils/visit-stepper';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 
