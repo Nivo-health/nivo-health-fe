@@ -39,43 +39,6 @@ A React TypeScript application for managing Outpatient Department (OPD) operatio
   npm run preview
   ```
 
-## 📱 Progressive Web App (PWA)
-
-This app is configured as a **Progressive Web App**! Users can install it on their devices and use it offline.
-
-### Quick PWA Setup
-
-1. **Generate app icons** (see `PWA_SETUP.md` for details):
-   - Create 512x512px icon
-   - Use online tools: [RealFaviconGenerator](https://realfavicongenerator.net/) or [PWA Builder](https://www.pwabuilder.com/imageGenerator)
-   - Place icons in `public/` folder:
-     - `pwa-192x192.png`
-     - `pwa-512x512.png`
-     - `apple-touch-icon.png` (180x180px)
-     - `favicon.ico`
-
-2. **Build and test:**
-
-   ```bash
-   npm run build
-   npm run preview
-   ```
-
-3. **Install on device:**
-   - **Android:** Chrome → Menu → "Add to Home screen"
-   - **iOS:** Safari → Share → "Add to Home Screen"
-   - **Desktop:** Look for install icon in address bar
-
-### PWA Features
-
-- ✅ Offline support (cached resources)
-- ✅ Installable on devices
-- ✅ Standalone app experience
-- ✅ Auto-updates on new versions
-- ✅ Fast loading with service worker
-
-📖 **Full PWA documentation:** See [PWA_SETUP.md](./PWA_SETUP.md)
-
 ## 📱 App Flow & Exploration Guide
 
 ### 1. **Home Screen** (`/`)

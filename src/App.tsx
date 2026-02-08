@@ -64,7 +64,7 @@ function App() {
                   />
                   <Route path="/settings" element={<SettingsScreen />} />
                   <Route
-                    path="/doc-settings"
+                    path="/doctor-schedule"
                     element={<DoctorScheduleSettingsScreen />}
                   />
                   <Route path="*" element={<Navigate to="/" replace />} />

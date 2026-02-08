@@ -39,8 +39,8 @@ const navItems: NavItem[] = [
     icon: <Users className="w-5 h-5" />,
   },
   {
-    name: 'Doc Settings',
-    path: '/doc-settings',
+    name: 'Doctor Schedule',
+    path: '/doctor-schedule',
     icon: <ClipboardClock className="w-5 h-5" />,
   },
   {

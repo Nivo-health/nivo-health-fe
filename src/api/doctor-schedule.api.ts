@@ -101,8 +101,7 @@ export const doctorScheduleService = {
     if (params?.doctorId) queryParams.doctor_id = params.doctorId;
     if (params?.startDate)
       queryParams.start_date = toApiDateFormat(params.startDate);
-    if (params?.endDate)
-      queryParams.end_date = toApiDateFormat(params.endDate);
+    if (params?.endDate) queryParams.end_date = toApiDateFormat(params.endDate);
 
     const response = await apiClient.get<any>(
       '/doctor-schedule/off-days',

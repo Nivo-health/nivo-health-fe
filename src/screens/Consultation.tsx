@@ -14,9 +14,7 @@ export default function ConsultationScreen() {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const saveTimeoutRef = useRef<number | null>(null);
   const { data: visit } = useVisit(visitId || '');
-  const { data: prescription } = usePrescription(
-    visit?.prescription_id || '',
-  );
+  const { data: prescription } = usePrescription(visit?.prescription_id || '');
 
   useEffect(() => {
     if (!visitId) {

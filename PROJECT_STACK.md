@@ -39,11 +39,6 @@ Use this file as the default project context for future work.
 - `zod`
 - `zustand`
 
-## PWA
-
-- `vite-plugin-pwa`
-- `@vite-pwa/assets-generator`
-
 ## Tooling
 
 - `eslint` + `@eslint/js`
@@ -69,7 +64,6 @@ Use this file as the default project context for future work.
 - `pnpm lint` -> Run ESLint
 - `pnpm lint:fix` -> Auto-fix lint issues
 - `pnpm format` -> Run Prettier
-- `pnpm generate-icons` -> Generate PWA icons from `public/favicon.svg`
 
 ## Notes for Future Contributors/Agents
 
