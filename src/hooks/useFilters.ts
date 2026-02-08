@@ -26,6 +26,7 @@ export interface UseFiltersReturn<T> {
   resetFilters: ResetFiltersFn;
   /** Check if any filter has changed from initial */
   hasActiveFilters: boolean;
+  updateMultipleFilters: (updates: Partial<T>) => void;
 }
 
 /**
@@ -176,9 +177,31 @@ export function useFilters<T extends Record<string, unknown>>({
     });
   }, [initialValueJSON, values]);
 
+  // Update multiple filters at once
+  const updateMultipleFilters = useCallback(
+    (updates: Partial<T>) => {
+      if (syncWithUrl) {
+        const entries = Object.entries(updates).map(([key, value]) => ({
+          query: key,
+          value: Array.isArray(value)
+            ? value.join(',')
+            : value === null || value === undefined
+              ? null
+              : String(value),
+        }));
+
+        updateMultiple(entries);
+      }
+
+      setLocalValues((prev) => ({ ...prev, ...updates }));
+    },
+    [syncWithUrl, updateMultiple],
+  );
+
   return {
     values,
     updateFilter,
+    updateMultipleFilters,
     getUpdateFilter,
     resetFilters,
     hasActiveFilters,

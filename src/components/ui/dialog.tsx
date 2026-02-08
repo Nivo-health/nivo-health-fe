@@ -26,7 +26,7 @@ function Backdrop({ className, ...props }: DialogPrimitive.Backdrop.Props) {
   return (
     <DialogPrimitive.Backdrop
       className={cn(
-        'fixed inset-0 z-50 bg-black/32 backdrop-blur-sm transition-all duration-200 data-ending-style:opacity-0 data-starting-style:opacity-0',
+        'fixed inset-0 z-50 bg-neutral-500/55 backdrop-blur-s transition-all duration-200 data-ending-style:opacity-0 data-starting-style:opacity-0',
         className,
       )}
       data-slot="dialog-backdrop"
@@ -93,12 +93,24 @@ function Popup({
   );
 }
 
-function Header({ className, ...props }: React.ComponentProps<'div'>) {
+function Header({
+  className,
+  variant = 'default',
+  ...props
+}: React.ComponentProps<'div'> & {
+  variant?: 'default' | 'bare';
+}) {
   return (
     <div
       className={cn(
-        'flex flex-col gap-2 p-6 in-[[data-slot=dialog-popup]:has([data-slot=dialog-panel])]:pb-3 max-sm:pb-4',
+        'flex flex-col gap-2 p-6 in-[[data-slot=dialog-popup]:has([data-slot=dialog-panel])]:pb-3 max-sm:pb-4 sm:rounded-t-[calc(var(--radius-2xl)-1px)]',
+
         className,
+        {
+          'border-t bg-muted/72 py-4': variant === 'default',
+          'in-[[data-slot=dialog-popup]:has([data-slot=dialog-panel])]:pt-3 pt-4 pb-6':
+            variant === 'bare',
+        },
       )}
       data-slot="dialog-header"
       {...props}
@@ -117,10 +129,12 @@ function Footer({
     <div
       className={cn(
         'flex flex-col-reverse gap-2 px-6 sm:flex-row sm:justify-end sm:rounded-b-[calc(var(--radius-2xl)-1px)]',
-        variant === 'default' && 'border-t bg-muted/72 py-4',
-        variant === 'bare' &&
-          'in-[[data-slot=dialog-popup]:has([data-slot=dialog-panel])]:pt-3 pt-4 pb-6',
         className,
+        {
+          'border-t bg-muted/72 py-4': variant === 'default',
+          'in-[[data-slot=dialog-popup]:has([data-slot=dialog-panel])]:pt-3 pt-4 pb-6':
+            variant === 'bare',
+        },
       )}
       data-slot="dialog-footer"
       {...props}
@@ -163,7 +177,7 @@ function Panel({
     <ScrollArea.Root scrollFade={scrollFade}>
       <div
         className={cn(
-          'p-6 in-[[data-slot=dialog-popup]:has([data-slot=dialog-header])]:pt-1 in-[[data-slot=dialog-popup]:has([data-slot=dialog-footer]:not(.border-t))]:pb-1',
+          'p-6 in-[[data-slot=dialog-popup]:has([data-slot=dialog-header])]:pt-6 in-[[data-slot=dialog-popup]:has([data-slot=dialog-footer]:not(.border-t))]:pb-1',
           className,
         )}
         data-slot="dialog-panel"

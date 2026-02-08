@@ -232,7 +232,7 @@ export default function AllPatientsScreen() {
                   {/* Desktop View - Column Layout */}
                   <div className="hidden md:flex items-center gap-4">
                     {/* Avatar */}
-                    <div className="w-12 h-12 bg-gradient-to-br from-teal-500 to-teal-600 rounded-full flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
+                    <div className="w-12 h-12 bg-gradient-to-br from-teal-500 to-teal-600 rounded-full flex items-center justify-center text-white font-bold text-lg shrink-0">
                       {patient.name.charAt(0).toUpperCase()}
                     </div>
 

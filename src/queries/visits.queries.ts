@@ -1,6 +1,3 @@
-// TanStack Query v5: Visit Queries
-// Best practices: queryOptions factory, proper invalidation
-
 import {
   QueryClient,
   useMutation,
@@ -11,10 +8,6 @@ import {
 import { visitService } from '../api/visits.api';
 import type { Visit } from '../types';
 import { queryKeys } from './queryKeys';
-
-// ============================================
-// Types
-// ============================================
 
 interface VisitListParams {
   page?: number;
@@ -30,10 +23,6 @@ interface CreateVisitData {
   status?: 'waiting' | 'in_progress' | 'completed';
   doctorId?: string;
 }
-
-// ============================================
-// Query Options (v5 pattern for reusability)
-// ============================================
 
 export const visitQueryOptions = {
   detail: (id: string) =>
@@ -70,10 +59,6 @@ export const visitQueryOptions = {
     }),
 };
 
-// ============================================
-// Query Hooks
-// ============================================
-
 export function useVisit(id: string) {
   return useQuery(visitQueryOptions.detail(id));
 }
@@ -90,10 +75,6 @@ export function useVisitsList(params?: VisitListParams) {
   return useQuery(visitQueryOptions.list(params));
 }
 
-// ============================================
-// Prefetch Functions (for SSR/preloading)
-// ============================================
-
 export function fetchVisitsByPatient(
   queryClient: QueryClient,
   patientId: string,
@@ -101,10 +82,6 @@ export function fetchVisitsByPatient(
 ) {
   return queryClient.fetchQuery(visitQueryOptions.byPatient(patientId, limit));
 }
-
-// ============================================
-// Mutation Hooks
-// ============================================
 
 export function useCreateVisit() {
   const queryClient = useQueryClient();

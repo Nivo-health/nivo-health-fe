@@ -1,14 +1,7 @@
-// TanStack Query v5: Clinic Queries
-// Best practices: queryOptions factory, proper typing
-
 import { useQuery, queryOptions } from '@tanstack/react-query';
 import { clinicService } from '../api/clinic.api';
 import type { Clinic } from '../types';
 import { queryKeys } from './queryKeys';
-
-// ============================================
-// Query Options (v5 pattern for reusability)
-// ============================================
 
 export const clinicQueryOptions = {
   current: () =>
@@ -27,10 +20,6 @@ export const clinicQueryOptions = {
       staleTime: 1000 * 60 * 2, // 2 minutes
     }),
 };
-
-// ============================================
-// Query Hooks
-// ============================================
 
 export function useCurrentClinic() {
   return useQuery(clinicQueryOptions.current());

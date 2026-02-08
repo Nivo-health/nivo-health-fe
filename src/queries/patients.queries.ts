@@ -1,6 +1,3 @@
-// TanStack Query v5: Patient Queries
-// Best practices: queryOptions factory, proper invalidation
-
 import {
   useQuery,
   useMutation,
@@ -10,10 +7,6 @@ import {
 import { patientService, PatientSearchResult } from '../api/patients.api';
 import type { Patient } from '../types';
 import { queryKeys } from './queryKeys';
-
-// ============================================
-// Query Options (v5 pattern for reusability)
-// ============================================
 
 export const patientQueryOptions = {
   search: (query: string, limit = 20) =>
@@ -44,10 +37,6 @@ export const patientQueryOptions = {
     }),
 };
 
-// ============================================
-// Query Hooks
-// ============================================
-
 export function usePatientSearch(query: string, limit = 20) {
   return useQuery(patientQueryOptions.search(query, limit));
 }
@@ -64,9 +53,13 @@ export function useRecentPatients(limit = 10) {
   return useQuery(patientQueryOptions.recent(limit));
 }
 
-// ============================================
-// Mutation Hooks
-// ============================================
+export function usePatientSearchLazy() {
+  return useMutation({
+    mutationKey: ['patients', 'search-lazy'],
+    mutationFn: ({ query, limit = 20 }: { query: string; limit?: number }) =>
+      patientService.search(query, limit),
+  });
+}
 
 export function useCreatePatient() {
   const queryClient = useQueryClient();

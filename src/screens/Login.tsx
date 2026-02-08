@@ -1,4 +1,6 @@
 import { Button } from '@/components/ui/button';
+import { Field } from '@/components/ui/field';
+import { Fieldset } from '@/components/ui/fieldset';
 import { Form } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { toast } from '@/components/ui/toast';
@@ -8,9 +10,6 @@ import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { useLogin } from '../queries/auth.queries';
 import { useAuthStore } from '../stores/auth.store';
-
-import { Field } from '@/components/ui/field';
-import { Fieldset } from '@/components/ui/fieldset';
 
 export default function LoginScreen() {
   const navigate = useNavigate();

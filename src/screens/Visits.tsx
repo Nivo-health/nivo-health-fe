@@ -335,7 +335,7 @@ export default function VisitsScreen() {
             </div>
             <Button
               onClick={handleCreateVisit}
-              className="flex-shrink-0 text-sm md:text-base px-3 md:px-4"
+              className="shrink-0 text-sm md:text-base px-3 md:px-4"
               size="sm"
             >
               + Create
@@ -453,7 +453,7 @@ export default function VisitsScreen() {
                   <div className="flex items-center justify-between gap-4">
                     <div className="flex items-center gap-3 md:gap-4 flex-1 min-w-0">
                       {/* Avatar */}
-                      <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-teal-500 to-teal-600 rounded-full flex items-center justify-center text-white font-bold text-base md:text-lg flex-shrink-0">
+                      <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-teal-500 to-teal-600 rounded-full flex items-center justify-center text-white font-bold text-base md:text-lg shrink-0">
                         {visit.patient?.name?.charAt(0).toUpperCase() || '?'}
                       </div>
 
