@@ -4,7 +4,7 @@
 // GET /api/visits/prescription/:prescriptionId (get)
 
 import { apiClient } from './client';
-import { ApiError } from '@/lib/queryClient';
+import { ApiError } from '@/lib/query-client';
 import type { Prescription, Medicine, FollowUp } from '../types';
 import { visitService } from './visits.api';
 

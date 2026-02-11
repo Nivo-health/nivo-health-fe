@@ -1,10 +1,8 @@
-'use client';
-
 import { mergeProps } from '@base-ui/react/merge-props';
 import { useRender } from '@base-ui/react/use-render';
 import { cva, type VariantProps } from 'class-variance-authority';
+import Loader2 from 'lucide-react/dist/esm/icons/loader-2';
 import type * as React from 'react';
-
 import { cn } from '@/lib/utils';
 
 const buttonVariants = cva(
@@ -51,9 +49,19 @@ const buttonVariants = cva(
 interface ButtonProps extends useRender.ComponentProps<'button'> {
   variant?: VariantProps<typeof buttonVariants>['variant'];
   size?: VariantProps<typeof buttonVariants>['size'];
+  loading?: boolean;
 }
 
-function Button({ className, variant, size, render, ...props }: ButtonProps) {
+function Button({
+  className,
+  variant,
+  size,
+  render,
+  loading = false,
+  disabled,
+  children,
+  ...props
+}: ButtonProps) {
   const typeValue: React.ButtonHTMLAttributes<HTMLButtonElement>['type'] =
     render ? undefined : 'button';
 
@@ -61,6 +69,13 @@ function Button({ className, variant, size, render, ...props }: ButtonProps) {
     className: cn(buttonVariants({ className, size, variant })),
     'data-slot': 'button',
     type: typeValue,
+    disabled: disabled || loading,
+    children: (
+      <>
+        {loading && <Loader2 className="animate-spin" />}
+        <span className={cn(loading && 'opacity-0')}>{children}</span>
+      </>
+    ),
   };
 
   return useRender({

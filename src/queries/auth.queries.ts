@@ -1,13 +1,6 @@
-// TanStack Query v5: Auth Queries
-// Best practices: queryOptions factory, proper typing
-
 import { useMutation, useQuery, queryOptions } from '@tanstack/react-query';
 import { authService, LoginCredentials, LoginResponse } from '../api/auth.api';
-import { queryKeys } from './queryKeys';
-
-// ============================================
-// Query Options (v5 pattern for reusability)
-// ============================================
+import { queryKeys } from './query-keys';
 
 export const authQueryOptions = {
   isAuthenticated: () =>
@@ -19,17 +12,9 @@ export const authQueryOptions = {
     }),
 };
 
-// ============================================
-// Query Hooks
-// ============================================
-
 export function useIsAuthenticated() {
   return useQuery(authQueryOptions.isAuthenticated());
 }
-
-// ============================================
-// Mutation Hooks
-// ============================================
 
 export function useLogin() {
   return useMutation<LoginResponse, Error, LoginCredentials>({

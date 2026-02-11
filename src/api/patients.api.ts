@@ -2,8 +2,9 @@
 // Currently uses mock API client (localStorage), ready for backend integration
 
 import { apiClient } from './client';
-import { ApiError } from '@/lib/queryClient';
+import { ApiError } from '@/lib/query-client';
 import type { Patient } from '../types';
+import dayjs from 'dayjs';
 
 export interface PatientSearchResult extends Patient {
   lastVisitDate?: string;
@@ -42,7 +43,7 @@ export const patientService = {
       createdAt:
         apiPatient.created_at ||
         apiPatient.createdAt ||
-        new Date().toISOString(),
+        dayjs().toISOString(),
     }));
   },
 
@@ -70,7 +71,7 @@ export const patientService = {
         createdAt:
           apiPatient.created_at ||
           apiPatient.createdAt ||
-          new Date().toISOString(),
+          dayjs().toISOString(),
       };
 
       return mappedPatient;
@@ -130,7 +131,7 @@ export const patientService = {
         createdAt:
           apiPatient.created_at ||
           apiPatient.createdAt ||
-          new Date().toISOString(),
+          dayjs().toISOString(),
       };
 
       console.log('✅ Patient created successfully:', mappedPatient);
@@ -229,7 +230,7 @@ export const patientService = {
             createdAt:
               apiPatient.created_at ||
               apiPatient.createdAt ||
-              new Date().toISOString(),
+              dayjs().toISOString(),
             // Keep original fields for reference
             ...(apiPatient.address && { address: apiPatient.address }),
             ...(apiPatient.email && { email: apiPatient.email }),
@@ -317,21 +318,12 @@ export const patientService = {
    */
   calculateAge(dateOfBirth: string): number | undefined {
     if (!dateOfBirth) return undefined;
-    try {
-      const birthDate = new Date(dateOfBirth);
-      const today = new Date();
-      let age = today.getFullYear() - birthDate.getFullYear();
-      const monthDiff = today.getMonth() - birthDate.getMonth();
-      if (
-        monthDiff < 0 ||
-        (monthDiff === 0 && today.getDate() < birthDate.getDate())
-      ) {
-        age--;
-      }
-      return age >= 0 ? age : undefined;
-    } catch (error) {
+    const birthDate = dayjs(dateOfBirth);
+    if (!birthDate.isValid()) {
       return undefined;
     }
+    const age = dayjs().diff(birthDate, 'year');
+    return age >= 0 ? age : undefined;
   },
 
   /**
@@ -363,14 +355,6 @@ export const patientService = {
    */
   calculateDateOfBirth(age: number): string | null {
     if (!age || age < 0) return null;
-    try {
-      const today = new Date();
-      const birthYear = today.getFullYear() - age;
-      // Use January 1st as approximate date
-      const dateOfBirth = new Date(birthYear, 0, 1);
-      return dateOfBirth.toISOString().split('T')[0]; // Returns YYYY-MM-DD format
-    } catch (error) {
-      return null;
-    }
+    return dayjs().subtract(age, 'year').startOf('year').format('YYYY-MM-DD');
   },
 };

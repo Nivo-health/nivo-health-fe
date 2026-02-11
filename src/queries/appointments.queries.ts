@@ -1,6 +1,3 @@
-// TanStack Query v5: Appointment Queries
-// Best practices: queryOptions factory, proper invalidation
-
 import {
   useMutation,
   useQuery,
@@ -9,11 +6,7 @@ import {
 } from '@tanstack/react-query';
 import { appointmentService } from '../api/appointments.api';
 import type { Appointment } from '../types';
-import { queryKeys } from './queryKeys';
-
-// ============================================
-// Types
-// ============================================
+import { queryKeys } from './query-keys';
 
 interface AppointmentListParams {
   page?: number;
@@ -32,10 +25,6 @@ interface CreateAppointmentData {
   source?: string;
 }
 
-// ============================================
-// Query Options (v5 pattern for reusability)
-// ============================================
-
 export const appointmentQueryOptions = {
   list: (params?: AppointmentListParams) =>
     queryOptions({
@@ -50,17 +39,9 @@ export const appointmentQueryOptions = {
     }),
 };
 
-// ============================================
-// Query Hooks
-// ============================================
-
 export function useAppointments(params?: AppointmentListParams) {
   return useQuery(appointmentQueryOptions.list(params));
 }
-
-// ============================================
-// Mutation Hooks
-// ============================================
 
 export function useCreateAppointment() {
   const queryClient = useQueryClient();

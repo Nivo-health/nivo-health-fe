@@ -66,16 +66,68 @@ export interface Clinic {
   doctors?: ClinicDoctor[];
 }
 
+export interface AppointmentSlot {
+  id: string;
+  date: string;
+  start_time: string;
+  end_time: string;
+  slot_status: 'BOOKED' | 'BLOCKED';
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DoctorWorkingHour {
+  id: string;
+  doctor: ClinicDoctor;
+  day_of_week: number;
+  day_of_week_label: string;
+  start_time: string;
+  end_time: string;
+  slot_duration_minutes: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DoctorOffDay {
+  id: string;
+  doctor: ClinicDoctor;
+  date: string;
+  reason: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AvailableSlot {
+  start_time: string;
+  end_time: string;
+  status: 'AVAILABLE';
+}
+
+export interface DaySlots {
+  date: string;
+  day_of_week: string;
+  slots: AvailableSlot[];
+}
+
+export interface AvailableSlotsResponse {
+  doctor_id: string;
+  start_date: string;
+  end_date: string;
+  days: DaySlots[];
+}
+
 export interface Appointment {
   id: string;
   name: string;
   mobile_number: string;
-  gender: 'MALE' | 'FEMALE';
+  gender: 'MALE' | 'FEMALE' | 'OTHER';
   doctor?: ClinicDoctor;
   clinic_id: string;
-  appointment_date_time: string;
+  slot: AppointmentSlot | null;
+  appointment_date_time?: string;
   appointment_status: 'WAITING' | 'CHECKED_IN' | 'NO_SHOW';
-  source: string; // e.g., "PHONE", "ONLINE"
+  source: string;
   created_at?: string;
   updated_at?: string;
 }

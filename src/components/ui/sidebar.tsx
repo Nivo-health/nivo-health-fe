@@ -2,6 +2,9 @@
 
 import { mergeProps } from '@base-ui/react/merge-props';
 import { useRender } from '@base-ui/react/use-render';
+import { cva, type VariantProps } from 'class-variance-authority';
+import PanelLeftIcon from 'lucide-react/dist/esm/icons/panel-left';
+import * as React from 'react';
 import { Button } from './button';
 import { Input as BaseInput } from './input';
 import { ScrollArea } from './scroll-area';
@@ -9,11 +12,7 @@ import { Separator as BaseSeparator } from './separator';
 import { Sheet } from './sheet';
 import { Skeleton } from './skeleton';
 import { Tooltip } from './tooltip';
-// import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
-import { cva, type VariantProps } from 'class-variance-authority';
-import { PanelLeftIcon } from 'lucide-react';
-import * as React from 'react';
 
 const SIDEBAR_COOKIE_NAME = 'sidebar_state';
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;

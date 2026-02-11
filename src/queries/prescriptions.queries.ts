@@ -1,6 +1,3 @@
-// TanStack Query v5: Prescription Queries
-// Best practices: queryOptions factory, proper invalidation
-
 import {
   useMutation,
   useQueries,
@@ -11,11 +8,7 @@ import {
 import { prescriptionService } from '../api/prescriptions.api';
 import { visitService } from '../api/visits.api';
 import type { Prescription, Visit } from '../types';
-import { queryKeys } from './queryKeys';
-
-// ============================================
-// Query Options (v5 pattern for reusability)
-// ============================================
+import { queryKeys } from './query-keys';
 
 export const prescriptionQueryOptions = {
   detail: (prescriptionId: string) =>
@@ -26,10 +19,6 @@ export const prescriptionQueryOptions = {
     }),
 };
 
-// ============================================
-// Query Hooks
-// ============================================
-
 export function usePrescription(prescriptionId: string) {
   return useQuery(prescriptionQueryOptions.detail(prescriptionId));
 }
@@ -39,10 +28,6 @@ export function usePrescriptionsByIds(prescriptionIds: string[]) {
     queries: prescriptionIds.map((id) => prescriptionQueryOptions.detail(id)),
   });
 }
-
-// ============================================
-// Mutation Hooks
-// ============================================
 
 export function useCreatePrescription() {
   const queryClient = useQueryClient();
@@ -65,8 +50,10 @@ export function useUpdatePrescription() {
 
   return useMutation({
     mutationKey: ['prescriptions', 'update'],
-    mutationFn: (data: { prescriptionId: string; prescription: Prescription }) =>
-      prescriptionService.update(data.prescriptionId, data.prescription),
+    mutationFn: (data: {
+      prescriptionId: string;
+      prescription: Prescription;
+    }) => prescriptionService.update(data.prescriptionId, data.prescription),
     onSuccess: (_updatedId, variables) => {
       queryClient.invalidateQueries({
         queryKey: queryKeys.prescription(variables.prescriptionId),

@@ -1,9 +1,9 @@
-export { useClinic } from './useClinic';
+export { useClinic } from './use-clinic';
 export {
   useFilters,
   type UpdateFilterFn,
   type ResetFiltersFn,
   type UseFiltersOptions,
   type UseFiltersReturn,
-} from './useFilters';
-export { useQueryParams, useUpdateQueryParams } from './useQueryParams';
+} from './use-filters';
+export { useQueryParams, useUpdateQueryParams } from './use-query-params';

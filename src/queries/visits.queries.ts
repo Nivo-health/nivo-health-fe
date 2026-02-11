@@ -1,6 +1,3 @@
-// TanStack Query v5: Visit Queries
-// Best practices: queryOptions factory, proper invalidation
-
 import {
   QueryClient,
   useMutation,
@@ -10,11 +7,7 @@ import {
 } from '@tanstack/react-query';
 import { visitService } from '../api/visits.api';
 import type { Visit } from '../types';
-import { queryKeys } from './queryKeys';
-
-// ============================================
-// Types
-// ============================================
+import { queryKeys } from './query-keys';
 
 interface VisitListParams {
   page?: number;
@@ -31,10 +24,6 @@ interface CreateVisitData {
   doctorId?: string;
 }
 
-// ============================================
-// Query Options (v5 pattern for reusability)
-// ============================================
-
 export const visitQueryOptions = {
   detail: (id: string) =>
     queryOptions({
@@ -45,7 +34,7 @@ export const visitQueryOptions = {
 
   byPatient: (patientId: string, limit = 50) =>
     queryOptions({
-      queryKey: queryKeys.visitsByPatient(patientId),
+      queryKey: queryKeys.visitsByPatient(patientId, limit),
       queryFn: () => visitService.getByPatientId(patientId, limit),
       enabled: Boolean(patientId),
     }),
@@ -70,10 +59,6 @@ export const visitQueryOptions = {
     }),
 };
 
-// ============================================
-// Query Hooks
-// ============================================
-
 export function useVisit(id: string) {
   return useQuery(visitQueryOptions.detail(id));
 }
@@ -90,10 +75,6 @@ export function useVisitsList(params?: VisitListParams) {
   return useQuery(visitQueryOptions.list(params));
 }
 
-// ============================================
-// Prefetch Functions (for SSR/preloading)
-// ============================================
-
 export function fetchVisitsByPatient(
   queryClient: QueryClient,
   patientId: string,
@@ -101,10 +82,6 @@ export function fetchVisitsByPatient(
 ) {
   return queryClient.fetchQuery(visitQueryOptions.byPatient(patientId, limit));
 }
-
-// ============================================
-// Mutation Hooks
-// ============================================
 
 export function useCreateVisit() {
   const queryClient = useQueryClient();
