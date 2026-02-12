@@ -1,5 +1,7 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { Popover } from '@base-ui/react/popover';
+// 'use client';
+
+import * as React from 'react';
+import { Combobox } from '@/components/ui/combobox';
 import { Input } from './input';
 import { medicationService, type Medication } from '../../api/medications.api';
 import { cn } from '@/lib/utils';
@@ -14,209 +16,157 @@ export interface MedicationInputProps {
   disabled?: boolean;
 }
 
+const CREATE_ID = '__create__';
+
 export function MedicationInput({
   value,
   onChange,
-  placeholder = 'Search medication...',
+  placeholder = 'Search medication…',
   label,
   error,
   className,
   disabled,
 }: MedicationInputProps) {
-  const [searchQuery, setSearchQuery] = useState(value);
-  const [suggestions, setSuggestions] = useState<Medication[]>([]);
-  const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [selectedIndex, setSelectedIndex] = useState(-1);
+  const [query, setQuery] = React.useState(value);
+  const [searchResults, setSearchResults] = React.useState<Medication[]>([]);
+  const [loading, setLoading] = React.useState(false);
 
-  const inputRef = useRef<HTMLInputElement>(null);
-  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const debounceRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Debounced search function
-  const performSearch = useCallback(async (query: string) => {
-    if (query.trim().length < 2) {
-      setSuggestions([]);
-      setOpen(false);
+  const search = React.useCallback(async (q: string) => {
+    if (q.trim().length < 2) {
+      setSearchResults([]);
       return;
     }
 
     setLoading(true);
     try {
-      const results = await medicationService.search(query);
-      setSuggestions(results);
-      if (results.length > 0) {
-        setOpen(true);
-      } else {
-        setOpen(false);
-      }
-      setSelectedIndex(-1);
-    } catch (error) {
-      console.error('Error searching medications:', error);
-      setSuggestions([]);
-      setOpen(false);
+      const result = await medicationService.search(q);
+      setSearchResults(result);
+    } catch (e) {
+      console.error('Medication search failed', e);
+      setSearchResults([]);
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // Handle input change with debouncing
-  const handleInputChange = (newValue: string) => {
-    setSearchQuery(newValue);
-    onChange(newValue);
+  const trimmedQuery = query.trim();
+  const hasExactMatch = searchResults.some(
+    (m) => m.full_name.toLowerCase() === trimmedQuery.toLowerCase(),
+  );
 
-    // Clear previous timer
-    if (debounceTimerRef.current) {
-      clearTimeout(debounceTimerRef.current);
+  const items: Medication[] = React.useMemo(() => {
+    if (!trimmedQuery || trimmedQuery.length < 2) return searchResults;
+    if (hasExactMatch || loading) return searchResults;
+
+    const createItem: Medication = {
+      id: CREATE_ID,
+      name: trimmedQuery,
+      full_name: trimmedQuery,
+      generic_name: null,
+      manufacturer: '',
+    };
+
+    return [...searchResults, createItem];
+  }, [searchResults, trimmedQuery, hasExactMatch, loading]);
+
+  const handleInputChange = (
+    inputValue: string,
+    eventDetails: { reason: string },
+  ) => {
+    setQuery(inputValue);
+    onChange(inputValue);
+
+    // Only trigger API search on actual user typing, not on item selection
+    if (eventDetails.reason !== 'input-change') return;
+
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
     }
 
-    // Set new timer for debouncing (500ms delay)
-    debounceTimerRef.current = setTimeout(() => {
-      performSearch(newValue);
-    }, 500);
+    debounceRef.current = setTimeout(() => {
+      search(inputValue);
+    }, 400);
   };
 
-  // Handle medication selection
-  const handleSelectMedication = (medication: Medication) => {
-    setSearchQuery(medication.full_name);
-    onChange(medication.full_name);
-    setOpen(false);
-    setSuggestions([]);
-    inputRef.current?.blur();
-  };
-
-  // Handle keyboard navigation
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (!open || suggestions.length === 0) {
-      if (e.key === 'Escape') {
-        setOpen(false);
-      }
-      return;
-    }
-
-    switch (e.key) {
-      case 'ArrowDown':
-        e.preventDefault();
-        setSelectedIndex((prev) =>
-          prev < suggestions.length - 1 ? prev + 1 : prev,
-        );
-        break;
-      case 'ArrowUp':
-        e.preventDefault();
-        setSelectedIndex((prev) => (prev > 0 ? prev - 1 : -1));
-        break;
-      case 'Enter':
-        e.preventDefault();
-        if (selectedIndex >= 0 && selectedIndex < suggestions.length) {
-          handleSelectMedication(suggestions[selectedIndex]);
-        }
-        break;
-      case 'Escape':
-        setOpen(false);
-        break;
-    }
-  };
-
-  // Sync value prop with searchQuery
-  useEffect(() => {
-    if (value !== searchQuery) {
-      setSearchQuery(value);
+  React.useEffect(() => {
+    if (value !== query) {
+      setQuery(value);
     }
   }, [value]);
 
-  // Cleanup debounce timer on unmount
-  useEffect(() => {
+  React.useEffect(() => {
     return () => {
-      if (debounceTimerRef.current) {
-        clearTimeout(debounceTimerRef.current);
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current);
       }
     };
   }, []);
 
   return (
-    <Popover.Root open={open && suggestions.length > 0} onOpenChange={setOpen}>
-      <div className={cn('relative', className)}>
-        <Popover.Trigger
+    <div className={cn('w-full', className)}>
+      {label && (
+        <label className="mb-1 block text-sm font-medium text-foreground">
+          {label}
+        </label>
+      )}
+
+      <Combobox.Root<Medication>
+        items={items}
+        filter={null}
+        inputValue={query}
+        onInputValueChange={handleInputChange}
+        onValueChange={(medication) => {
+          if (!medication) return;
+          setQuery(medication.full_name);
+          onChange(medication.full_name);
+        }}
+        itemToStringLabel={(item) => item.full_name}
+        disabled={disabled}
+      >
+        <Combobox.Input
+          placeholder={placeholder}
           render={
-            <div className="relative">
-              <label>
-                {label}
-                <Input
-                  ref={inputRef}
-                  value={searchQuery}
-                  onChange={(e) => handleInputChange(e.target.value)}
-                  onFocus={() => {
-                    if (suggestions.length > 0) {
-                      setOpen(true);
-                    }
-                  }}
-                  onKeyDown={handleKeyDown}
-                  placeholder={placeholder}
-                  disabled={disabled}
-                  className="w-full"
-                />
-              </label>
-              {/* Loading indicator */}
-              {loading && (
-                <div className="absolute right-3 top-2 text-gray-400">
-                  <svg
-                    className="animate-spin h-4 w-4"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    />
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    />
-                  </svg>
-                </div>
+            <Input
+              className={cn(
+                'w-full',
+                error && 'border-destructive focus-visible:ring-destructive',
               )}
-            </div>
+              nativeInput
+            />
           }
         />
-        <Popover.Portal>
-          <Popover.Positioner align="start" sideOffset={4} collisionPadding={8}>
-            <Popover.Popup
-              className={cn(
-                'w-60',
-                'max-h-48 overflow-auto rounded-md border bg-white shadow-lg',
-              )}
-            >
-              {suggestions.map((medication, index) => (
-                <div
-                  role="button"
-                  key={medication.id}
-                  onClick={() => handleSelectMedication(medication)}
-                  className={cn(
-                    'px-4 py-3 cursor-pointer hover:bg-teal-50 transition-colors',
-                    index === selectedIndex && 'bg-teal-50',
-                    index === 0 && 'rounded-t-md',
-                    index === suggestions.length - 1 && 'rounded-b-md',
-                  )}
-                >
-                  <div className="font-medium text-gray-900">
-                    {medication.full_name}
+
+        <Combobox.Popup>
+          <Combobox.Status>{loading && 'Searching…'}</Combobox.Status>
+
+          <Combobox.Empty>{!loading && 'No medications found'}</Combobox.Empty>
+
+          <Combobox.List>
+            {items.map((med) => (
+              <Combobox.Item key={med.id} value={med}>
+                {med.id === CREATE_ID ? (
+                  <div className="italic text-muted-foreground">
+                    Use &ldquo;{med.full_name}&rdquo;
                   </div>
-                  {medication.manufacturer && (
-                    <div className="text-xs text-gray-500 mt-1">
-                      {medication.manufacturer}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </Popover.Popup>
-          </Popover.Positioner>
-        </Popover.Portal>
-      </div>
-    </Popover.Root>
+                ) : (
+                  <div>
+                    <div className="font-medium">{med.full_name}</div>
+                    {med.manufacturer && (
+                      <div className="text-xs text-muted-foreground">
+                        {med.manufacturer}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </Combobox.Item>
+            ))}
+          </Combobox.List>
+        </Combobox.Popup>
+      </Combobox.Root>
+
+      {error && <p className="mt-1 text-sm text-destructive">{error}</p>}
+    </div>
   );
 }

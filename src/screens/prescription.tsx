@@ -724,38 +724,39 @@ export default function PrescriptionScreen() {
                   Follow-up after
                 </label>
               </div>
-              {followUpEnabled && (
-                <div className="flex items-center gap-2 flex-1 sm:flex-initial">
-                  <Input
-                    type="number"
-                    value={followUpValue}
-                    onChange={(e) => handleFollowUpValueChange(e.target.value)}
-                    placeholder="Value"
-                    className="w-24 sm:w-32"
-                    min="1"
-                  />
-
-                  <Select.Root
-                    value={followUpUnit}
-                    onValueChange={(value) =>
-                      handleFollowUpUnitChange(
-                        value as 'days' | 'weeks' | 'months',
-                      )
-                    }
-                  >
-                    <Select.Trigger className="flex-1 sm:flex-initial sm:w-auto">
-                      <Select.Value placeholder="Unit" />
-                    </Select.Trigger>
-
-                    <Select.Popup>
-                      <Select.Item value="days">Days</Select.Item>
-                      <Select.Item value="weeks">Weeks</Select.Item>
-                      <Select.Item value="months">Months</Select.Item>
-                    </Select.Popup>
-                  </Select.Root>
-                </div>
-              )}
             </RadioGroup.Root>
+
+            {followUpEnabled && (
+              <div className="flex items-center gap-2 flex-1 sm:flex-initial mt-3">
+                <Input
+                  type="number"
+                  value={followUpValue}
+                  onChange={(e) => handleFollowUpValueChange(e.target.value)}
+                  placeholder="Value"
+                  className="w-24 sm:w-32"
+                  min="1"
+                />
+
+                <Select.Root
+                  value={followUpUnit}
+                  onValueChange={(value) =>
+                    handleFollowUpUnitChange(
+                      value as 'days' | 'weeks' | 'months',
+                    )
+                  }
+                >
+                  <Select.Trigger className="flex-1 sm:flex-initial sm:w-auto">
+                    <Select.Value placeholder="Unit" />
+                  </Select.Trigger>
+
+                  <Select.Popup>
+                    <Select.Item value="days">Days</Select.Item>
+                    <Select.Item value="weeks">Weeks</Select.Item>
+                    <Select.Item value="months">Months</Select.Item>
+                  </Select.Popup>
+                </Select.Root>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -788,6 +789,8 @@ export default function PrescriptionScreen() {
               </Button>
               {whatsappEnabled && (
                 <Button
+                  disabled={sendPrescriptionMutation.isPending}
+                  loading={sendPrescriptionMutation.isPending}
                   variant="outline"
                   onClick={handleWhatsApp}
                   className="shadow-sm w-full sm:w-auto"
@@ -797,6 +800,14 @@ export default function PrescriptionScreen() {
                 </Button>
               )}
               <Button
+                disabled={
+                  savePrescriptionMutation.isPending ||
+                  updateVisitStatusMutation.isPending
+                }
+                loading={
+                  savePrescriptionMutation.isPending ||
+                  updateVisitStatusMutation.isPending
+                }
                 onClick={handleFinishVisit}
                 size="sm"
                 className="shadow-lg w-full sm:w-auto"
