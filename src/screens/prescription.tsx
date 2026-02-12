@@ -403,7 +403,7 @@ export default function PrescriptionScreen() {
 
   if (loading) {
     return (
-      <div className="min-h-[calc(100vh-4rem)] bg-gray-50 flex items-center justify-center">
+      <div className="h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="text-gray-500 mb-2">Loading prescription...</div>
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600 mx-auto"></div>
@@ -415,7 +415,7 @@ export default function PrescriptionScreen() {
   // Show error state only if we have an error and no visit (and not loading)
   if (error && !visit && !loading) {
     return (
-      <div className="min-h-[calc(100vh-4rem)] bg-gray-50 flex items-center justify-center">
+      <div className="h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="text-red-600 mb-4">{error}</div>
           <Button onClick={() => navigate('/visits')}>Go Back to Visits</Button>
@@ -427,7 +427,7 @@ export default function PrescriptionScreen() {
   // If no visit after loading completes, show message
   if (!visit && !loading) {
     return (
-      <div className="min-h-[calc(100vh-4rem)] bg-gray-50 flex items-center justify-center">
+      <div className="h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="text-gray-500 mb-4">Visit not found</div>
           <Button onClick={() => navigate('/visits')}>Go Back to Visits</Button>
@@ -442,7 +442,7 @@ export default function PrescriptionScreen() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-gray-50 overflow-x-hidden pb-32 md:pb-24">
+    <div className="h-screen bg-background overflow-x-hidden pb-32 md:pb-24">
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 md:py-6">
         {/* Visit Progress Stepper */}
         <Card.Root className="mb-4 border-teal-200">

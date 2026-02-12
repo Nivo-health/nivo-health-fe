@@ -26,7 +26,7 @@ export default function SettingsScreen() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-gray-50 p-6">
+    <div className="h-screen bg-background p-6">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold text-teal-900 mb-6">Settings</h1>
         <Card.Root className="border-teal-200">

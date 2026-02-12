@@ -298,14 +298,14 @@ export default function VisitsScreen() {
 
   if (loading) {
     return (
-      <div className="min-h-[calc(100vh-4rem)] bg-background flex items-center justify-center">
+      <div className="h-screen bg-background flex items-center justify-center">
         <div className="text-muted-foreground">Loading visits...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-background overflow-x-hidden">
+    <div className="h-screen bg-background overflow-x-hidden">
       <div className="max-w-7xl mx-auto px-3 md:px-6 py-4 md:py-6">
         {/* Header - Compact on Mobile */}
         <div className="mb-4 md:mb-6">

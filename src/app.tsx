@@ -21,7 +21,7 @@ const DoctorScheduleSettingsScreen = lazy(
 
 function RouteLoader() {
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-background flex items-center justify-center">
+    <div className="h-screen bg-background flex items-center justify-center">
       <div className="text-muted-foreground">Loading...</div>
     </div>
   );

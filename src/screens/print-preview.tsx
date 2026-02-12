@@ -59,7 +59,7 @@ export default function PrintPreviewScreen() {
   const visitDate = dayjs(visit.date).format('DD MMMM YYYY');
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-gray-50 overflow-x-hidden">
+    <div className="h-screen bg-background overflow-x-hidden">
       <div className="max-w-6xl mx-auto px-4 md:px-6 py-4 md:py-6">
         {/* Visit Progress Stepper */}
         <Card.Root className="mb-4 border-teal-200">

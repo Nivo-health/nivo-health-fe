@@ -193,7 +193,7 @@ export default function DoctorScheduleSettingsScreen() {
   const selectedDoc = doctors.find((doc) => doc.id === selectedDoctorId);
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-gray-50 overflow-x-hidden">
+    <div className="h-screen bg-background overflow-x-hidden">
       <div className="max-w-4xl mx-auto px-3 md:px-6 py-4 md:py-6">
         {/* Header */}
         <div className="mb-4 md:mb-6">

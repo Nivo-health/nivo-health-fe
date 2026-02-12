@@ -136,7 +136,7 @@ export default function PatientSearchScreen() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-background overflow-x-hidden">
+    <div className="h-screen bg-background overflow-x-hidden">
       <div className="sticky z-10 bg-white border-b border-teal-100 shadow-sm">
         <div className="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center gap-4">
           <Input

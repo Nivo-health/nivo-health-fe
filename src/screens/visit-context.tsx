@@ -97,7 +97,7 @@ export default function VisitContextScreen() {
 
   if (!visit || !patient) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="h-screen bg-background flex items-center justify-center">
         <div className="text-gray-500">Loading...</div>
       </div>
     );
@@ -106,7 +106,7 @@ export default function VisitContextScreen() {
   const visitDate = dayjs(visit.date).format('DD MMMM YYYY');
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-gray-50 overflow-x-hidden">
+    <div className="h-screen bg-background overflow-x-hidden">
       <div className="max-w-7xl mx-auto px-6 py-6">
         {/* Patient Header */}
         <Card.Root className="mb-6 border-teal-200">

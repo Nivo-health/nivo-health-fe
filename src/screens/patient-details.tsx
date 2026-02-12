@@ -51,7 +51,7 @@ export default function PatientDetailsScreen() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-background overflow-x-hidden">
+    <div className="h-screen bg-background overflow-x-hidden">
       <div className="max-w-7xl mx-auto px-6 py-6">
         {/* Patient Header */}
         <Card.Root className="mb-6 border-teal-200">
