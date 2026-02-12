@@ -3,17 +3,7 @@
 import { get } from './client';
 import type { Clinic } from '../types';
 
-// clinic ID as per requirements
-const CLINIC_ID = '1beae540-0651-4ebe-8d65-7434c596de9f';
-
 export const clinicService = {
-  /**
-   * Get clinic ID (hardcoded for now)
-   */
-  getClinicId(): string {
-    return CLINIC_ID;
-  },
-
   /**
    * Get current clinic
    * GET /api/clinic (uses current_clinic_id from cookie)
@@ -26,19 +16,15 @@ export const clinicService = {
         return null;
       }
 
+      // Store clinic ID for use in token refresh
+      if (response.data.id) {
+        localStorage.setItem('clinic_id', response.data.id);
+      }
+
       return response.data;
     } catch (error) {
       return null;
     }
-  },
-
-  /**
-   * Get clinic by ID (deprecated - use getCurrentClinic instead)
-   * @deprecated Use getCurrentClinic() instead
-   */
-  async getById(_id?: string): Promise<Clinic | null> {
-    // For backward compatibility, use getCurrentClinic
-    return this.getCurrentClinic();
   },
 
   /**

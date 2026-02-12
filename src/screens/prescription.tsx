@@ -27,6 +27,8 @@ import SendWhatsappModal from '@/components/prescription/modals/send-whatsapp-mo
 import { toast } from '@/components/ui/toast';
 import { RadioGroup } from '@/components/ui/radio-group';
 import { Select } from '@/components/ui/select';
+import Plus from 'lucide-react/dist/esm/icons/plus';
+import Trash2 from 'lucide-react/dist/esm/icons/trash-2';
 
 export default function PrescriptionScreen() {
   const { visitId } = useParams<{ visitId: string }>();
@@ -445,7 +447,7 @@ export default function PrescriptionScreen() {
     <div className="h-screen bg-background overflow-x-hidden pb-32 md:pb-24">
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 md:py-6">
         {/* Visit Progress Stepper */}
-        <Card.Root className="mb-4 border-teal-200">
+        <Card.Root className="mb-4 border-primary/10">
           <Card.Panel className="pt-4 pb-4">
             <Stepper
               steps={visitSteps}
@@ -454,7 +456,7 @@ export default function PrescriptionScreen() {
           </Card.Panel>
         </Card.Root>
 
-        <div className="bg-white rounded-lg border border-teal-200 shadow-sm p-4 md:p-6">
+        <div className="bg-white rounded-lg border border-primary/10 shadow-sm p-4 md:p-6">
           <div className="mb-6">
             <h2 className="text-xl md:text-2xl font-semibold text-teal-900 mb-4">
               Prescription
@@ -465,7 +467,7 @@ export default function PrescriptionScreen() {
               {medicines.map((medicine, index) => (
                 <div
                   key={medicine.id}
-                  className="border border-teal-200 rounded-lg p-4 bg-white space-y-3"
+                  className="border border-primary/10 rounded-lg p-4 bg-white space-y-3"
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium text-teal-700">
@@ -489,20 +491,7 @@ export default function PrescriptionScreen() {
                           onClick={handleAddMedicine}
                           className="text-teal-600 hover:text-teal-700 hover:bg-teal-50 h-8 px-2"
                         >
-                          <svg
-                            className="w-4 h-4 mr-1.5"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M12 4v16m8-8H4"
-                            />
-                          </svg>
-                          Add More
+                          <Plus />
                         </Button>
                       )}
                     </div>
@@ -671,7 +660,7 @@ export default function PrescriptionScreen() {
                               onClick={() => handleRemoveMedicine(medicine.id)}
                               className="text-red-600 hover:text-red-700 hover:bg-red-50 h-8 px-2"
                             >
-                              Remove
+                              <Trash2 />
                             </Button>
                           )}
                           {index === medicines.length - 1 && (
@@ -681,20 +670,7 @@ export default function PrescriptionScreen() {
                               onClick={handleAddMedicine}
                               className="text-teal-600 hover:text-teal-700 hover:bg-teal-50 h-8 px-2"
                             >
-                              <svg
-                                className="w-4 h-4 mr-1.5"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M12 4v16m8-8H4"
-                                />
-                              </svg>
-                              Add
+                              <Plus />
                             </Button>
                           )}
                         </div>
@@ -707,7 +683,7 @@ export default function PrescriptionScreen() {
           </div>
 
           {/* Follow-up Section */}
-          <div className="mt-6 p-4 md:p-6 bg-teal-50 rounded-lg border border-teal-200">
+          <div className="mt-6 p-4 md:p-6 bg-teal-50 rounded-lg border border-primary/10">
             <h3 className="text-base md:text-lg font-semibold text-teal-900 mb-4">
               Follow-up
             </h3>
@@ -737,12 +713,16 @@ export default function PrescriptionScreen() {
               }}
             >
               <div className="flex items-center gap-2">
-                <RadioGroup.Item value="none" />
-                <label className="text-sm font-medium">No follow-up</label>
+                <RadioGroup.Item value="none" id="none" />
+                <label htmlFor="none" className="text-sm font-medium">
+                  No follow-up
+                </label>
               </div>
               <div className="flex items-center gap-2">
-                <RadioGroup.Item value="yes" />
-                <label className="text-sm font-medium">Follow-up after</label>
+                <RadioGroup.Item value="yes" id="yes" />
+                <label htmlFor="yes" className="text-sm font-medium">
+                  Follow-up after
+                </label>
               </div>
               {followUpEnabled && (
                 <div className="flex items-center gap-2 flex-1 sm:flex-initial">
@@ -781,7 +761,7 @@ export default function PrescriptionScreen() {
       </div>
 
       {/* Sticky Bottom Bar */}
-      <div className="fixed bottom-16 md:bottom-0 left-0 right-0 bg-white border-t border-teal-200 shadow-lg z-40 md:ml-64 ml-0">
+      <div className="fixed bottom-16 md:bottom-0 left-0 right-0 bg-white border-t border-primary/10 shadow-lg z-40 md:ml-64 ml-0">
         <div className="max-w-7xl mx-auto px-3 md:px-6 py-3 md:py-4">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4">
             <div className="flex items-center space-x-2">
@@ -818,7 +798,7 @@ export default function PrescriptionScreen() {
               )}
               <Button
                 onClick={handleFinishVisit}
-                size="lg"
+                size="sm"
                 className="shadow-lg w-full sm:w-auto"
               >
                 Save & Finish Visit

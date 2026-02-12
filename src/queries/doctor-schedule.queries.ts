@@ -55,6 +55,7 @@ export function useCreateWorkingHour() {
       queryClient.invalidateQueries({
         queryKey: queryKeys.doctorSchedule,
       });
+      queryClient.invalidateQueries({ queryKey: queryKeys.slots });
     },
   });
 }
@@ -77,6 +78,7 @@ export function useUpdateWorkingHour() {
       queryClient.invalidateQueries({
         queryKey: queryKeys.doctorSchedule,
       });
+      queryClient.invalidateQueries({ queryKey: queryKeys.slots });
     },
   });
 }
@@ -91,6 +93,7 @@ export function useDeleteWorkingHour() {
       queryClient.invalidateQueries({
         queryKey: queryKeys.doctorSchedule,
       });
+      queryClient.invalidateQueries({ queryKey: queryKeys.slots });
     },
   });
 }

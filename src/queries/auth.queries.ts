@@ -1,4 +1,9 @@
-import { useMutation, useQuery, queryOptions } from '@tanstack/react-query';
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  queryOptions,
+} from '@tanstack/react-query';
 import { authService, LoginCredentials, LoginResponse } from '../api/auth.api';
 import { queryKeys } from './query-keys';
 
@@ -17,9 +22,15 @@ export function useIsAuthenticated() {
 }
 
 export function useLogin() {
+  const queryClient = useQueryClient();
+
   return useMutation<LoginResponse, Error, LoginCredentials>({
     mutationKey: ['auth', 'login'],
     mutationFn: (credentials) => authService.login(credentials),
+    onSuccess: () => {
+      // Invalidate all queries so they refetch with the new auth token
+      queryClient.invalidateQueries();
+    },
   });
 }
 

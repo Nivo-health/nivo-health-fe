@@ -107,14 +107,20 @@ export default function VisitContextScreen() {
 
   return (
     <div className="h-screen bg-background overflow-x-hidden">
-      <div className="max-w-7xl mx-auto px-6 py-6">
+      <div className="max-w-7xl mx-auto px-6 py-6 flex flex-col gap-5">
         {/* Patient Header */}
-        <Card.Root className="mb-6 border-teal-200">
-          <Card.Header className="bg-linear-to-r from-teal-50 to-white border-b border-teal-100">
+        <Card.Root className="overflow-hidden border-primary/10 ">
+          <Card.Header
+            className="relative border border-b flex items-center justify-between px-4 py-3 border-b-primary/10 border-x-0 border-t-0"
+            style={{
+              background: 'var(--gradient-header)',
+            }}
+          >
             <div className="flex items-center justify-between">
-              <Card.Title className="text-2xl text-teal-900">
+              <Card.Title className="text-2xl text-primary">
                 {patient.name}
               </Card.Title>
+
               <div className="flex items-center gap-2">
                 <span
                   className={`px-3 py-1 rounded-full text-xs font-semibold ${
@@ -167,10 +173,17 @@ export default function VisitContextScreen() {
         </Card.Root>
 
         {/* Primary Actions */}
-        <div className="mb-6">
-          <Card.Root>
-            <Card.Header>
-              <Card.Title className="text-lg">Actions</Card.Title>
+        <div className="overflow-hidden border-primary/10 ">
+          <Card.Root className="overflow-hidden border-primary/10 ">
+            <Card.Header
+              className="relative border border-b flex items-center justify-between px-4 py-3 border-b-primary/10 border-x-0 border-t-0"
+              style={{
+                background: 'var(--gradient-header)',
+              }}
+            >
+              <Card.Title className="text-sm font-medium text-muted-foreground">
+                Actions
+              </Card.Title>
             </Card.Header>
             <Card.Panel className="space-y-4">
               <div className="flex items-center space-x-2">
@@ -211,9 +224,16 @@ export default function VisitContextScreen() {
 
         {/* Visit History */}
         <div>
-          <Card.Root>
-            <Card.Header>
-              <Card.Title className="text-lg">Visit History</Card.Title>
+          <Card.Root className="overflow-hidden border-primary/10 ">
+            <Card.Header
+              className="relative border border-b flex items-center justify-between px-4 py-3 border-b-primary/10 border-x-0 border-t-0"
+              style={{
+                background: 'var(--gradient-header)',
+              }}
+            >
+              <Card.Title className="text-sm font-medium text-muted-foreground">
+                Visit History
+              </Card.Title>
             </Card.Header>
             <Card.Panel>
               {visitHistory.length > 0 ? (

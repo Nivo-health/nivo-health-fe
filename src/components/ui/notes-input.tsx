@@ -1,11 +1,13 @@
+'use client';
+
 import * as React from 'react';
-import { Popover } from '@base-ui/react/popover';
+import { Combobox } from '@/components/ui/combobox';
 import { cn } from '@/lib/utils';
 import { Input } from './input';
 
 export interface NotesInputProps extends Omit<
   React.InputHTMLAttributes<HTMLInputElement>,
-  'list' | 'onChange'
+  'list' | 'onChange' | 'value'
 > {
   label?: string;
   error?: string;
@@ -24,8 +26,8 @@ const DEFAULT_OPTIONS = [
   'With meals',
 ];
 
-const NotesInput = React.forwardRef<HTMLInputElement, NotesInputProps>(
-  (
+export const NotesInput = React.forwardRef<HTMLInputElement, NotesInputProps>(
+  function NotesInput(
     {
       className,
       label,
@@ -34,152 +36,72 @@ const NotesInput = React.forwardRef<HTMLInputElement, NotesInputProps>(
       value,
       onChange,
       predefinedOptions = DEFAULT_OPTIONS,
+      disabled,
       ...props
     },
     ref,
-  ) => {
+  ) {
     const inputId =
-      id || `notes-input-${Math.random().toString(36).substr(2, 9)}`;
-    const [open, setOpen] = React.useState(false);
-    const [filteredOptions, setFilteredOptions] =
-      React.useState<string[]>(predefinedOptions);
-    const inputRef = React.useRef<HTMLInputElement>(null);
-    const [selectedIndex, setSelectedIndex] = React.useState(-1);
+      id ?? `notes-input-${Math.random().toString(36).slice(2, 9)}`;
 
-    // Combine refs
-    React.useImperativeHandle(ref, () => inputRef.current as HTMLInputElement);
+    const filteredOptions = React.useMemo(() => {
+      if (!value.trim()) return predefinedOptions;
 
-    React.useEffect(() => {
-      // Filter options based on input value
-      if (value.trim() === '') {
-        setFilteredOptions(predefinedOptions);
-      } else {
-        const filtered = predefinedOptions.filter((option) =>
-          option.toLowerCase().includes(value.toLowerCase()),
-        );
-        setFilteredOptions(filtered);
-      }
+      return predefinedOptions.filter((option) =>
+        option.toLowerCase().includes(value.toLowerCase()),
+      );
     }, [value, predefinedOptions]);
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      onChange(e.target.value);
-      if (e.target.value.trim() !== '') {
-        setOpen(true);
-      }
-    };
-
-    const handleSelectOption = (option: string) => {
-      onChange(option);
-      setOpen(false);
-      inputRef.current?.blur();
-    };
-
-    const handleInputFocus = () => {
-      if (filteredOptions.length > 0) {
-        setOpen(true);
-      }
-    };
-
-    const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-      if (!open || filteredOptions.length === 0) {
-        if (e.key === 'Escape') {
-          setOpen(false);
-          inputRef.current?.blur();
-        }
-        return;
-      }
-
-      switch (e.key) {
-        case 'ArrowDown':
-          e.preventDefault();
-          setSelectedIndex((prev) =>
-            prev < filteredOptions.length - 1 ? prev + 1 : prev,
-          );
-          break;
-        case 'ArrowUp':
-          e.preventDefault();
-          setSelectedIndex((prev) => (prev > 0 ? prev - 1 : -1));
-          break;
-        case 'Enter':
-          e.preventDefault();
-          if (selectedIndex >= 0 && selectedIndex < filteredOptions.length) {
-            handleSelectOption(filteredOptions[selectedIndex]);
-          } else if (filteredOptions.length > 0) {
-            handleSelectOption(filteredOptions[0]);
-          }
-          break;
-        case 'Escape':
-          setOpen(false);
-          inputRef.current?.blur();
-          break;
-      }
-    };
-
     return (
-      <Popover.Root
-        open={open && filteredOptions.length > 0}
-        onOpenChange={setOpen}
-      >
-        <div className="w-full relative">
-          {label && (
-            <label
-              htmlFor={inputId}
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              {label}
-            </label>
-          )}
+      <div className={cn('w-full', className)}>
+        {label && (
+          <label
+            htmlFor={inputId}
+            className="mb-1 block text-sm font-medium text-foreground"
+          >
+            {label}
+          </label>
+        )}
 
-          <Popover.Trigger
+        <Combobox.Root
+          items={filteredOptions}
+          inputValue={value}
+          onInputValueChange={onChange}
+          onValueChange={(option: string | null) => {
+            if (option) onChange(option);
+          }}
+          itemToStringLabel={(item) => item ?? ''}
+          disabled={disabled}
+        >
+          <Combobox.Input
+            id={inputId}
+            ref={ref}
             render={
               <Input
-                type="text"
-                id={inputId}
-                ref={inputRef}
-                value={value}
-                onChange={handleInputChange}
-                onFocus={handleInputFocus}
-                onKeyDown={handleInputKeyDown}
                 {...props}
+                className={cn(
+                  error && 'border-destructive focus-visible:ring-destructive',
+                )}
+                nativeInput
               />
             }
-          ></Popover.Trigger>
+          />
 
-          <Popover.Portal>
-            <Popover.Positioner
-              align="start"
-              sideOffset={4}
-              collisionPadding={8}
-            >
-              <Popover.Popup
-                className={cn(
-                  'w-[--popover-trigger-width]',
-                  'max-h-48 overflow-auto rounded-md border bg-white shadow-lg',
-                )}
-              >
-                {filteredOptions.map((option, index) => (
-                  <button
-                    key={option}
-                    type="button"
-                    onClick={() => handleSelectOption(option)}
-                    className={cn(
-                      'w-full text-left px-3 py-2 text-sm hover:bg-teal-50',
-                      index === selectedIndex && 'bg-teal-50',
-                    )}
-                  >
-                    {option}
-                  </button>
-                ))}
-              </Popover.Popup>
-            </Popover.Positioner>
-          </Popover.Portal>
-        </div>
+          <Combobox.Popup>
+            <Combobox.Empty>No suggestions</Combobox.Empty>
 
-        {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
-      </Popover.Root>
+            <Combobox.List>
+              {filteredOptions.map((option) => (
+                <Combobox.Item key={option} value={option}>
+                  {option}
+                </Combobox.Item>
+              ))}
+            </Combobox.List>
+          </Combobox.Popup>
+        </Combobox.Root>
+
+        {error && <p className="mt-1 text-sm text-destructive">{error}</p>}
+      </div>
     );
   },
 );
-NotesInput.displayName = 'NotesInput';
-
-export { NotesInput };

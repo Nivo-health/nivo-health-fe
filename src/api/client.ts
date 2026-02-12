@@ -63,7 +63,10 @@ async function refreshAccessToken(): Promise<string | null> {
           Accept: 'application/json',
         },
         credentials: 'include',
-        body: JSON.stringify({ refresh: refreshToken }),
+        body: JSON.stringify({
+          refresh: refreshToken,
+          clinic_id: localStorage.getItem('clinic_id'),
+        }),
       });
 
       if (!response.ok) {

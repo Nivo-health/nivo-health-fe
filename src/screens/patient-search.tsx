@@ -10,7 +10,10 @@ import { useFiltersStore } from '../stores/filters.store';
 import { useCreateVisit } from '../queries/visits.queries';
 import { useQueryClient } from '@tanstack/react-query';
 import { fetchVisitsByPatient } from '../queries/visits.queries';
-import { validatePhoneNumber } from '../utils/phone-validation';
+import {
+  validatePhoneNumber,
+  formatPhoneForAPI,
+} from '../utils/phone-validation';
 import {
   extractValidationErrors,
   getErrorMessage,
@@ -106,7 +109,7 @@ export default function PatientSearchScreen() {
     try {
       const patient = await createPatientMutation.mutateAsync({
         name: newPatient.name.trim(),
-        mobile: newPatient.mobile.trim(),
+        mobile: formatPhoneForAPI(newPatient.mobile),
         age: newPatient.age ? Number(newPatient.age) : undefined,
         gender: newPatient.gender || undefined,
       });

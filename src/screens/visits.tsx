@@ -8,7 +8,10 @@ import {
 import { useCreateVisit, useVisitsList } from '../queries/visits.queries';
 import { useCurrentClinic } from '../queries/clinic.queries';
 import { useFiltersStore } from '../stores/filters.store';
-import { validatePhoneNumber } from '../utils/phone-validation';
+import {
+  validatePhoneNumber,
+  formatPhoneForAPI,
+} from '../utils/phone-validation';
 import {
   extractValidationErrors,
   getErrorMessage,
@@ -223,7 +226,7 @@ export default function VisitsScreen() {
         // Create new patient
         const patient = await createPatientMutation.mutateAsync({
           name: newPatient.name.trim(),
-          mobile: newPatient.mobile.trim(),
+          mobile: formatPhoneForAPI(newPatient.mobile),
           age: newPatient.age ? Number(newPatient.age) : undefined,
           gender: newPatient.gender as 'M' | 'F',
         });

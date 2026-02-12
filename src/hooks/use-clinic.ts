@@ -20,19 +20,11 @@ export function useClinic() {
         } else {
           setError('Failed to load clinic data');
           // Set fallback clinic data
-          setClinic({
-            id: clinicService.getClinicId(),
-            name: 'Clinic OPD Management',
-          });
         }
       } catch (err) {
         console.error('Error loading clinic:', err);
         setError('Failed to load clinic data');
         // Set fallback clinic data
-        setClinic({
-          id: clinicService.getClinicId(),
-          name: 'Clinic OPD Management',
-        });
       } finally {
         setLoading(false);
       }

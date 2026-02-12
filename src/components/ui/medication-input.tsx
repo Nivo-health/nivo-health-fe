@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Popover } from '@/components/ui/popover';
+import { Popover } from '@base-ui/react/popover';
 import { Input } from './input';
 import { medicationService, type Medication } from '../../api/medications.api';
 import { cn } from '@/lib/utils';
@@ -157,7 +157,7 @@ export function MedicationInput({
               </label>
               {/* Loading indicator */}
               {loading && (
-                <div className="absolute right-3 top-[2.5rem] text-gray-400">
+                <div className="absolute right-3 top-2 text-gray-400">
                   <svg
                     className="animate-spin h-4 w-4"
                     xmlns="http://www.w3.org/2000/svg"
@@ -183,39 +183,39 @@ export function MedicationInput({
             </div>
           }
         />
-
-        <Popover.Popup
-          align="start"
-          sideOffset={4}
-          className={cn(
-            'z-[9999] w-[var(--radix-popover-trigger-width)] max-h-60 overflow-auto rounded-md border border-teal-200 bg-white shadow-lg',
-            'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
-            'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2',
-            'data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
-          )}
-        >
-          {suggestions.map((medication, index) => (
-            <div
-              key={medication.id}
-              onClick={() => handleSelectMedication(medication)}
+        <Popover.Portal>
+          <Popover.Positioner align="start" sideOffset={4} collisionPadding={8}>
+            <Popover.Popup
               className={cn(
-                'px-4 py-3 cursor-pointer hover:bg-teal-50 transition-colors',
-                index === selectedIndex && 'bg-teal-50',
-                index === 0 && 'rounded-t-md',
-                index === suggestions.length - 1 && 'rounded-b-md',
+                'w-60',
+                'max-h-48 overflow-auto rounded-md border bg-white shadow-lg',
               )}
             >
-              <div className="font-medium text-gray-900">
-                {medication.full_name}
-              </div>
-              {medication.manufacturer && (
-                <div className="text-xs text-gray-500 mt-1">
-                  {medication.manufacturer}
+              {suggestions.map((medication, index) => (
+                <div
+                  role="button"
+                  key={medication.id}
+                  onClick={() => handleSelectMedication(medication)}
+                  className={cn(
+                    'px-4 py-3 cursor-pointer hover:bg-teal-50 transition-colors',
+                    index === selectedIndex && 'bg-teal-50',
+                    index === 0 && 'rounded-t-md',
+                    index === suggestions.length - 1 && 'rounded-b-md',
+                  )}
+                >
+                  <div className="font-medium text-gray-900">
+                    {medication.full_name}
+                  </div>
+                  {medication.manufacturer && (
+                    <div className="text-xs text-gray-500 mt-1">
+                      {medication.manufacturer}
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-          ))}
-        </Popover.Popup>
+              ))}
+            </Popover.Popup>
+          </Popover.Positioner>
+        </Popover.Portal>
       </div>
     </Popover.Root>
   );

@@ -2,7 +2,10 @@ import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAllPatients, useCreatePatient } from '../queries/patients.queries';
 import { useFiltersStore } from '../stores/filters.store';
-import { validatePhoneNumber } from '../utils/phone-validation';
+import {
+  validatePhoneNumber,
+  formatPhoneForAPI,
+} from '../utils/phone-validation';
 import {
   extractValidationErrors,
   getErrorMessage,
@@ -79,7 +82,7 @@ export default function AllPatientsScreen() {
     try {
       const patient = await createPatientMutation.mutateAsync({
         name: newPatient.name.trim(),
-        mobile: newPatient.mobile.trim(),
+        mobile: formatPhoneForAPI(newPatient.mobile),
         age: newPatient.age ? Number(newPatient.age) : undefined,
         gender: newPatient.gender as 'M' | 'F', // Gender is required, validated in form
       });
