@@ -68,7 +68,7 @@ export default function PatientSearchScreen() {
       });
       navigate(`/visit/${visit.id}`);
     } catch (error) {
-      console.error('Failed to create visit:', error);
+      // Error surfaces through TanStack Query's error state
     }
   };
 
@@ -119,8 +119,6 @@ export default function PatientSearchScreen() {
       setIsModalOpen(false);
       navigate(`/visit/${visit.id}`);
     } catch (error: any) {
-      console.error('Failed to create patient:', error);
-
       // Extract validation errors if present
       if (hasValidationErrors(error)) {
         const validationErrors = extractValidationErrors(error);
@@ -128,10 +126,6 @@ export default function PatientSearchScreen() {
           ...prevErrors,
           ...validationErrors,
         }));
-        // Show general error message (toast can be added if needed)
-        console.error('Validation errors:', validationErrors);
-      } else {
-        console.error('Error:', getErrorMessage(error));
       }
     }
   };

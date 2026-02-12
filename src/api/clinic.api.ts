@@ -1,6 +1,6 @@
 // Clinic service - Fetches clinic data from API
 
-import { apiClient } from './client';
+import { get } from './client';
 import type { Clinic } from '../types';
 
 // clinic ID as per requirements
@@ -20,16 +20,14 @@ export const clinicService = {
    */
   async getCurrentClinic(): Promise<Clinic | null> {
     try {
-      const response = await apiClient.get<Clinic>('/clinic');
+      const response = await get<Clinic>('/clinic');
 
       if (!response.success || !response.data) {
-        console.error('Failed to fetch clinic:', response.error?.message);
         return null;
       }
 
       return response.data;
     } catch (error) {
-      console.error('Error fetching clinic:', error);
       return null;
     }
   },
@@ -76,10 +74,9 @@ export const clinicService = {
       }
 
       // Backend will get clinic_id from cookie
-      const response = await apiClient.get<any>(`/clinic-stats`, params);
+      const response = await get<any>(`/clinic-stats`, params);
 
       if (!response.success || !response.data) {
-        console.error('Failed to fetch clinic stats:', response.error?.message);
         return null;
       }
 

@@ -1,7 +1,7 @@
 // Visit service - Uses API format as per API_SPECIFICATION.md
 // Currently uses mock API client (localStorage), ready for backend integration
 
-import { apiClient } from './client';
+import { get, post, put, patch } from './client';
 import { ApiError } from '@/lib/query-client';
 import type { Visit, Patient } from '../types';
 import dayjs from 'dayjs';
@@ -12,8 +12,7 @@ export const visitService = {
       id: apiVisit.id,
       patientId:
         apiVisit.patient?.id || apiVisit.patient_id || fallbackPatientId || '',
-      date:
-        apiVisit.visit_date || apiVisit.created_at || dayjs().toISOString(),
+      date: apiVisit.visit_date || apiVisit.created_at || dayjs().toISOString(),
       status: this.mapVisitStatus(apiVisit.visit_status),
       // Notes saved from ConsultationScreen (if backend returns them)
       notes: apiVisit.notes || undefined,
@@ -70,12 +69,9 @@ export const visitService = {
         visit_status: visitStatus,
       };
 
-      console.log('📤 Creating visit with API data:', apiRequestData);
-
-      const response = await apiClient.post<any>('/visits', apiRequestData);
+      const response = await post<any>('/visits', apiRequestData);
 
       if (!response.success || !response.data) {
-        console.error('❌ Failed to create visit:', response.error);
         throw new ApiError(
           response.error?.message || 'Failed to create visit',
           response.error?.code || 'VISIT_CREATE_ERROR',
@@ -90,10 +86,8 @@ export const visitService = {
         visitData.patientId,
       );
 
-      console.log('✅ Visit created successfully:', mappedVisit);
       return mappedVisit;
     } catch (error: any) {
-      console.error('❌ Error creating visit:', error);
       throw error;
     }
   },
@@ -103,7 +97,7 @@ export const visitService = {
    * GET /api/v1/visits/:visitId
    */
   async getById(id: string): Promise<Visit | null> {
-    const response = await apiClient.get<any>(`/visits/${id}`);
+    const response = await get<any>(`/visits/${id}`);
 
     if (!response.success || !response.data) return null;
 
@@ -118,7 +112,7 @@ export const visitService = {
     patientId: string,
     limit: number = 50,
   ): Promise<Visit[]> {
-    const response = await apiClient.get<any[]>(`/visits/patient/${patientId}`);
+    const response = await get<any[]>(`/visits/patient/${patientId}`);
 
     if (!response.success || !response.data) return [];
 
@@ -145,7 +139,7 @@ export const visitService = {
    * PATCH /api/v1/visits/:visitId/notes
    */
   async updateNotes(id: string, notes: string): Promise<Visit | null> {
-    const response = await apiClient.patch<{ id: string; notes: string }>(
+    const response = await patch<{ id: string; notes: string }>(
       `/visits/${id}/notes`,
       { notes },
     );
@@ -166,7 +160,7 @@ export const visitService = {
     id: string,
     prescription: Visit['prescription'],
   ): Promise<Visit | null> {
-    const response = await apiClient.patch<{
+    const response = await patch<{
       id: string;
       prescription: Visit['prescription'];
     }>(`/visits/${id}/prescription`, {
@@ -200,19 +194,17 @@ export const visitService = {
         };
       const apiStatus = statusMap[status] || 'WAITING';
 
-      const response = await apiClient.put<any>(`/visits/${id}`, {
+      const response = await put<any>(`/visits/${id}`, {
         visit_status: apiStatus,
       });
 
       if (!response.success || !response.data) {
-        console.error('❌ Failed to update visit status:', response.error);
         return null;
       }
 
       // Map and return updated visit
       return this.mapApiVisitToVisit(response.data);
     } catch (error: any) {
-      console.error('❌ Error updating visit status:', error);
       return null;
     }
   },
@@ -222,7 +214,7 @@ export const visitService = {
    * GET /api/v1/visits/waiting
    */
   async getWaitingVisits(): Promise<Visit[]> {
-    const response = await apiClient.get<Visit[]>('/visits/waiting');
+    const response = await get<Visit[]>('/visits/waiting');
 
     if (!response.success || !response.data) {
       return [];
@@ -244,7 +236,7 @@ export const visitService = {
    * PATCH /api/v1/visits/:visitId/complete
    */
   async complete(id: string): Promise<Visit | null> {
-    const response = await apiClient.patch<{ id: string; status: 'completed' }>(
+    const response = await patch<{ id: string; status: 'completed' }>(
       `/visits/${id}/complete`,
       { status: 'completed' },
     );
@@ -297,10 +289,9 @@ export const visitService = {
         params.doctor_id = doctorId;
       }
 
-      const response = await apiClient.get<any>(`/visits/all/visits`, params);
+      const response = await get<any>(`/visits/all/visits`, params);
 
       if (!response.success || !response.data) {
-        console.error('❌ Failed to get all visits:', response.error);
         return { visits: [], count: 0, next: null, previous: null };
       }
 
@@ -313,9 +304,7 @@ export const visitService = {
         id: apiVisit.id,
         patientId: apiVisit.patient?.id || '',
         date:
-          apiVisit.visit_date ||
-          apiVisit.created_at ||
-          dayjs().toISOString(),
+          apiVisit.visit_date || apiVisit.created_at || dayjs().toISOString(),
         status: this.mapVisitStatus(apiVisit.visit_status),
         notes: undefined,
         prescription: undefined,
@@ -342,7 +331,6 @@ export const visitService = {
         previous: apiData.previous || null,
       };
     } catch (error: any) {
-      console.error('❌ Error getting all visits:', error);
       return { visits: [], count: 0, next: null, previous: null };
     }
   },
@@ -392,9 +380,7 @@ export const visitService = {
       age: age,
       gender: mapGender(apiPatient.gender),
       createdAt:
-        apiPatient.created_at ||
-        apiPatient.createdAt ||
-        dayjs().toISOString(),
+        apiPatient.created_at || apiPatient.createdAt || dayjs().toISOString(),
     };
   },
 };

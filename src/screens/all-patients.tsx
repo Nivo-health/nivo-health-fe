@@ -77,15 +77,12 @@ export default function AllPatientsScreen() {
     }
 
     try {
-      console.log('🔄 Creating patient...');
       const patient = await createPatientMutation.mutateAsync({
         name: newPatient.name.trim(),
         mobile: newPatient.mobile.trim(),
         age: newPatient.age ? Number(newPatient.age) : undefined,
         gender: newPatient.gender as 'M' | 'F', // Gender is required, validated in form
       });
-
-      console.log('✅ Patient created:', patient);
 
       // Show success message
       toast.add({
@@ -96,8 +93,6 @@ export default function AllPatientsScreen() {
       // Close modal
       setIsModalOpen(false);
     } catch (error: any) {
-      console.error('❌ Failed to create patient:', error);
-
       // Extract validation errors if present
       if (hasValidationErrors(error)) {
         const validationErrors = extractValidationErrors(error);

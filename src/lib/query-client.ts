@@ -38,21 +38,13 @@ export function isApiError(error: unknown): error is ApiError {
 export function createQueryClient(): QueryClient {
   return new QueryClient({
     queryCache: new QueryCache({
-      onError: (error, query) => {
-        // Log errors for debugging
-        console.error('Query error:', {
-          queryKey: query.queryKey,
-          error: error.message,
-        });
+      onError: () => {
+        // Errors surface through TanStack Query's error state
       },
     }),
     mutationCache: new MutationCache({
-      onError: (error, _variables, _context, mutation) => {
-        // Log mutation errors
-        console.error('Mutation error:', {
-          mutationKey: mutation.options.mutationKey,
-          error: error.message,
-        });
+      onError: () => {
+        // Errors surface through TanStack Query's error state
       },
     }),
     defaultOptions: {

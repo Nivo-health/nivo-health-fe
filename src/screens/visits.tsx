@@ -137,7 +137,6 @@ export default function VisitsScreen() {
     try {
       setErrors({});
 
-      console.log('🔍 Searching for patient with mobile:', mobileNumber);
       const searchResults = await patientSearchMutation.mutateAsync({
         query: mobileNumber,
         limit: 20,
@@ -146,7 +145,6 @@ export default function VisitsScreen() {
       if (searchResults.length > 0) {
         // Patient found - use the first match
         const patient = searchResults[0];
-        console.log('✅ Patient found:', patient);
         setFoundPatient(patient);
         setNewPatient({
           name: patient.name,
@@ -157,7 +155,6 @@ export default function VisitsScreen() {
         setStep('patient-form');
       } else {
         // Patient not found - show form to create
-        console.log('❌ Patient not found, showing create form');
         setFoundPatient(null);
         setNewPatient({
           name: '',
@@ -168,7 +165,6 @@ export default function VisitsScreen() {
         setStep('patient-form');
       }
     } catch (error) {
-      console.error('❌ Error searching patient:', error);
       toast.add({
         type: 'error',
         title: 'Failed to search patient',
@@ -223,10 +219,8 @@ export default function VisitsScreen() {
       if (foundPatient) {
         // Use existing patient
         patientId = foundPatient.id;
-        console.log('✅ Using existing patient:', patientId);
       } else {
         // Create new patient
-        console.log('🔄 Creating new patient...');
         const patient = await createPatientMutation.mutateAsync({
           name: newPatient.name.trim(),
           mobile: newPatient.mobile.trim(),
@@ -234,11 +228,9 @@ export default function VisitsScreen() {
           gender: newPatient.gender as 'M' | 'F',
         });
         patientId = patient.id;
-        console.log('✅ Patient created:', patientId);
       }
 
       // Create visit
-      console.log('🔄 Creating visit...');
       const visit = await createVisitMutation.mutateAsync({
         patientId,
         visitReason: visitReason.trim() || 'General consultation',
@@ -246,7 +238,6 @@ export default function VisitsScreen() {
         doctorId: selectedDoctorId || undefined,
       });
 
-      console.log('✅ Visit created:', visit.id);
       toast.add({
         type: 'success',
         title: 'Visit created successfully!',
@@ -256,8 +247,6 @@ export default function VisitsScreen() {
       // Reload visits and navigate
       navigate(`/visit/${visit.id}`);
     } catch (error: any) {
-      console.error('❌ Failed to create visit:', error);
-
       // Extract validation errors if present
       if (hasValidationErrors(error)) {
         const validationErrors = extractValidationErrors(error);

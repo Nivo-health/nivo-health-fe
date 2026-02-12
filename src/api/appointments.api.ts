@@ -1,8 +1,8 @@
 // Appointment service - Handles appointment API calls
 
-import { apiClient } from './client';
 import { ApiError } from '@/lib/query-client';
 import type { Appointment } from '@/types';
+import { get, put } from './client';
 
 export const appointmentService = {
   /**
@@ -75,13 +75,9 @@ export const appointmentService = {
         params.doctor_id = doctorId;
       }
 
-      const response = await apiClient.get<any>(
-        `/appointments/all/appointments`,
-        params,
-      );
+      const response = await get<any>(`/appointments/all/appointments`, params);
 
       if (!response.success || !response.data) {
-        console.error('❌ Failed to get all appointments:', response.error);
         return { appointments: [], count: 0, next: null, previous: null };
       }
 
@@ -101,76 +97,17 @@ export const appointmentService = {
         previous: apiData.previous || null,
       };
     } catch (error: any) {
-      console.error('❌ Error getting all appointments:', error);
       return { appointments: [], count: 0, next: null, previous: null };
     }
   },
 
-  /**
-   * Create a new appointment
-   * POST /api/appointments
-   */
-  async create(appointmentData: {
-    name: string;
-    mobile_number: string;
-    gender: 'MALE' | 'FEMALE';
-    doctor_id: string;
-    appointment_date_time: string;
-    appointment_status?: 'WAITING' | 'CHECKED_IN' | 'NO_SHOW';
-    source?: string;
-  }): Promise<Appointment> {
-    try {
-      // Backend will get clinic_id from cookie
-      const apiRequestData = {
-        name: appointmentData.name,
-        mobile_number: appointmentData.mobile_number,
-        gender: appointmentData.gender,
-        doctor_id: appointmentData.doctor_id,
-        appointment_date_time: appointmentData.appointment_date_time,
-        appointment_status: appointmentData.appointment_status || 'WAITING',
-        source: appointmentData.source || 'PHONE',
-      };
-
-      console.log('📤 Creating appointment with API data:', apiRequestData);
-
-      const response = await apiClient.post<any>(
-        '/appointments',
-        apiRequestData,
-      );
-
-      if (!response.success || !response.data) {
-        console.error('❌ Failed to create appointment:', response.error);
-        throw new ApiError(
-          response.error?.message || 'Failed to create appointment',
-          response.error?.code || 'APPOINTMENT_CREATE_ERROR',
-          response.error?.statusCode,
-          response.error?.details,
-        );
-      }
-
-      const mappedAppointment = this.mapApiAppointmentToAppointment(
-        response.data,
-      );
-      console.log('✅ Appointment created successfully:', mappedAppointment);
-      return mappedAppointment;
-    } catch (error: any) {
-      console.error('❌ Error creating appointment:', error);
-      throw error;
-    }
-  },
-
-  /**
-   * Update appointment status
-   * PUT /api/appointments/:appointmentId
-   */
   async updateStatus(
     appointmentId: string,
     status: 'WAITING' | 'CHECKED_IN' | 'NO_SHOW',
   ): Promise<Appointment | null> {
-    const response = await apiClient.put<any>(
-      `/appointments/${appointmentId}`,
-      { appointment_status: status },
-    );
+    const response = await put<any>(`/appointments/${appointmentId}`, {
+      appointment_status: status,
+    });
 
     if (!response.success || !response.data) {
       throw new ApiError(

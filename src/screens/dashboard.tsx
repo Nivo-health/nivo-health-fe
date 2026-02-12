@@ -279,7 +279,7 @@ export default function HomeScreen() {
   );
 }
 function getGreeting(): string {
-  const hour = new Date().getHours();
+  const hour = dayjs().hour();
   if (hour < 12) return 'Morning';
   if (hour < 17) return 'Afternoon';
   return 'Evening';

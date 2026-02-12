@@ -1,7 +1,7 @@
 // Patient service - Uses API format as per API_SPECIFICATION.md
 // Currently uses mock API client (localStorage), ready for backend integration
 
-import { apiClient } from './client';
+import { get, post } from './client';
 import { ApiError } from '@/lib/query-client';
 import type { Patient } from '../types';
 import dayjs from 'dayjs';
@@ -20,13 +20,10 @@ export const patientService = {
       return [];
     }
 
-    const response = await apiClient.get<PatientSearchResult[]>(
-      '/patients/search',
-      {
-        query: query,
-        limit,
-      },
-    );
+    const response = await get<PatientSearchResult[]>('/patients/search', {
+      query: query,
+      limit,
+    });
 
     if (!response.success || !response.data) {
       return [];
@@ -41,9 +38,7 @@ export const patientService = {
       age: this.getAgeFromApiPatient(apiPatient),
       gender: this.mapGender(apiPatient.gender),
       createdAt:
-        apiPatient.created_at ||
-        apiPatient.createdAt ||
-        dayjs().toISOString(),
+        apiPatient.created_at || apiPatient.createdAt || dayjs().toISOString(),
     }));
   },
 
@@ -53,10 +48,9 @@ export const patientService = {
    */
   async getById(id: string): Promise<Patient | null> {
     try {
-      const response = await apiClient.get<any>(`/patient/${id}`);
+      const response = await get<any>(`/patient/${id}`);
 
       if (!response.success || !response.data) {
-        console.error('❌ Failed to get patient by ID:', response.error);
         return null;
       }
 
@@ -76,7 +70,6 @@ export const patientService = {
 
       return mappedPatient;
     } catch (error: any) {
-      console.error('❌ Error getting patient by ID:', error);
       return null;
     }
   },
@@ -88,58 +81,47 @@ export const patientService = {
   async create(
     patientData: Omit<Patient, 'id' | 'createdAt'>,
   ): Promise<Patient> {
-    try {
-      // Map our Patient format to API request format
-      // Backend will get clinic_id from cookie
-      const apiRequestData = {
-        name: patientData.name,
-        mobile_number: patientData.mobile,
-        gender: this.mapGenderToAPI(patientData.gender),
-        email: (patientData as any).email || null,
-        address: (patientData as any).address || null,
-        date_of_birth: patientData.age
-          ? this.calculateDateOfBirth(patientData.age)
-          : null,
-        blood_group:
-          (patientData as any).bloodGroup ||
-          (patientData as any).blood_group ||
-          null,
-      };
+    // Map our Patient format to API request format
+    // Backend will get clinic_id from cookie
+    const apiRequestData = {
+      name: patientData.name,
+      mobile_number: patientData.mobile,
+      gender: this.mapGenderToAPI(patientData.gender),
+      email: (patientData as any).email || null,
+      address: (patientData as any).address || null,
+      date_of_birth: patientData.age
+        ? this.calculateDateOfBirth(patientData.age)
+        : null,
+      blood_group:
+        (patientData as any).bloodGroup ||
+        (patientData as any).blood_group ||
+        null,
+    };
 
-      console.log('📤 Creating patient with API data:', apiRequestData);
+    const response = await post<any>('/patient', apiRequestData);
 
-      const response = await apiClient.post<any>('/patient', apiRequestData);
-
-      if (!response.success || !response.data) {
-        console.error('❌ Failed to create patient:', response.error);
-        throw new ApiError(
-          response.error?.message || 'Failed to create patient',
-          response.error?.code || 'PATIENT_CREATE_ERROR',
-          response.error?.statusCode,
-          response.error?.details,
-        );
-      }
-
-      // Map API response back to our Patient format
-      const apiPatient = response.data;
-      const mappedPatient: Patient = {
-        id: apiPatient.id,
-        name: apiPatient.name || '',
-        mobile: apiPatient.mobile_number || apiPatient.mobile || '',
-        age: this.getAgeFromApiPatient(apiPatient),
-        gender: this.mapGender(apiPatient.gender),
-        createdAt:
-          apiPatient.created_at ||
-          apiPatient.createdAt ||
-          dayjs().toISOString(),
-      };
-
-      console.log('✅ Patient created successfully:', mappedPatient);
-      return mappedPatient;
-    } catch (error: any) {
-      console.error('❌ Error creating patient:', error);
-      throw error;
+    if (!response.success || !response.data) {
+      throw new ApiError(
+        response.error?.message || 'Failed to create patient',
+        response.error?.code || 'PATIENT_CREATE_ERROR',
+        response.error?.statusCode,
+        response.error?.details,
+      );
     }
+
+    // Map API response back to our Patient format
+    const apiPatient = response.data;
+    const mappedPatient: Patient = {
+      id: apiPatient.id,
+      name: apiPatient.name || '',
+      mobile: apiPatient.mobile_number || apiPatient.mobile || '',
+      age: this.getAgeFromApiPatient(apiPatient),
+      gender: this.mapGender(apiPatient.gender),
+      createdAt:
+        apiPatient.created_at || apiPatient.createdAt || dayjs().toISOString(),
+    };
+
+    return mappedPatient;
   },
 
   /**
@@ -147,10 +129,9 @@ export const patientService = {
    * GET /api/v1/patients/recent?limit={limit}
    */
   async getRecent(limit: number = 10): Promise<PatientSearchResult[]> {
-    const response = await apiClient.get<PatientSearchResult[]>(
-      '/patients/recent',
-      { limit },
-    );
+    const response = await get<PatientSearchResult[]>('/patients/recent', {
+      limit,
+    });
 
     if (!response.success || !response.data) {
       return [];
@@ -165,26 +146,8 @@ export const patientService = {
    */
   async getAll(_clinicId?: string): Promise<PatientSearchResult[]> {
     try {
-      console.log('Fetching all patients...');
-
       // Use real API endpoint - backend will get clinic_id from cookie
-      const response =
-        await apiClient.get<PatientSearchResult[]>(`/patients/all`);
-
-      console.log('API Response:', {
-        success: response.success,
-        hasData: response.data !== undefined,
-        dataType: Array.isArray(response.data) ? 'array' : typeof response.data,
-        dataLength: Array.isArray(response.data) ? response.data.length : 'N/A',
-        dataKeys:
-          response.data &&
-          typeof response.data === 'object' &&
-          !Array.isArray(response.data)
-            ? Object.keys(response.data)
-            : 'N/A',
-        error: response.error,
-        fullData: response.data, // Log full data to see structure
-      });
+      const response = await get<PatientSearchResult[]>(`/patients/all`);
 
       // Check if response has data (even if empty array) - prioritize API response
       // Only fallback if there's an explicit error or data is completely missing
@@ -239,38 +202,17 @@ export const patientService = {
             }),
           }));
 
-          console.log(
-            '✅ Using API data (array) - patients count:',
-            mappedPatients.length,
-          );
           return mappedPatients;
         }
 
-        // If no array found, log warning and return empty
-        console.warn(
-          '⚠️ API returned data but no array found. Data type:',
-          typeof response.data,
-        );
+        // If no array found, return empty
         return [];
       }
 
       // Only fallback if API explicitly failed or data is missing
-      if (response.error) {
-        console.warn(
-          '❌ API request failed, falling back to mock data:',
-          response.error?.message,
-        );
-      } else if (response.data === undefined || response.data === null) {
-        console.warn(
-          '⚠️ API response missing data field, falling back to mock data',
-        );
-      }
-
       // Fallback to mock/recent patients only if API explicitly failed
-      console.log('🔄 Falling back to mock data...');
       const apiPatients = await this.getRecent(1000);
       if (apiPatients.length > 0) {
-        console.log('📦 Using mock data - patients count:', apiPatients.length);
         return apiPatients;
       }
 
@@ -280,23 +222,17 @@ export const patientService = {
         const stored = localStorage.getItem(STORAGE_KEY);
         if (stored) {
           const patients = JSON.parse(stored);
-          console.log(
-            '💾 Using localStorage data - patients count:',
-            patients.length,
-          );
           return patients.map((p: any) => ({
             ...p,
             lastVisitDate: undefined, // Will be calculated if needed
           }));
         }
       } catch (error) {
-        console.error('Error reading from localStorage:', error);
+        // Error reading from localStorage
       }
 
-      console.log('📭 No data found, returning empty array');
       return [];
     } catch (error) {
-      console.error('❌ Failed to get all patients:', error);
       // Fallback to empty array
       return [];
     }

@@ -17,6 +17,7 @@ import {
 } from '../utils/error-handler';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { MedicationInput } from '@/components/ui/medication-input';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -24,6 +25,7 @@ import { NotesInput } from '@/components/ui/notes-input';
 import { Table } from '@/components/ui/table';
 import SendWhatsappModal from '@/components/prescription/modals/send-whatsapp-modal';
 import { toast } from '@/components/ui/toast';
+import { RadioGroup } from '@/components/ui/radio-group';
 import { Select } from '@/components/ui/select';
 
 export default function PrescriptionScreen() {
@@ -63,7 +65,6 @@ export default function PrescriptionScreen() {
 
   useEffect(() => {
     if (!visitId) {
-      console.log('⚠️ No visitId provided');
       navigate('/visits');
     }
   }, [visitId, navigate]);
@@ -238,8 +239,6 @@ export default function PrescriptionScreen() {
       });
       return true;
     } catch (error: any) {
-      console.error('❌ Failed to save prescription:', error);
-
       // Extract validation errors if present
       if (hasValidationErrors(error)) {
         const validationErrors = extractValidationErrors(error);
@@ -269,7 +268,6 @@ export default function PrescriptionScreen() {
           type: 'error',
           title: getErrorMessage(error),
         });
-        console.error('Validation errors:', validationErrors);
       } else {
         setMedicineErrors({});
         toast.add({
@@ -713,50 +711,38 @@ export default function PrescriptionScreen() {
             <h3 className="text-base md:text-lg font-semibold text-teal-900 mb-4">
               Follow-up
             </h3>
-            <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3 md:gap-4">
+            <RadioGroup.Root
+              className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3 md:gap-4"
+              value={followUpEnabled ? 'yes' : 'none'}
+              onValueChange={(value) => {
+                if (value === 'none') {
+                  setFollowUpEnabled(false);
+                  setFollowUp(null);
+                  setFollowUpValue('');
+                } else {
+                  setFollowUpEnabled(true);
+                  if (!followUpValue) {
+                    setFollowUpValue('7');
+                    setFollowUp({
+                      value: 7,
+                      unit: followUpUnit,
+                    });
+                  } else if (followUpValue && Number(followUpValue) > 0) {
+                    setFollowUp({
+                      value: Number(followUpValue),
+                      unit: followUpUnit,
+                    });
+                  }
+                }
+              }}
+            >
               <div className="flex items-center gap-2">
-                <input
-                  type="radio"
-                  id="followup-none"
-                  name="followup"
-                  checked={!followUpEnabled}
-                  onChange={() => {
-                    setFollowUpEnabled(false);
-                    setFollowUp(null);
-                    setFollowUpValue('');
-                  }}
-                  className="w-4 h-4"
-                />
-                <label htmlFor="followup-none" className="text-sm font-medium">
-                  No follow-up
-                </label>
+                <RadioGroup.Item value="none" />
+                <label className="text-sm font-medium">No follow-up</label>
               </div>
               <div className="flex items-center gap-2">
-                <input
-                  type="radio"
-                  id="followup-yes"
-                  name="followup"
-                  checked={followUpEnabled}
-                  onChange={() => {
-                    setFollowUpEnabled(true);
-                    if (!followUpValue) {
-                      setFollowUpValue('7');
-                      setFollowUp({
-                        value: 7,
-                        unit: followUpUnit,
-                      });
-                    } else if (followUpValue && Number(followUpValue) > 0) {
-                      setFollowUp({
-                        value: Number(followUpValue),
-                        unit: followUpUnit,
-                      });
-                    }
-                  }}
-                  className="w-4 h-4"
-                />
-                <label htmlFor="followup-yes" className="text-sm font-medium">
-                  Follow-up after
-                </label>
+                <RadioGroup.Item value="yes" />
+                <label className="text-sm font-medium">Follow-up after</label>
               </div>
               {followUpEnabled && (
                 <div className="flex items-center gap-2 flex-1 sm:flex-initial">
@@ -789,7 +775,7 @@ export default function PrescriptionScreen() {
                   </Select.Root>
                 </div>
               )}
-            </div>
+            </RadioGroup.Root>
           </div>
         </div>
       </div>
@@ -799,12 +785,10 @@ export default function PrescriptionScreen() {
         <div className="max-w-7xl mx-auto px-3 md:px-6 py-3 md:py-4">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4">
             <div className="flex items-center space-x-2">
-              <input
-                type="checkbox"
+              <Checkbox.Root
                 id="whatsapp-checkbox"
                 checked={whatsappEnabled}
-                onChange={(e) => setWhatsappEnabled(e.target.checked)}
-                className="w-4 h-4 text-teal-600 border-teal-300 rounded focus:ring-teal-500"
+                onCheckedChange={(checked) => setWhatsappEnabled(checked)}
               />
               <label
                 htmlFor="whatsapp-checkbox"

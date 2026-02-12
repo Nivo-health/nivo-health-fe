@@ -6,6 +6,7 @@ import { usePrescription } from '../queries/prescriptions.queries';
 import { getVisitStep, visitSteps } from '../utils/visit-stepper';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
 
 export default function ConsultationScreen() {
   const { visitId } = useParams<{ visitId: string }>();
@@ -79,14 +80,14 @@ export default function ConsultationScreen() {
                 >
                   Enter consultation notes (optional)
                 </label>
-                <textarea
+                <Textarea
                   ref={textareaRef}
                   id="notes"
                   value={notes}
                   onChange={(e) => handleNotesChange(e.target.value)}
                   onBlur={handleBlur}
                   placeholder="Enter patient symptoms, diagnosis, observations, etc..."
-                  className="w-full min-h-100 px-3 py-2 border border-teal-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent resize-y"
+                  className="min-h-100"
                   autoFocus
                 />
               </div>

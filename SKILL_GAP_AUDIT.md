@@ -1,90 +1,149 @@
-# Skill Compliance Audit (Post-Fix Rerun)
+# Skill Compliance Audit (Rerun)
 
 Audit date: 2026-02-08  
-Scope: current codebase (`src/`, root configs) against active skills.
+Scope: current codebase (`src/`, root configs) against active skills and project conventions.
+
+## Verification Summary
+
+- `pnpm -s tsc --noEmit`: pass
+- `pnpm -s build`: pass
 
 ## Snapshot Metrics
 
-- `lucide-react` barrel imports in `src/`: **0**
+- `lucide-react` barrel imports in `src/`: **1** (type-only in `src/types/lucide-icon-modules.d.ts`)
 - Inline screen-level modals (`<Dialog.Root>` in `src/screens`): **0**
 - Non-`kebab-case` TypeScript filenames in `src/`: **0**
 - Raw HTML form/control elements outside `src/components/ui/*`: **16**
 - `console.log`/`console.error`/`console.warn` occurrences in `src/`: **78**
-- Native date API usages (`new Date`/locale formatting): **15**
+- Native date API usages (`new Date`, locale formatters, `Date.now`): **12**
 
 Largest screen files:
-- `src/screens/prescription.tsx` (856)
-- `src/screens/visits.tsx` (557)
-- `src/screens/doctor-schedule-settings.tsx` (405)
-- `src/screens/appointments.tsx` (396)
 
-## Resolved Gaps
+- `src/screens/prescription.tsx` (856 lines)
+- `src/screens/visits.tsx` (557 lines)
+- `src/screens/doctor-schedule-settings.tsx` (405 lines)
+- `src/screens/appointments.tsx` (396 lines)
+- `src/screens/all-patients.tsx` (331 lines)
 
-### 1) `tailwind-v4-shadcn`
+## Skill Status
 
-- `components.json` updated to v4 pattern (`"tailwind.config": ""`).
-- Legacy `tailwind.config.js` removed.
-- `@apply` usage removed from `src/index.css` base layer.
-- Dark custom variant updated to recommended `@:where(.dark, .dark *)` pattern.
-- Base styles now use direct CSS variable declarations.
+### `frontend-architecture-dx`
 
-### 2) `tanstack-query`
+Pass:
 
-- Query keys now include all query inputs:
-  - `patientSearch(query, limit)`
-  - `visitsByPatient(patientId, limit)`
-- `Visits` duplicate-fetch flow removed by switching to `usePatientSearchLazy()` mutation flow.
-- React Query Devtools now render only in dev (`import.meta.env.DEV`).
+- All `src/` TS/TSX filenames are now `kebab-case`.
+- Modal internals are no longer defined inline in screen files.
 
-### 3) `vercel-react-best-practices`
+Gaps:
 
-- Route-level code splitting implemented using `React.lazy` + `Suspense` in `src/app.tsx`.
-- Immutable sorting pattern applied in `src/api/visits.api.ts` (`toSorted`).
-- Barrel icon imports replaced with per-icon subpath imports.
-  - Added `src/types/lucide-icon-modules.d.ts` for icon subpath typing.
-
-### 4) `ui-ux-pro-max` + `web-design-guidelines`
-
-- Non-semantic clickable containers in key audited screens replaced with semantic buttons:
+- Several screen files are still too heavy and not orchestration-only:
+  - `src/screens/prescription.tsx`
   - `src/screens/visits.tsx`
-  - `src/screens/all-patients.tsx`
-  - `src/screens/patient-search.tsx`
-  - `src/screens/patient-details.tsx`
-- Date picker nav buttons now include `aria-label`.
-- Emoji-based functional row icons replaced with text labels in audited screens.
-- `type="tel"` fields in audited forms now include mobile ergonomics attrs (`inputMode`, `autoComplete`, `pattern`).
-
-### 5) `frontend-architecture-dx`
-
-- Screen-level modal JSX extracted to dedicated feature modal files:
-  - `src/components/all-patients/modals/add-patient-modal.tsx`
-  - `src/components/patient-search/modals/add-patient-modal.tsx`
-  - `src/components/visits/modals/create-visit-modal.tsx`
-  - `src/components/doctor-schedule/modals/working-hour-modal.tsx`
-  - `src/components/prescription/modals/send-whatsapp-modal.tsx`
-- `kebab-case` migration completed for all `src/` TypeScript filenames and import paths.
-
-### 6) Date Standardization (Project Stack)
-
-- Core audited date flows moved to `dayjs` in:
+  - `src/screens/doctor-schedule-settings.tsx`
   - `src/screens/appointments.tsx`
-  - `src/screens/visits.tsx`
+  - `src/screens/all-patients.tsx`
+
+### `tailwind-design-system` and design-system-first rule
+
+Pass:
+
+- Shared primitives from `src/components/ui/*` are broadly used.
+
+Gaps:
+
+- 16 raw controls remain outside `src/components/ui/*`, for example:
+  - `src/screens/consultation.tsx:82` (`<textarea>`)
+  - `src/screens/visit-context.tsx:180` (`<input type="checkbox">`)
+  - `src/screens/prescription.tsx:718` (`<input type="radio">`)
+  - `src/screens/prescription.tsx:802` (`<input type="checkbox">`)
+  - `src/components/dashboard/quick-action-button.tsx:16` (`<button>`)
+
+### `tanstack-query`
+
+Pass:
+
+- Query layer uses v5 object syntax and `queryOptions`.
+- Query keys include dynamic inputs for key paths audited (`patientSearch`, `visitsByPatient`, list params).
+- No `cacheTime`, `keepPreviousData`, or `useErrorBoundary` usage found.
+
+Gaps:
+
+- None blocking. Optional enhancement backlog can still adopt advanced v5 patterns (`useMutationState`, `throwOnError` boundaries, `networkMode` where applicable).
+
+### `tailwind-v4-shadcn`
+
+Pass:
+
+- Project builds and Tailwind v4 setup is functional.
+
+Gap (pending from previous audit):
+
+- `vite.config.ts` has fallback dynamic import for `@tailwindcss/vite`, but dependency is still not present in `package.json`.
+
+### `vercel-react-best-practices`
+
+Pass:
+
+- Route-level splitting and lazy loading are in place.
+- `toSorted()` immutable sorting pattern already applied.
+
+Gap:
+
+- One remaining `lucide-react` barrel import exists as a type import in `src/types/lucide-icon-modules.d.ts:3`.
+
+### Date standardization (`dayjs`)
+
+Pass:
+
+- Most feature screens use `dayjs`.
+
+Gaps:
+
+- Native date APIs remain in key files:
+  - `src/screens/visit-context.tsx`
+  - `src/screens/print-preview.tsx`
   - `src/screens/patient-details.tsx`
-  - `src/components/ui/date-picker.tsx`
-  - `src/api/patients.api.ts`
-  - `src/api/visits.api.ts`
+  - `src/utils/print.ts`
+  - `src/screens/dashboard.tsx`
+  - `src/api/prescriptions.api.ts` (timestamp-based IDs)
 
-## Remaining Gaps (Actionable Backlog)
+## Newly Identified Issues In This Rerun
 
-1. Tailwind plugin dependency alignment:
-- `vite.config.ts` includes optional dynamic loading for `@tailwindcss/vite`, but package install is pending local network/package-manager availability.
+1. Accessibility/semantics issue in visit history cards:
 
-2. Architecture thinning still pending for very large screens:
-- `src/screens/prescription.tsx`
-- `src/screens/visits.tsx`
-- `src/screens/doctor-schedule-settings.tsx`
-- `src/screens/appointments.tsx`
+- `src/screens/visit-context.tsx` uses clickable `<div>` card blocks with `onClick`, which are not keyboard-accessible by default.
 
-3. Design-system-first hardening still has residual raw controls (count: 16) that can be further migrated to shared UI primitives.
+2. Barrel import exception still present:
 
-4. Console cleanup/logging policy not yet enforced (count: 78).
+- `src/types/lucide-icon-modules.d.ts:3` imports `LucideProps` from `'lucide-react'` (type-only).
+
+## Pending Items From Previous Audit (Still Open)
+
+1. Install and standardize Tailwind Vite plugin setup:
+
+- Add `@tailwindcss/vite` and remove fallback dynamic import behavior.
+
+2. Thin heavy screens into feature components:
+
+- Continue extracting sections into `src/components/<feature>/*` and keep screens orchestration-only.
+  SKILL_GAP_AUDIT.md
+
+3. Design-system-first completion:
+
+- Replace raw `<button>`, `<input>`, `<textarea>` usage with shared primitives (`Button`, `Input`, `Textarea`, `Checkbox`, `RadioGroup`) or dedicated feature wrappers.
+
+4. Logging policy cleanup:
+
+- Remove debug logs from API/screen codepaths and route errors via centralized handling.
+
+5. Finish date API unification:
+
+- Replace remaining `new Date(...).toLocaleDateString(...)` and `new Date().getHours()` with `dayjs`.
+
+## Recommended Fix Order
+
+1. Accessibility and design-system violations (`visit-context`, `consultation`, `prescription`, dashboard/doctor schedule icon action buttons).
+2. Date API unification to `dayjs` in screens + `utils/print.ts`.
+3. Screen decomposition for the top 5 largest screen files.
+4. Console log cleanup and error-surface standardization.
+5. Tailwind plugin dependency alignment.
