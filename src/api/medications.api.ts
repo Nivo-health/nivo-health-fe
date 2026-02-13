@@ -1,4 +1,4 @@
-import { apiClient } from './client';
+import { get } from './client';
 
 export interface Medication {
   id: string;
@@ -22,12 +22,11 @@ export const medicationService = {
     }
 
     try {
-      const response = await apiClient.get<Medication[]>('/medications', {
+      const response = await get<Medication[]>('/medications', {
         query: query.trim(),
       });
 
       if (!response.success || !response.data) {
-        console.error('❌ Failed to search medications:', response.error);
         return [];
       }
 
@@ -35,7 +34,6 @@ export const medicationService = {
       const medications = Array.isArray(response.data) ? response.data : [];
       return medications.slice(0, 10);
     } catch (error: any) {
-      console.error('❌ Error searching medications:', error);
       return [];
     }
   },

@@ -1,4 +1,4 @@
-import { apiClient } from './client';
+import { get, post, del } from './client';
 import { ApiError } from '@/lib/query-client';
 import { toApiDateFormat } from '@/utils/date-format';
 import { appointmentService } from './appointments.api';
@@ -14,7 +14,7 @@ export const slotsService = {
     start_date: string; // YYYY-MM-DD
     end_date: string; // YYYY-MM-DD
   }): Promise<AvailableSlotsResponse> {
-    const response = await apiClient.get<any>('/slots/available', {
+    const response = await get<any>('/slots/available', {
       doctor_id: params.doctor_id,
       start_date: toApiDateFormat(params.start_date),
       end_date: toApiDateFormat(params.end_date),
@@ -41,7 +41,7 @@ export const slotsService = {
     gender: 'MALE' | 'FEMALE' | 'OTHER';
     source?: string;
   }): Promise<Appointment> {
-    const response = await apiClient.post<any>('/slots/book', {
+    const response = await post<any>('/slots/book', {
       doctor_id: data.doctor_id,
       date: toApiDateFormat(data.date),
       start_time: data.start_time,
@@ -68,7 +68,7 @@ export const slotsService = {
     date: string; // YYYY-MM-DD
     start_time: string; // HH:MM
   }): Promise<AppointmentSlot> {
-    const response = await apiClient.post<any>('/slots/block', {
+    const response = await post<any>('/slots/block', {
       doctor_id: data.doctor_id,
       date: toApiDateFormat(data.date),
       start_time: data.start_time,
@@ -87,7 +87,7 @@ export const slotsService = {
   },
 
   async unblockSlot(slotId: string): Promise<void> {
-    const response = await apiClient.delete<any>(`/slots/block/${slotId}`);
+    const response = await del<any>(`/slots/block/${slotId}`);
 
     if (!response.success) {
       throw new ApiError(

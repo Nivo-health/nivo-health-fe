@@ -2,7 +2,10 @@ import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAllPatients, useCreatePatient } from '../queries/patients.queries';
 import { useFiltersStore } from '../stores/filters.store';
-import { validatePhoneNumber } from '../utils/phone-validation';
+import {
+  validatePhoneNumber,
+  formatPhoneForAPI,
+} from '../utils/phone-validation';
 import {
   extractValidationErrors,
   getErrorMessage,
@@ -77,15 +80,12 @@ export default function AllPatientsScreen() {
     }
 
     try {
-      console.log('🔄 Creating patient...');
       const patient = await createPatientMutation.mutateAsync({
         name: newPatient.name.trim(),
-        mobile: newPatient.mobile.trim(),
+        mobile: formatPhoneForAPI(newPatient.mobile),
         age: newPatient.age ? Number(newPatient.age) : undefined,
         gender: newPatient.gender as 'M' | 'F', // Gender is required, validated in form
       });
-
-      console.log('✅ Patient created:', patient);
 
       // Show success message
       toast.add({
@@ -96,8 +96,6 @@ export default function AllPatientsScreen() {
       // Close modal
       setIsModalOpen(false);
     } catch (error: any) {
-      console.error('❌ Failed to create patient:', error);
-
       // Extract validation errors if present
       if (hasValidationErrors(error)) {
         const validationErrors = extractValidationErrors(error);
@@ -120,14 +118,14 @@ export default function AllPatientsScreen() {
 
   if (isLoading) {
     return (
-      <div className="min-h-[calc(100vh-4rem)] bg-background flex items-center justify-center">
+      <div className="h-screen bg-background flex items-center justify-center">
         <div className="text-muted-foreground">Loading patients...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-background overflow-x-hidden">
+    <div className="h-screen bg-background overflow-x-hidden">
       <div className="max-w-7xl mx-auto px-3 md:px-6 py-4 md:py-6">
         {/* Header - Compact on Mobile */}
         <div className="mb-4 md:mb-6">

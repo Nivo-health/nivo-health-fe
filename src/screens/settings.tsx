@@ -26,12 +26,17 @@ export default function SettingsScreen() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-gray-50 p-6">
+    <div className="h-screen bg-background p-6">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold text-teal-900 mb-6">Settings</h1>
-        <Card.Root className="border-teal-200">
-          <Card.Header className="bg-linear-to-r from-teal-50 to-white border-b border-teal-100">
-            <Card.Title className="text-teal-900">
+        <Card.Root className="overflow-hidden border-primary/10">
+          <Card.Header
+            className="relative border border-b flex items-center justify-between px-4 py-3 border-b-primary/10 border-x-0 border-t-0"
+            style={{
+              background: 'var(--gradient-header)',
+            }}
+          >
+            <Card.Title className="text-sm font-medium text-muted-foreground">
               Clinic Information
             </Card.Title>
           </Card.Header>
@@ -93,9 +98,16 @@ export default function SettingsScreen() {
         </Card.Root>
 
         {/* Logout Section */}
-        <Card.Root className="border-teal-200 mt-6">
-          <Card.Header className="bg-linear-to-r from-teal-50 to-white border-b border-teal-100">
-            <Card.Title className="text-teal-900">Account</Card.Title>
+        <Card.Root className="overflow-hidden border-primary/10 mt-6">
+          <Card.Header
+            className="relative border border-b flex items-center justify-between px-4 py-3 border-b-primary/10 border-x-0 border-t-0"
+            style={{
+              background: 'var(--gradient-header)',
+            }}
+          >
+            <Card.Title className="text-sm font-medium text-muted-foreground">
+              Account
+            </Card.Title>
           </Card.Header>
           <Card.Panel className="pt-6">
             <Button

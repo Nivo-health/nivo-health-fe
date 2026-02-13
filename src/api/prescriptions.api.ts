@@ -3,10 +3,11 @@
 // PUT /api/visits/prescription/:prescriptionId (update)
 // GET /api/visits/prescription/:prescriptionId (get)
 
-import { apiClient } from './client';
+import { get, post, put } from './client';
 import { ApiError } from '@/lib/query-client';
 import type { Prescription, Medicine, FollowUp } from '../types';
 import { visitService } from './visits.api';
+import dayjs from 'dayjs';
 
 export const prescriptionService = {
   /**
@@ -18,7 +19,7 @@ export const prescriptionService = {
     ).map((item: any) => ({
       id:
         item.id ||
-        `medicine_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        `medicine_${dayjs().valueOf()}_${Math.random().toString(36).substr(2, 9)}`,
       name: item.medicine || '',
       dosage: item.dosage || '',
       duration: item.duration || '',
@@ -81,18 +82,14 @@ export const prescriptionService = {
    */
   async getById(prescriptionId: string): Promise<Prescription | null> {
     try {
-      const response = await apiClient.get<any>(
-        `/visits/prescription/${prescriptionId}`,
-      );
+      const response = await get<any>(`/visits/prescription/${prescriptionId}`);
 
       if (!response.success || !response.data) {
-        console.error('❌ Failed to get prescription:', response.error);
         return null;
       }
 
       return this.mapApiPrescriptionToPrescription(response.data);
     } catch (error: any) {
-      console.error('❌ Error getting prescription:', error);
       return null;
     }
   },
@@ -108,15 +105,12 @@ export const prescriptionService = {
     try {
       const apiData = this.mapPrescriptionToApi(prescription);
 
-      console.log('📤 Creating prescription with API data:', apiData);
-
-      const response = await apiClient.post<any>(
+      const response = await post<any>(
         `/visits/${visitId}/prescription`,
         apiData,
       );
 
       if (!response.success || !response.data) {
-        console.error('❌ Failed to create prescription:', response.error);
         throw new ApiError(
           response.error?.message || 'Failed to create prescription',
           response.error?.code || 'PRESCRIPTION_CREATE_ERROR',
@@ -125,10 +119,8 @@ export const prescriptionService = {
         );
       }
 
-      console.log('✅ Prescription created successfully:', response.data.id);
       return response.data.id; // Return prescription ID
     } catch (error: any) {
-      console.error('❌ Error creating prescription:', error);
       throw error; // Re-throw to allow error handling in UI
     }
   },
@@ -144,15 +136,12 @@ export const prescriptionService = {
     try {
       const apiData = this.mapPrescriptionToApi(prescription);
 
-      console.log('📤 Updating prescription with API data:', apiData);
-
-      const response = await apiClient.put<any>(
+      const response = await put<any>(
         `/visits/prescription/${prescriptionId}`,
         apiData,
       );
 
       if (!response.success) {
-        console.error('❌ Failed to update prescription:', response.error);
         throw new ApiError(
           response.error?.message || 'Failed to update prescription',
           response.error?.code || 'PRESCRIPTION_UPDATE_ERROR',
@@ -161,10 +150,8 @@ export const prescriptionService = {
         );
       }
 
-      console.log('✅ Prescription updated successfully');
       return true;
     } catch (error: any) {
-      console.error('❌ Error updating prescription:', error);
       throw error; // Re-throw to allow error handling in UI
     }
   },
@@ -181,16 +168,13 @@ export const prescriptionService = {
       // Get the visit to check if prescription_id exists
       const visit = await visitService.getById(visitId);
       if (!visit) {
-        console.error('❌ Visit not found');
         return false;
       }
 
       // If prescription_id exists, update; otherwise create
       if (visit.prescription_id) {
-        console.log('📝 Prescription exists, updating...');
         return await this.update(visit.prescription_id, prescription);
       } else {
-        console.log('✨ Creating new prescription...');
         const prescriptionId = await this.create(visitId, prescription);
         if (prescriptionId) {
           // Reload visit to get updated prescription_id
@@ -203,7 +187,6 @@ export const prescriptionService = {
         return false;
       }
     } catch (error: any) {
-      console.error('❌ Error saving prescription:', error);
       return false;
     }
   },
@@ -221,7 +204,6 @@ export const prescriptionService = {
 
       return await this.getById(visit.prescription_id);
     } catch (error: any) {
-      console.error('❌ Error getting prescription from visit:', error);
       return null;
     }
   },
@@ -232,7 +214,7 @@ export const prescriptionService = {
   createMedicine(medicineData: Omit<Medicine, 'id'>): Medicine {
     return {
       ...medicineData,
-      id: `medicine_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      id: `medicine_${dayjs().valueOf()}_${Math.random().toString(36).substr(2, 9)}`,
     };
   },
 

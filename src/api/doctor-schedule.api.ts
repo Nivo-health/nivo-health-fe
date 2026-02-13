@@ -1,4 +1,4 @@
-import { apiClient } from './client';
+import { get, post, put, del } from './client';
 import { ApiError } from '@/lib/query-client';
 import { toApiDateFormat } from '@/utils/date-format';
 import type { DoctorWorkingHour, DoctorOffDay } from '@/types/api';
@@ -10,10 +10,7 @@ export const doctorScheduleService = {
     const params: Record<string, string> = {};
     if (doctorId) params.doctor_id = doctorId;
 
-    const response = await apiClient.get<any>(
-      '/doctor-schedule/working-hours',
-      params,
-    );
+    const response = await get<any>('/doctor-schedule/working-hours', params);
 
     if (!response.success || !response.data) {
       return [];
@@ -32,10 +29,7 @@ export const doctorScheduleService = {
     end_time: string;
     slot_duration_minutes?: number;
   }): Promise<DoctorWorkingHour> {
-    const response = await apiClient.post<any>(
-      '/doctor-schedule/working-hours',
-      data,
-    );
+    const response = await post<any>('/doctor-schedule/working-hours', data);
 
     if (!response.success || !response.data) {
       throw new ApiError(
@@ -58,7 +52,7 @@ export const doctorScheduleService = {
       is_active?: boolean;
     },
   ): Promise<DoctorWorkingHour> {
-    const response = await apiClient.put<any>(
+    const response = await put<any>(
       `/doctor-schedule/working-hours/${id}`,
       data,
     );
@@ -76,9 +70,7 @@ export const doctorScheduleService = {
   },
 
   async deleteWorkingHour(id: string): Promise<void> {
-    const response = await apiClient.delete<any>(
-      `/doctor-schedule/working-hours/${id}`,
-    );
+    const response = await del<any>(`/doctor-schedule/working-hours/${id}`);
 
     if (!response.success) {
       throw new ApiError(
@@ -103,10 +95,7 @@ export const doctorScheduleService = {
       queryParams.start_date = toApiDateFormat(params.startDate);
     if (params?.endDate) queryParams.end_date = toApiDateFormat(params.endDate);
 
-    const response = await apiClient.get<any>(
-      '/doctor-schedule/off-days',
-      queryParams,
-    );
+    const response = await get<any>('/doctor-schedule/off-days', queryParams);
 
     if (!response.success || !response.data) {
       return [];
@@ -123,7 +112,7 @@ export const doctorScheduleService = {
     date: string; // YYYY-MM-DD
     reason?: string;
   }): Promise<DoctorOffDay> {
-    const response = await apiClient.post<any>('/doctor-schedule/off-days', {
+    const response = await post<any>('/doctor-schedule/off-days', {
       doctor_id: data.doctor_id,
       date: toApiDateFormat(data.date),
       reason: data.reason,
@@ -142,9 +131,7 @@ export const doctorScheduleService = {
   },
 
   async deleteOffDay(id: string): Promise<void> {
-    const response = await apiClient.delete<any>(
-      `/doctor-schedule/off-days/${id}`,
-    );
+    const response = await del<any>(`/doctor-schedule/off-days/${id}`);
 
     if (!response.success) {
       throw new ApiError(

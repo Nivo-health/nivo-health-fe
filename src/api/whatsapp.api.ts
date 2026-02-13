@@ -1,7 +1,7 @@
 // WhatsApp service - Uses API format as per API_SPECIFICATION.md
 // Currently uses mock API client, ready for backend integration
 
-import { apiClient } from './client';
+import { post } from './client';
 import type { Prescription } from '../types';
 
 export interface WhatsAppResponse {
@@ -19,7 +19,7 @@ export const whatsappService = {
     visitId: string;
     mobile: string;
   }): Promise<{ success: boolean; message?: string }> {
-    const response = await apiClient.post<WhatsAppResponse>(
+    const response = await post<WhatsAppResponse>(
       '/whatsapp/visit-confirmation',
       data,
     );
@@ -47,7 +47,7 @@ export const whatsappService = {
     mobile: string;
     prescription: Prescription;
   }): Promise<{ success: boolean; message?: string }> {
-    const response = await apiClient.post<WhatsAppResponse>(
+    const response = await post<WhatsAppResponse>(
       '/whatsapp/prescription',
       data,
     );

@@ -51,7 +51,7 @@ export default function PatientDetailsScreen() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-background overflow-x-hidden">
+    <div className="h-screen bg-background overflow-x-hidden">
       <div className="max-w-7xl mx-auto px-6 py-6">
         {/* Patient Header */}
         <Card.Root className="mb-6 border-teal-200">
@@ -90,11 +90,7 @@ export default function PatientDetailsScreen() {
                 <span className="text-teal-600 font-medium">Joined:</span>
                 <span className="font-semibold text-gray-900">
                   {patient.createdAt
-                    ? new Date(patient.createdAt).toLocaleDateString('en-IN', {
-                        day: '2-digit',
-                        month: 'short',
-                        year: 'numeric',
-                      })
+                    ? dayjs(patient.createdAt).format('DD MMM YYYY')
                     : 'N/A'}
                 </span>
               </div>

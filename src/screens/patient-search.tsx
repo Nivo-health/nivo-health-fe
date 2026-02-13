@@ -10,7 +10,10 @@ import { useFiltersStore } from '../stores/filters.store';
 import { useCreateVisit } from '../queries/visits.queries';
 import { useQueryClient } from '@tanstack/react-query';
 import { fetchVisitsByPatient } from '../queries/visits.queries';
-import { validatePhoneNumber } from '../utils/phone-validation';
+import {
+  validatePhoneNumber,
+  formatPhoneForAPI,
+} from '../utils/phone-validation';
 import {
   extractValidationErrors,
   getErrorMessage,
@@ -68,7 +71,7 @@ export default function PatientSearchScreen() {
       });
       navigate(`/visit/${visit.id}`);
     } catch (error) {
-      console.error('Failed to create visit:', error);
+      // Error surfaces through TanStack Query's error state
     }
   };
 
@@ -106,7 +109,7 @@ export default function PatientSearchScreen() {
     try {
       const patient = await createPatientMutation.mutateAsync({
         name: newPatient.name.trim(),
-        mobile: newPatient.mobile.trim(),
+        mobile: formatPhoneForAPI(newPatient.mobile),
         age: newPatient.age ? Number(newPatient.age) : undefined,
         gender: newPatient.gender || undefined,
       });
@@ -119,8 +122,6 @@ export default function PatientSearchScreen() {
       setIsModalOpen(false);
       navigate(`/visit/${visit.id}`);
     } catch (error: any) {
-      console.error('Failed to create patient:', error);
-
       // Extract validation errors if present
       if (hasValidationErrors(error)) {
         const validationErrors = extractValidationErrors(error);
@@ -128,10 +129,6 @@ export default function PatientSearchScreen() {
           ...prevErrors,
           ...validationErrors,
         }));
-        // Show general error message (toast can be added if needed)
-        console.error('Validation errors:', validationErrors);
-      } else {
-        console.error('Error:', getErrorMessage(error));
       }
     }
   };
@@ -142,7 +139,7 @@ export default function PatientSearchScreen() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-background overflow-x-hidden">
+    <div className="h-screen bg-background overflow-x-hidden">
       <div className="sticky z-10 bg-white border-b border-teal-100 shadow-sm">
         <div className="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center gap-4">
           <Input

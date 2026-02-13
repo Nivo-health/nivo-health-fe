@@ -15,16 +15,6 @@ interface AppointmentListParams {
   doctorId?: string;
 }
 
-interface CreateAppointmentData {
-  name: string;
-  mobile_number: string;
-  gender: 'MALE' | 'FEMALE';
-  doctor_id: string;
-  appointment_date_time: string;
-  appointment_status?: 'WAITING' | 'CHECKED_IN' | 'NO_SHOW';
-  source?: string;
-}
-
 export const appointmentQueryOptions = {
   list: (params?: AppointmentListParams) =>
     queryOptions({
@@ -41,18 +31,6 @@ export const appointmentQueryOptions = {
 
 export function useAppointments(params?: AppointmentListParams) {
   return useQuery(appointmentQueryOptions.list(params));
-}
-
-export function useCreateAppointment() {
-  const queryClient = useQueryClient();
-
-  return useMutation<Appointment, Error, CreateAppointmentData>({
-    mutationKey: ['appointments', 'create'],
-    mutationFn: appointmentService.create,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.appointments });
-    },
-  });
 }
 
 export function useUpdateAppointmentStatus() {

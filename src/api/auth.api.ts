@@ -1,7 +1,7 @@
 // Auth service - Handles authentication and token management
 // TanStack Query v5 best practices
 
-import { apiClient } from './client';
+import { post } from './client';
 import { ApiError } from '@/lib/query-client';
 import {
   clearTokens,
@@ -27,10 +27,7 @@ export const authService = {
    * @throws {ApiError} When login fails
    */
   async login(credentials: LoginCredentials): Promise<LoginResponse> {
-    const response = await apiClient.post<LoginResponse>(
-      '/auth/login',
-      credentials,
-    );
+    const response = await post<LoginResponse>('/auth/login', credentials);
 
     // Handle both wrapped and direct response formats
     let loginData: LoginResponse;

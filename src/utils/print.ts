@@ -1,6 +1,7 @@
 // Print utilities for A4 and Thermal layouts
 
 import type { Patient, Visit, Prescription } from '../types';
+import dayjs from 'dayjs';
 
 export const printUtils = {
   /**
@@ -12,11 +13,7 @@ export const printUtils = {
     prescription: Prescription,
     clinicName: string = 'Clinic OPD Management',
   ): string {
-    const date = new Date(visit.date).toLocaleDateString('en-IN', {
-      day: '2-digit',
-      month: 'long',
-      year: 'numeric',
-    });
+    const date = dayjs(visit.date).format('DD MMMM YYYY');
 
     const medicinesHtml = prescription.medicines
       .map(
@@ -140,11 +137,7 @@ export const printUtils = {
     prescription: Prescription,
     clinicName: string = 'Clinic OPD Management',
   ): string {
-    const date = new Date(visit.date).toLocaleDateString('en-IN', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-    });
+    const date = dayjs(visit.date).format('DD MMM YYYY');
 
     const medicinesHtml = prescription.medicines
       .map(

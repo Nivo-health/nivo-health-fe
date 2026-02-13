@@ -203,7 +203,9 @@ const DatePicker = React.forwardRef<HTMLButtonElement, DatePickerProps>(
                       <button
                         key={day}
                         type="button"
-                        onClick={() => handleDateSelect(calendarMonth.date(day))}
+                        onClick={() =>
+                          handleDateSelect(calendarMonth.date(day))
+                        }
                         className={cn(
                           'h-8 rounded-md text-sm transition-colors',
                           'hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring',

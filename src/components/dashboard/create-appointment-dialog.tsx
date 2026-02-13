@@ -23,7 +23,7 @@ import {
   getSlotDateRange,
   groupSlotsByPeriod,
 } from '@/utils/date-format';
-import { formatPhoneInput } from '@/utils/phone-validation';
+import { formatPhoneInput, formatPhoneForAPI } from '@/utils/phone-validation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import dayjs from 'dayjs';
 import { useMemo, useState } from 'react';
@@ -117,7 +117,7 @@ export default function CreateAppointmentDialog(
   const handleSearchPatient = async (data: MobileSearchForm) => {
     try {
       const result = await patientSearchLazy.mutateAsync({
-        query: data.mobile,
+        query: formatPhoneForAPI(data.mobile),
         limit: 20,
       });
 
@@ -177,7 +177,7 @@ export default function CreateAppointmentDialog(
         date: selectedDate,
         start_time: formatTimeShort(selectedSlot.start_time),
         name: data.name.trim(),
-        mobile_number: data.mobile.trim(),
+        mobile_number: formatPhoneForAPI(data.mobile),
         gender: data.gender,
         source: data.source || 'PHONE',
       });
@@ -300,7 +300,6 @@ export default function CreateAppointmentDialog(
                           type="tel"
                           inputMode="tel"
                           autoComplete="tel"
-                          pattern="^[+0-9\\s()-]{8,20}$"
                           placeholder="Enter mobile number (e.g., +91 9876543210)"
                           autoFocus
                           disabled={searching}
@@ -317,9 +316,9 @@ export default function CreateAppointmentDialog(
                     />
                   </Field.Item>
                   {mobileForm.formState.errors.mobile && (
-                    <Field.Error>
+                    <p className="text-destructive-foreground text-xs">
                       {mobileForm.formState.errors.mobile.message}
-                    </Field.Error>
+                    </p>
                   )}
                   <Field.Description>
                     Enter the patient's mobile number to search. If the patient
@@ -493,9 +492,9 @@ export default function CreateAppointmentDialog(
                     />
                   </Field.Item>
                   {patientForm.formState.errors.name && (
-                    <Field.Error>
+                    <p className="text-destructive-foreground text-xs">
                       {patientForm.formState.errors.name.message}
-                    </Field.Error>
+                    </p>
                   )}
                 </Field.Root>
 
@@ -510,7 +509,6 @@ export default function CreateAppointmentDialog(
                           type="tel"
                           inputMode="tel"
                           autoComplete="tel"
-                          pattern="^[+0-9\\s()-]{8,20}$"
                           placeholder="Enter mobile number"
                           disabled={!!foundPatient}
                           {...patientForm.register('mobile', {
@@ -526,9 +524,9 @@ export default function CreateAppointmentDialog(
                     />
                   </Field.Item>
                   {patientForm.formState.errors.mobile && (
-                    <Field.Error>
+                    <p className="text-destructive-foreground text-xs">
                       {patientForm.formState.errors.mobile.message}
-                    </Field.Error>
+                    </p>
                   )}
                 </Field.Root>
 
@@ -559,9 +557,9 @@ export default function CreateAppointmentDialog(
                     </label>
                   </RadioGroup.Root>
                   {patientForm.formState.errors.gender && (
-                    <Field.Error>
+                    <p className="text-destructive-foreground text-xs">
                       {patientForm.formState.errors.gender.message}
-                    </Field.Error>
+                    </p>
                   )}
                 </Field.Root>
 

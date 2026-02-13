@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import dayjs from 'dayjs';
 import type { Visit } from '../types';
 import { usePatient } from '../queries/patients.queries';
 import {
@@ -10,6 +11,7 @@ import {
 import { usePrescriptionsByIds } from '../queries/prescriptions.queries';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from '@/components/ui/toast';
 
 export default function VisitContextScreen() {
@@ -68,7 +70,6 @@ export default function VisitContextScreen() {
         });
       }
     } catch (error: any) {
-      console.error('Failed to start consultation:', error);
       toast.add({
         type: 'error',
         title:
@@ -77,9 +78,9 @@ export default function VisitContextScreen() {
     }
   };
 
-  const handleWhatsAppToggle = () => {
-    setWhatsappEnabled(!whatsappEnabled);
-    if (!whatsappEnabled) {
+  const handleWhatsAppToggle = (checked: boolean) => {
+    setWhatsappEnabled(checked);
+    if (checked) {
       toast.add({
         type: 'success',
         title: 'WhatsApp notifications enabled',
@@ -96,28 +97,30 @@ export default function VisitContextScreen() {
 
   if (!visit || !patient) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="h-screen bg-background flex items-center justify-center">
         <div className="text-gray-500">Loading...</div>
       </div>
     );
   }
 
-  const visitDate = new Date(visit.date).toLocaleDateString('en-IN', {
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric',
-  });
+  const visitDate = dayjs(visit.date).format('DD MMMM YYYY');
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-gray-50 overflow-x-hidden">
-      <div className="max-w-7xl mx-auto px-6 py-6">
+    <div className="h-screen bg-background overflow-x-hidden">
+      <div className="max-w-7xl mx-auto px-6 py-6 flex flex-col gap-5">
         {/* Patient Header */}
-        <Card.Root className="mb-6 border-teal-200">
-          <Card.Header className="bg-linear-to-r from-teal-50 to-white border-b border-teal-100">
+        <Card.Root className="overflow-hidden border-primary/10 ">
+          <Card.Header
+            className="relative border border-b flex items-center justify-between px-4 py-3 border-b-primary/10 border-x-0 border-t-0"
+            style={{
+              background: 'var(--gradient-header)',
+            }}
+          >
             <div className="flex items-center justify-between">
-              <Card.Title className="text-2xl text-teal-900">
+              <Card.Title className="text-2xl text-primary">
                 {patient.name}
               </Card.Title>
+
               <div className="flex items-center gap-2">
                 <span
                   className={`px-3 py-1 rounded-full text-xs font-semibold ${
@@ -170,19 +173,24 @@ export default function VisitContextScreen() {
         </Card.Root>
 
         {/* Primary Actions */}
-        <div className="mb-6">
-          <Card.Root>
-            <Card.Header>
-              <Card.Title className="text-lg">Actions</Card.Title>
+        <div className="overflow-hidden border-primary/10 ">
+          <Card.Root className="overflow-hidden border-primary/10 ">
+            <Card.Header
+              className="relative border border-b flex items-center justify-between px-4 py-3 border-b-primary/10 border-x-0 border-t-0"
+              style={{
+                background: 'var(--gradient-header)',
+              }}
+            >
+              <Card.Title className="text-sm font-medium text-muted-foreground">
+                Actions
+              </Card.Title>
             </Card.Header>
             <Card.Panel className="space-y-4">
               <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
+                <Checkbox.Root
                   id="whatsapp"
                   checked={whatsappEnabled}
-                  onChange={handleWhatsAppToggle}
-                  className="w-4 h-4 text-teal-600 border-teal-300 rounded focus:ring-teal-500"
+                  onCheckedChange={handleWhatsAppToggle}
                 />
                 <label
                   htmlFor="whatsapp"
@@ -216,37 +224,34 @@ export default function VisitContextScreen() {
 
         {/* Visit History */}
         <div>
-          <Card.Root>
-            <Card.Header>
-              <Card.Title className="text-lg">Visit History</Card.Title>
+          <Card.Root className="overflow-hidden border-primary/10 ">
+            <Card.Header
+              className="relative border border-b flex items-center justify-between px-4 py-3 border-b-primary/10 border-x-0 border-t-0"
+              style={{
+                background: 'var(--gradient-header)',
+              }}
+            >
+              <Card.Title className="text-sm font-medium text-muted-foreground">
+                Visit History
+              </Card.Title>
             </Card.Header>
             <Card.Panel>
               {visitHistory.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                   {visitHistory.map((historyVisit) => (
-                    <div
+                    <button
                       key={historyVisit.id}
-                      className={`p-3 rounded-lg border transition-colors ${
+                      type="button"
+                      className={`p-3 rounded-lg border transition-colors text-left ${
                         historyVisit.id === visit.id
                           ? 'bg-teal-50 border-teal-300 shadow-sm'
                           : 'bg-white border-teal-200 hover:bg-teal-50 cursor-pointer'
                       }`}
-                      onClick={() => {
-                        // Make all non-current history cards clickable, regardless of local prescription field
-                        if (historyVisit.id !== visit.id) {
-                          handleViewOldPrescription(historyVisit);
-                        }
-                      }}
+                      disabled={historyVisit.id === visit.id}
+                      onClick={() => handleViewOldPrescription(historyVisit)}
                     >
                       <div className="text-sm font-medium text-gray-900">
-                        {new Date(historyVisit.date).toLocaleDateString(
-                          'en-IN',
-                          {
-                            day: '2-digit',
-                            month: 'short',
-                            year: 'numeric',
-                          },
-                        )}
+                        {dayjs(historyVisit.date).format('DD MMM YYYY')}
                       </div>
                       <div className="text-xs text-gray-600 mt-1">
                         {historyVisit.status === 'waiting'
@@ -268,7 +273,7 @@ export default function VisitContextScreen() {
                           Current Visit
                         </div>
                       )}
-                    </div>
+                    </button>
                   ))}
                 </div>
               ) : (

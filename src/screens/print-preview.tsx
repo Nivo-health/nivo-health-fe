@@ -10,6 +10,7 @@ import { usePrescription } from '../queries/prescriptions.queries';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs } from '@/components/ui/tabs';
+import dayjs from 'dayjs';
 
 export default function PrintPreviewScreen() {
   const { visitId } = useParams<{ visitId: string }>();
@@ -55,14 +56,10 @@ export default function PrintPreviewScreen() {
     );
   }
 
-  const visitDate = new Date(visit.date).toLocaleDateString('en-IN', {
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric',
-  });
+  const visitDate = dayjs(visit.date).format('DD MMMM YYYY');
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-gray-50 overflow-x-hidden">
+    <div className="h-screen bg-background overflow-x-hidden">
       <div className="max-w-6xl mx-auto px-4 md:px-6 py-4 md:py-6">
         {/* Visit Progress Stepper */}
         <Card.Root className="mb-4 border-teal-200">
@@ -206,12 +203,7 @@ export default function PrintPreviewScreen() {
                       `| ${patient.gender === 'M' ? 'M' : 'F'}`}
                   </div>
                   <div>
-                    {patient.mobile} |{' '}
-                    {new Date(visit.date).toLocaleDateString('en-IN', {
-                      day: '2-digit',
-                      month: 'short',
-                      year: 'numeric',
-                    })}
+                    {patient.mobile} | {dayjs(visit.date).format('DD MMM YYYY')}
                   </div>
                 </div>
 
