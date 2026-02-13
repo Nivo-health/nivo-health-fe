@@ -13,7 +13,7 @@ export default function BottomNav() {
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-teal-200 shadow-lg md:hidden">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-primary-foreground shadow-lg md:hidden">
       <div className="flex items-center justify-around h-16 px-2">
         {navItems.map((item) => (
           <Link
@@ -21,16 +21,16 @@ export default function BottomNav() {
             to={item.path}
             className={cn(
               'flex flex-col items-center justify-center flex-1 h-full transition-colors',
-              isActive(item.path)
-                ? 'text-primary'
-                : 'text-gray-500 hover:text-primary',
+              {
+                'text-primary': isActive(item.path),
+                'text-gray-500 hover:text-primary': !isActive(item.path),
+              },
             )}
           >
             <div
-              className={cn(
-                'flex items-center justify-center mb-1',
-                isActive(item.path) && 'text-primary',
-              )}
+              className={cn('flex items-center justify-center mb-1', {
+                'text-primary': isActive(item.path),
+              })}
             >
               {item.icon}
             </div>

@@ -13,10 +13,11 @@ import Clock from 'lucide-react/dist/esm/icons/clock';
 import TrendingUp from 'lucide-react/dist/esm/icons/trending-up';
 import UserPlus from 'lucide-react/dist/esm/icons/user-plus';
 import Users from 'lucide-react/dist/esm/icons/users';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useClinic } from '../hooks/use-clinic';
 import { useClinicStats } from '../queries/clinic.queries';
 import { Skeleton } from '@/components/ui/skeleton';
+import Home from 'lucide-react/dist/esm/icons/home';
 
 const today = dayjs().format('YYYY-MM-DD');
 
@@ -83,16 +84,28 @@ export default function HomeScreen() {
         {/* Header - Compact on Mobile */}
         <header className="mb-4 md:mb-3">
           <div className="flex items-start justify-between gap-3">
-            <h6 className="text-sm md:text-sm font-medium text-foreground flex items-center gap-2">
-              {isLoading ? <Skeleton className="p-3 w-20" /> : clinicName}
-            </h6>
+            <Link to="/" className="flex items-center gap-2 md:hidden">
+              <img
+                src="/logo.png"
+                alt="Nivo health"
+                className="h-7.5 w-8.5 rounded-full object-contain border border-primary"
+              />
+            </Link>
+            <div className="hidden md:block">
+              <h6 className="text-sm md:text-sm font-medium text-foreground flex items-center gap-2">
+                <Home className="size-4" />
+                {isLoading ? <Skeleton className="p-3 w-20" /> : clinicName}
+              </h6>
+            </div>
             <div className="flex gap-2 w-full sm:w-auto">
               <DatePicker
+                isRemovable={false}
                 value={startDate}
                 onChange={handleStartDateChange}
                 className="w-full sm:w-36"
               />
               <DatePicker
+                isRemovable={false}
                 value={endDate}
                 onChange={handleEndDateChange}
                 className="w-full sm:w-36"

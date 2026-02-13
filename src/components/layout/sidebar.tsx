@@ -65,7 +65,7 @@ export default function Sidebar() {
             <img
               src="/logo.png"
               alt="Nivo health"
-              className="size-10 rounded-lg object-contain border border-primary"
+              className="size-9 rounded-full object-contain border border-primary"
             />
             <h1 className="text-xl font-bold text-primary">Nivo health</h1>
           </Link>

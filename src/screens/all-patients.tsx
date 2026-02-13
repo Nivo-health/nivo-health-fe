@@ -81,7 +81,7 @@ export default function AllPatientsScreen() {
     }
 
     try {
-      const patient = await createPatientMutation.mutateAsync({
+      await createPatientMutation.mutateAsync({
         name: newPatient.name.trim(),
         mobile: formatPhoneForAPI(newPatient.mobile),
         age: newPatient.age ? Number(newPatient.age) : undefined,
@@ -163,7 +163,7 @@ export default function AllPatientsScreen() {
             {filteredPatients.map((patient) => (
               <Card.Root
                 key={patient.id}
-                className="border-teal-200 hover:border-teal-400 hover:shadow-lg transition-all cursor-pointer"
+                className="border-primary-foreground hover:border-teal-400 hover:shadow-lg transition-all md:border-0"
               >
                 <Card.Panel className="p-3 md:p-5">
                   <button
@@ -174,16 +174,11 @@ export default function AllPatientsScreen() {
                     {/* Mobile View - Compact Layout */}
                     <div className="md:hidden">
                       <div className="flex items-center gap-3">
-                        {/* Avatar */}
-                        <div className="w-12 h-12 bg-linear-to-br from-teal-500 to-teal-600 rounded-full flex items-center justify-center text-white font-bold text-base shrink-0">
-                          {patient.name.charAt(0).toUpperCase()}
-                        </div>
-
                         {/* Patient Info - 2 Column Grid */}
                         <div className="flex-1 min-w-0 grid grid-cols-2 gap-x-3 gap-y-1.5">
                           {/* Name - Full Width */}
                           <div className="col-span-2">
-                            <h3 className="text-base font-semibold text-gray-900 truncate">
+                            <h3 className="text-base text-gray-900 truncate flex-1">
                               {patient.name}
                             </h3>
                           </div>
@@ -226,16 +221,11 @@ export default function AllPatientsScreen() {
 
                     {/* Desktop View - Column Layout */}
                     <div className="hidden md:flex items-center gap-4">
-                      {/* Avatar */}
-                      <div className="w-12 h-12 bg-gradient-to-br from-teal-500 to-teal-600 rounded-full flex items-center justify-center text-white font-bold text-lg shrink-0">
-                        {patient.name.charAt(0).toUpperCase()}
-                      </div>
-
                       {/* Column-based layout for desktop */}
                       <div className="flex-1 min-w-0 grid grid-cols-[minmax(150px,1fr)_minmax(120px,auto)_minmax(80px,auto)_minmax(100px,auto)] gap-4 items-center">
                         {/* Name Column */}
                         <div className="min-w-0">
-                          <h3 className="text-lg font-semibold text-gray-900 truncate">
+                          <h3 className="text-base text-gray-900 truncate flex-1">
                             {patient.name}
                           </h3>
                         </div>

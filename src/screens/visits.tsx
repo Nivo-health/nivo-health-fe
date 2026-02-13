@@ -316,7 +316,7 @@ export default function VisitsScreen() {
           <div className="flex items-start justify-between gap-3 mb-3">
             <div className="flex-1 min-w-0">
               <h6 className="text-sm md:text-sm font-medium text-foreground flex items-center gap-2">
-                <ClipboardList className="size-4" /> Visits
+                <ClipboardList className="size-4" /> Queue
               </h6>
             </div>
             <Button
@@ -429,9 +429,9 @@ export default function VisitsScreen() {
             {filteredVisits.map((visit) => (
               <Card.Root
                 key={visit.id}
-                className="border-teal-200 hover:border-teal-300 hover:shadow-md transition-all cursor-pointer"
+                className="border-primary-foreground hover:border-teal-400 hover:shadow-lg transition-all md:border-0"
               >
-                <Card.Panel className="p-3 md:p-5">
+                <Card.Panel className="p-3">
                   <button
                     type="button"
                     onClick={() => handleVisitClick(visit)}
@@ -439,16 +439,11 @@ export default function VisitsScreen() {
                   >
                     <div className="flex items-center justify-between gap-4">
                       <div className="flex items-center gap-3 md:gap-4 flex-1 min-w-0">
-                        {/* Avatar */}
-                        <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-teal-500 to-teal-600 rounded-full flex items-center justify-center text-white font-bold text-base md:text-lg shrink-0">
-                          {visit.patient?.name?.charAt(0).toUpperCase() || '?'}
-                        </div>
-
                         {/* Column-based layout for desktop */}
                         <div className="flex-1 min-w-0 grid grid-cols-1 md:grid-cols-[minmax(150px,1fr)_minmax(120px,auto)_minmax(140px,auto)] gap-2 md:gap-4 items-center">
                           {/* Name Column */}
                           <div className="min-w-0">
-                            <h3 className="text-lg font-semibold text-gray-900 truncate">
+                            <h3 className="text-base text-gray-900 truncate flex-1">
                               {visit.patient?.name || 'Unknown Patient'}
                             </h3>
                           </div>
@@ -456,11 +451,13 @@ export default function VisitsScreen() {
                           {/* Mobile Column */}
                           <div className="min-w-0">
                             {visit.patient?.mobile ? (
-                              <span className="text-sm text-gray-600 whitespace-nowrap">
+                              <span className="text-sm text-muted-foreground whitespace-nowrap">
                                 Mobile: {visit.patient.mobile}
                               </span>
                             ) : (
-                              <span className="text-sm text-gray-400">—</span>
+                              <span className="text-sm text-muted-foreground">
+                                —
+                              </span>
                             )}
                           </div>
 
@@ -471,7 +468,9 @@ export default function VisitsScreen() {
                                 Token: {visit.token_number}
                               </span>
                             ) : (
-                              <span className="text-sm text-gray-400">—</span>
+                              <span className="text-sm text-muted-foreground">
+                                —
+                              </span>
                             )}
                           </div>
                         </div>
