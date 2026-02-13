@@ -24,6 +24,7 @@ import Edit2 from 'lucide-react/dist/esm/icons/edit-2';
 import Plus from 'lucide-react/dist/esm/icons/plus';
 import Trash2 from 'lucide-react/dist/esm/icons/trash-2';
 import { useMemo, useState } from 'react';
+import ClipboardList from 'lucide-react/dist/esm/icons/clipboard-list';
 
 const DAY_LABELS = [
   'Monday',
@@ -43,10 +44,14 @@ export default function DoctorScheduleSettingsScreen() {
     doctors.length === 1 ? doctors[0].id : '',
   );
 
-  const { data: workingHours, isLoading: whLoading } =
-    useWorkingHours(selectedDoctorId);
+  const selectedDoc = doctors.find(
+    (doc) => doc.id === selectedDoctorId || doctors[0].id,
+  );
+  const docId = selectedDoc?.id;
+
+  const { data: workingHours, isLoading: whLoading } = useWorkingHours(docId);
   const { data: offDays, isLoading: odLoading } = useOffDays({
-    doctorId: selectedDoctorId,
+    doctorId: docId,
   });
 
   const createWorkingHourMutation = useCreateWorkingHour();
@@ -101,7 +106,7 @@ export default function DoctorScheduleSettingsScreen() {
   };
 
   const handleSaveWH = async () => {
-    if (!selectedDoctorId) return;
+    if (!docId) return;
     if (whForm.endTime <= whForm.startTime) {
       toast.add({ title: 'End time must be after start time', type: 'error' });
       return;
@@ -120,7 +125,7 @@ export default function DoctorScheduleSettingsScreen() {
         toast.add({ title: 'Working hour updated', type: 'success' });
       } else {
         await createWorkingHourMutation.mutateAsync({
-          doctor_id: selectedDoctorId,
+          doctor_id: docId,
           day_of_week: whForm.dayOfWeek,
           start_time: whForm.startTime,
           end_time: whForm.endTime,
@@ -154,14 +159,14 @@ export default function DoctorScheduleSettingsScreen() {
   const [offDayReason, setOffDayReason] = useState('');
 
   const handleAddOffDay = async () => {
-    if (!selectedDoctorId || !offDayDate) {
+    if (!docId || !offDayDate) {
       toast.add({ title: 'Please select a date', type: 'error' });
       return;
     }
 
     try {
       await createOffDayMutation.mutateAsync({
-        doctor_id: selectedDoctorId,
+        doctor_id: docId,
         date: offDayDate,
         reason: offDayReason || undefined,
       });
@@ -190,49 +195,43 @@ export default function DoctorScheduleSettingsScreen() {
 
   const loading = whLoading || odLoading;
 
-  const selectedDoc = doctors.find((doc) => doc.id === selectedDoctorId);
-
   return (
     <div className="h-screen bg-background overflow-x-hidden">
-      <div className="max-w-4xl mx-auto px-3 md:px-6 py-4 md:py-6">
+      <div className="mx-auto px-3 md:px-6 py-4 md:py-6">
         {/* Header */}
-        <div className="mb-4 md:mb-6">
-          <h1 className="text-xl md:text-3xl font-bold text-teal-900">
-            Doctor Schedule
-          </h1>
-          <p className="text-xs md:text-base text-gray-600 mt-1">
-            Configure working hours and off days
-          </p>
+        <div className="mb-4 md:mb-3">
+          <div className="flex items-start justify-between gap-3 mb-3">
+            <div className="flex-1 min-w-0">
+              <h6 className="text-sm md:text-sm font-medium text-foreground flex items-center gap-2">
+                <ClipboardList className="size-4" /> Doctor Schedule
+              </h6>
+            </div>
+            {doctors.length > 0 && (
+              <div className="max-w-xs">
+                <Select.Root
+                  value={docId}
+                  onValueChange={(value) => setSelectedDoctorId(value ?? '')}
+                >
+                  <Select.Trigger className="w-full">
+                    <Select.Value placeholder="Select doctor">
+                      {selectedDoc?.name}
+                    </Select.Value>
+                  </Select.Trigger>
+                  <Select.Popup>
+                    {doctors.map((doc) => (
+                      <Select.Item key={doc.id} value={doc.id}>
+                        {doc.name}
+                      </Select.Item>
+                    ))}
+                  </Select.Popup>
+                </Select.Root>
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* Doctor Selector */}
-        {doctors.length > 0 && (
-          <div className="mb-4 md:mb-6 max-w-xs">
-            <label className="text-sm font-medium text-gray-700 mb-1 block">
-              Select Doctor
-            </label>
-            <Select.Root
-              value={selectedDoctorId || undefined}
-              onValueChange={(value) => setSelectedDoctorId(value ?? '')}
-            >
-              <Select.Trigger className="w-full">
-                <Select.Value placeholder="Select doctor">
-                  {selectedDoc?.name}
-                </Select.Value>
-              </Select.Trigger>
-              <Select.Popup>
-                {doctors.map((doc) => (
-                  <Select.Item key={doc.id} value={doc.id}>
-                    {doc.name}
-                  </Select.Item>
-                ))}
-              </Select.Popup>
-            </Select.Root>
-          </div>
-        )}
-
-        {!selectedDoctorId ? (
-          <Card.Root className="border-teal-200">
+        {!docId ? (
+          <Card.Root className="">
             <Card.Panel className="p-12 text-center">
               <p className="text-gray-500">
                 Please select a doctor to manage their schedule
@@ -247,11 +246,10 @@ export default function DoctorScheduleSettingsScreen() {
           <div className="space-y-6">
             {/* Working Hours Section */}
             <div>
-              <h2 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                <Clock className="w-5 h-5 text-teal-600" />
+              <h6 className="text-sm md:text-sm mb-3 font-medium text-foreground flex items-center gap-2">
                 Weekly Working Hours
-              </h2>
-              <div className="space-y-2">
+              </h6>
+              <div className="grid md:grid-cols-3 gap-3">
                 {DAY_LABELS.map((dayLabel, dayIndex) => {
                   const hours = hoursByDay[dayIndex] || [];
                   return (
@@ -316,9 +314,9 @@ export default function DoctorScheduleSettingsScreen() {
 
             {/* Off Days Section */}
             <div>
-              <h2 className="text-lg font-semibold text-gray-900 mb-3">
+              <h6 className="text-sm md:text-sm mb-3 font-medium text-foreground flex items-center gap-2">
                 Off Days / Holidays
-              </h2>
+              </h6>
 
               {/* Add Off Day Form */}
               <Card.Root className="border-gray-200 mb-3">
@@ -352,7 +350,7 @@ export default function DoctorScheduleSettingsScreen() {
 
               {/* Off Days List */}
               {offDays && offDays.length > 0 ? (
-                <div className="space-y-2">
+                <div className="space-y-2 grid md:grid-cols-3 gap-3">
                   {offDays.map((od) => (
                     <Card.Root key={od.id} className="border-gray-200">
                       <Card.Panel className="p-3 md:p-4">

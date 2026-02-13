@@ -16,6 +16,7 @@ import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { toast } from '@/components/ui/toast';
 import AddPatientModal from '@/components/all-patients/modals/add-patient-modal';
+import Users from 'lucide-react/dist/esm/icons/users';
 
 export default function AllPatientsScreen() {
   const navigate = useNavigate();
@@ -128,17 +129,13 @@ export default function AllPatientsScreen() {
     <div className="h-screen bg-background overflow-x-hidden">
       <div className="max-w-7xl mx-auto px-3 md:px-6 py-4 md:py-6">
         {/* Header - Compact on Mobile */}
-        <div className="mb-4 md:mb-6">
+        <div className="mb-4 md:mb-3">
           <div className="flex items-start justify-between gap-3 mb-3">
             <div className="flex-1 min-w-0">
-              <h1 className="text-xl md:text-3xl font-bold text-foreground">
-                All Patients
-              </h1>
-              <p className="text-xs md:text-base text-muted-foreground mt-1">
-                {filteredPatients.length}{' '}
-                {filteredPatients.length === 1 ? 'patient' : 'patients'}
-                {patientSearch && ` found`}
-              </p>
+              <h6 className="text-sm md:text-sm font-medium text-foreground flex items-center gap-2">
+                <Users className="size-4" /> All Patients
+              </h6>
+              <h1 className="text-xl md:text-3xl font-bold text-foreground"></h1>
             </div>
             <Button
               onClick={handleAddNewPatient}

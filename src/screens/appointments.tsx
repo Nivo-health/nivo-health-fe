@@ -16,6 +16,7 @@ import { formatTimeShort } from '@/utils/date-format';
 import type { Appointment } from '@/types';
 import dayjs from 'dayjs';
 import { useMemo } from 'react';
+import CalendarDays from 'lucide-react/dist/esm/icons/calendar-days';
 
 export default function AppointmentsScreen() {
   const { data: clinic } = useCurrentClinic();
@@ -26,8 +27,8 @@ export default function AppointmentsScreen() {
   const { values, updateFilter, updateMultipleFilters } = useFilters({
     initialValue: {
       SEARCH: '',
-      DATE: dayjs().format('YYYY-MM-DD'),
-      DOCTOR_ID: '',
+      DATE: '',
+      DOCTOR_ID: 'all',
       PAGE: 1,
       PAGE_SIZE: 20,
     },
@@ -130,19 +131,12 @@ export default function AppointmentsScreen() {
     <div className="h-screen bg-background overflow-x-hidden">
       <div className="max-w-7xl mx-auto px-3 md:px-6 py-4 md:py-6">
         {/* Header - Compact on Mobile */}
-        <div className="mb-4 md:mb-6">
+        <div className="mb-4 md:mb-3">
           <div className="flex items-start justify-between gap-3 mb-3">
             <div className="flex-1 min-w-0">
-              <h1 className="text-xl md:text-3xl font-bold text-foreground">
-                Appointments
-              </h1>
-              <p className="text-xs md:text-base text-muted-foreground mt-1">
-                {filteredAppointments.length}{' '}
-                {filteredAppointments.length === 1
-                  ? 'appointment'
-                  : 'appointments'}
-                {values.SEARCH && ` found`}
-              </p>
+              <h6 className="text-sm md:text-sm font-medium text-foreground flex items-center gap-2">
+                <CalendarDays className="size-4" /> Appointments
+              </h6>
             </div>
             <Button onClick={handleCreateAppointment} size="sm">
               + Create
@@ -173,7 +167,7 @@ export default function AppointmentsScreen() {
           {doctors.length > 0 && (
             <div className="flex flex-col items-start gap-2 sm:w-48 md:w-56">
               <Select.Root
-                value={values.DOCTOR_ID || undefined}
+                value={values.DOCTOR_ID || 'all'}
                 onValueChange={(value) => {
                   updateMultipleFilters({ DOCTOR_ID: value || '', PAGE: 1 });
                 }}

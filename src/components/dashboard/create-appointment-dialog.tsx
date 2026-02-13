@@ -30,6 +30,7 @@ import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { RadioGroup } from '../ui/radio-group';
+import { cn } from '@/lib/utils';
 
 type CreateAppointmentDialogProps = ModalControl;
 type MobileSearchForm = z.infer<typeof mobileSearchSchema>;
@@ -263,11 +264,14 @@ export default function CreateAppointmentDialog(
                 key={slot.start_time}
                 type="button"
                 onClick={() => setSelectedSlot(slot)}
-                className={`px-3 py-1.5 rounded-md text-sm font-medium border transition-colors ${
-                  isSelected
-                    ? 'bg-teal-600 text-white border-teal-600'
-                    : 'bg-white text-gray-700 border-gray-300 hover:border-teal-400 hover:text-teal-700'
-                }`}
+                className={cn(
+                  `px-3 py-1.5 rounded-md text-sm font-medium border transition-colors`,
+                  {
+                    'bg-teal-600 text-white border-teal-600': isSelected,
+                    'bg-white text-gray-700 border-gray-300 hover:border-teal-400 hover:text-teal-700':
+                      !isSelected,
+                  },
+                )}
               >
                 {formatTimeShort(slot.start_time)}
               </button>

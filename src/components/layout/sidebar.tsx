@@ -18,32 +18,32 @@ export const navItems: NavItem[] = [
   {
     name: 'Home',
     path: '/',
-    icon: <Home className="w-5 h-5" />,
+    icon: <Home className="size-4" />,
   },
   {
     name: 'Appointments',
     path: '/appointments',
-    icon: <CalendarDays className="w-5 h-5" />,
+    icon: <CalendarDays className="size-4" />,
   },
   {
     name: 'Queue',
     path: '/visits',
-    icon: <ClipboardList className="w-5 h-5" />,
+    icon: <ClipboardList className="size-4" />,
   },
   {
     name: 'All Patients',
     path: '/patients',
-    icon: <Users className="w-5 h-5" />,
+    icon: <Users className="size-4" />,
   },
   {
     name: 'Doctor Schedule',
     path: '/doctor-schedule',
-    icon: <ClipboardClock className="w-5 h-5" />,
+    icon: <ClipboardClock className="size-4" />,
   },
   {
     name: 'Settings',
     path: '/settings',
-    icon: <Settings className="w-5 h-5" />,
+    icon: <Settings className="size-4" />,
   },
 ];
 
@@ -58,30 +58,32 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="fixed left-0 h-full w-64 bg-white border-r border-teal-100 overflow-y-auto hidden md:block">
+    <aside className="fixed left-0 h-full w-64 bg-primary-foreground overflow-y-auto hidden md:block">
       <>
-        <div className="flex items-center gap-4 px-4 md:px-6 h-16">
+        <div className="flex items-center gap-4 px-4 md:px-6 h-14">
           <Link to="/" className="flex items-center gap-2">
             <img
               src="/logo.png"
-              alt="Nivo Health"
-              className="w-8 h-8 rounded-lg object-contain"
+              alt="Nivo health"
+              className="size-10 rounded-lg object-contain border border-primary"
             />
-            <h1 className="text-xl font-bold text-gray-900">{'Nivo Health'}</h1>
+            <h1 className="text-xl font-bold text-primary">Nivo health</h1>
           </Link>
         </div>
         <Separator className="bg-primary/10" />
       </>
-      <nav className="p-4 space-y-2">
+      <nav className="px-4 py-2 space-y-1">
         {navItems.map((item) => (
           <Link
             key={item.path}
             to={item.path}
             className={cn(
-              'flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors',
-              isActive(item.path)
-                ? 'bg-teal-50 text-teal-700 border border-teal-200'
-                : 'text-gray-700 hover:bg-teal-50 hover:text-teal-700',
+              'flex items-center gap-3 px-2 py-2 rounded-lg text-xs font-medium transition-colors',
+              {
+                'bg-primary/20 text-primary': isActive(item.path),
+                'text-gray-700 hover:bg-primary/10 hover:text-primary':
+                  !isActive(item.path),
+              },
             )}
           >
             {item.icon}

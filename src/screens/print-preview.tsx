@@ -15,7 +15,7 @@ import dayjs from 'dayjs';
 export default function PrintPreviewScreen() {
   const { visitId } = useParams<{ visitId: string }>();
   const navigate = useNavigate();
-  const { clinic } = useClinic();
+  const { data: clinic } = useClinic();
   const [activeTab, setActiveTab] = useState<'a4' | 'thermal'>('a4');
   const clinicName = clinic?.name || 'Clinic OPD Management';
   const { data: visit } = useVisit(visitId || '');

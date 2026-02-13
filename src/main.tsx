@@ -7,9 +7,11 @@ import { ToastProvider } from './components/ui/toast';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <QueryProvider>
-      <ToastProvider />
-      <App />
-    </QueryProvider>
+    <div className="">
+      <QueryProvider>
+        <ToastProvider />
+        <App />
+      </QueryProvider>
+    </div>
   </StrictMode>,
 );

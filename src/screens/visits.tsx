@@ -25,6 +25,7 @@ import { Select } from '@/components/ui/select';
 import { toast } from '@/components/ui/toast';
 import dayjs from 'dayjs';
 import CreateVisitModal from '@/components/visits/modals/create-visit-modal';
+import ClipboardList from 'lucide-react/dist/esm/icons/clipboard-list';
 
 export default function VisitsScreen() {
   const navigate = useNavigate();
@@ -311,17 +312,12 @@ export default function VisitsScreen() {
     <div className="h-screen bg-background overflow-x-hidden">
       <div className="max-w-7xl mx-auto px-3 md:px-6 py-4 md:py-6">
         {/* Header - Compact on Mobile */}
-        <div className="mb-4 md:mb-6">
+        <div className="mb-4 md:mb-3">
           <div className="flex items-start justify-between gap-3 mb-3">
             <div className="flex-1 min-w-0">
-              <h1 className="text-xl md:text-3xl font-bold text-foreground">
-                Visits
-              </h1>
-              <p className="text-xs md:text-base text-muted-foreground mt-1">
-                {filteredVisits.length}{' '}
-                {filteredVisits.length === 1 ? 'visit' : 'visits'}
-                {searchQuery && ` found`}
-              </p>
+              <h6 className="text-sm md:text-sm font-medium text-foreground flex items-center gap-2">
+                <ClipboardList className="size-4" /> Visits
+              </h6>
             </div>
             <Button
               onClick={handleCreateVisit}
