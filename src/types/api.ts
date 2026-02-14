@@ -52,7 +52,7 @@ export interface Visit {
   prescription?: Prescription;
   followUp?: FollowUp;
   status: 'waiting' | 'in_progress' | 'completed';
-  patient: Patient;
+  patient?: Patient;
   clinic_id?: string;
   doctor_id?: string;
   visit_reason?: string;
