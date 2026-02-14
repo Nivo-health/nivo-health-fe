@@ -52,15 +52,20 @@ export default function PatientDetailsScreen() {
 
   return (
     <div className="h-screen bg-background overflow-x-hidden">
-      <div className="max-w-7xl mx-auto px-6 py-6">
+      <div className="max-w-7xl mx-auto px-6 py-6 flex flex-col gap-3">
         {/* Patient Header */}
-        <Card.Root className="mb-6 border-teal-200">
-          <Card.Header className="bg-linear-to-r from-teal-50 to-white border-b border-teal-100">
-            <Card.Title className="text-2xl text-teal-900">
+        <Card.Root className="overflow-hidden border-primary/10 ">
+          <Card.Header
+            className="relative border border-b flex items-center justify-between px-4 py-3 border-b-primary/10 border-x-0 border-t-0"
+            style={{
+              background: 'var(--gradient-header)',
+            }}
+          >
+            <Card.Title className="text-sm font-medium text-muted-foreground">
               {patient.name}
             </Card.Title>
           </Card.Header>
-          <Card.Panel className="pt-6">
+          <Card.Panel>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
               <div className="flex items-center gap-2">
                 <span className="text-teal-600 font-medium">Age:</span>
@@ -99,49 +104,54 @@ export default function PatientDetailsScreen() {
         </Card.Root>
 
         {/* Visit History */}
-        <div>
-          <Card.Root>
-            <Card.Header>
-              <Card.Title className="text-lg">Visit History</Card.Title>
-            </Card.Header>
-            <Card.Panel>
-              {visitHistory.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                  {visitHistory.map((visit) => (
-                    <button
-                      key={visit.id}
-                      type="button"
-                      className="p-3 rounded-lg border bg-white border-teal-200 hover:bg-teal-50 cursor-pointer transition-colors"
-                      onClick={() => handleViewVisit(visit)}
-                    >
-                      <div className="text-sm font-medium text-gray-900">
-                        {dayjs(visit.date).format('DD MMM YYYY')}
+        <Card.Root className="overflow-hidden border-primary/10 ">
+          <Card.Header
+            className="relative border border-b flex items-center justify-between px-4 py-3 border-b-primary/10 border-x-0 border-t-0"
+            style={{
+              background: 'var(--gradient-header)',
+            }}
+          >
+            <Card.Title className="text-sm font-medium text-muted-foreground">
+              Visit History
+            </Card.Title>
+          </Card.Header>
+          <Card.Panel>
+            {visitHistory.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {visitHistory.map((visit) => (
+                  <button
+                    key={visit.id}
+                    type="button"
+                    className="p-3 rounded-lg border bg-white border-teal-300 hover:bg-teal-50 cursor-pointer transition-colors"
+                    onClick={() => handleViewVisit(visit)}
+                  >
+                    <div className="text-sm font-medium text-gray-900">
+                      {dayjs(visit.date).format('DD MMM YYYY')}
+                    </div>
+                    <div className="text-xs text-gray-600 mt-1">
+                      {visit.visit_status === 'WAITING' ||
+                      visit.status === 'waiting'
+                        ? 'Waiting'
+                        : visit.visit_status === 'IN_PROGRESS' ||
+                            visit.status === 'in_progress'
+                          ? 'In Progress'
+                          : 'Completed'}
+                      {visit.prescription &&
+                        ` • ${visit.prescription.medicines.length} medicine(s)`}
+                    </div>
+                    {visit.visit_reason && (
+                      <div className="text-xs text-gray-500 mt-1">
+                        {visit.visit_reason}
                       </div>
-                      <div className="text-xs text-gray-600 mt-1">
-                        {visit.visit_status === 'WAITING' ||
-                        visit.status === 'waiting'
-                          ? 'Waiting'
-                          : visit.visit_status === 'IN_PROGRESS' ||
-                              visit.status === 'in_progress'
-                            ? 'In Progress'
-                            : 'Completed'}
-                        {visit.prescription &&
-                          ` • ${visit.prescription.medicines.length} medicine(s)`}
-                      </div>
-                      {visit.visit_reason && (
-                        <div className="text-xs text-gray-500 mt-1">
-                          {visit.visit_reason}
-                        </div>
-                      )}
-                    </button>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-sm text-gray-500">No previous visits</div>
-              )}
-            </Card.Panel>
-          </Card.Root>
-        </div>
+                    )}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div className="text-sm text-gray-500">No previous visits</div>
+            )}
+          </Card.Panel>
+        </Card.Root>
       </div>
     </div>
   );

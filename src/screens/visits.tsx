@@ -56,7 +56,7 @@ export const appointmentColumns: ColumnDef<Visit>[] = [
     header: 'Name',
     size: 200,
     cell: ({ getValue }) => (
-      <span className="block truncate capitalize">
+      <span className="block truncate capitalize py-2">
         {getValue<string>() || '-'}
       </span>
     ),
@@ -444,7 +444,7 @@ export default function VisitsScreen() {
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
-              size="sm"
+              size="xs"
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page <= 1}
             >
@@ -452,7 +452,7 @@ export default function VisitsScreen() {
             </Button>
             <Button
               variant="outline"
-              size="sm"
+              size="xs"
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page >= totalPages}
             >
@@ -470,6 +470,9 @@ export default function VisitsScreen() {
               <>
                 <div className="md:block hidden">
                   <DataTable
+                    onRowClick={(_, { original: visit }) =>
+                      handleVisitClick(visit)
+                    }
                     data={filteredVisits}
                     columns={appointmentColumns}
                   />

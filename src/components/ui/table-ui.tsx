@@ -2,17 +2,24 @@ import {
   ColumnDef,
   flexRender,
   getCoreRowModel,
+  Row,
   useReactTable,
 } from '@tanstack/react-table';
 
 import { Table } from './table';
+import { MouseEvent } from 'react';
+import { cn } from '@/lib/utils';
 
 type DataTableProps<T> = {
   columns: ColumnDef<T>[];
   data: T[];
+  onRowClick?: (
+    e: MouseEvent<HTMLTableDataCellElement, globalThis.MouseEvent>,
+    row: Row<T>,
+  ) => void;
 };
 
-export function DataTable<T>({ columns, data }: DataTableProps<T>) {
+export function DataTable<T>({ columns, data, onRowClick }: DataTableProps<T>) {
   const table = useReactTable({
     data,
     columns,
@@ -43,8 +50,12 @@ export function DataTable<T>({ columns, data }: DataTableProps<T>) {
           <Table.Row key={row.id}>
             {row.getVisibleCells().map((cell) => (
               <Table.Cell
+                onClick={(e) => onRowClick?.(e, row)}
                 key={cell.id}
                 style={{ width: cell.column.getSize() }}
+                className={cn({
+                  'cursor-pointer': onRowClick,
+                })}
               >
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
               </Table.Cell>

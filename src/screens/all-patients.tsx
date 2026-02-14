@@ -27,7 +27,7 @@ export const patientsColumns: ColumnDef<Patient>[] = [
     header: 'Name',
     size: 200,
     cell: ({ getValue }) => (
-      <span className="block truncate capitalize">
+      <span className="block truncate capitalize py-2">
         {getValue<string>() || '-'}
       </span>
     ),
@@ -197,6 +197,9 @@ export default function AllPatientsScreen() {
               <>
                 <div className="md:block hidden">
                   <DataTable
+                    onRowClick={(_, { original: patient }) =>
+                      navigate(`/patient/${patient.id}`)
+                    }
                     data={filteredPatients}
                     columns={patientsColumns}
                   />

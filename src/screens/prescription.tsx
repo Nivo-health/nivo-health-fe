@@ -444,7 +444,7 @@ export default function PrescriptionScreen() {
   }
 
   return (
-    <div className="h-screen bg-background overflow-x-hidden pb-32 md:pb-24">
+    <div className="h-screen bg-background overflow-x-hidden pb-60 md:pb-24">
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 md:py-6">
         {/* Visit Progress Stepper */}
         <Card.Root className="mb-4 border-primary/10">
