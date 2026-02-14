@@ -197,7 +197,7 @@ export default function DoctorScheduleSettingsScreen() {
 
   return (
     <div className="h-screen bg-background overflow-x-hidden">
-      <div className="mx-auto px-3 md:px-6 py-4 md:py-6">
+      <div className="max-w-7xl mx-auto px-3 md:px-6 py-4 md:py-6">
         {/* Header */}
         <div className="mb-4 md:mb-3">
           <div className="flex items-start justify-between gap-3 mb-3">
@@ -350,7 +350,7 @@ export default function DoctorScheduleSettingsScreen() {
 
               {/* Off Days List */}
               {offDays && offDays.length > 0 ? (
-                <div className="space-y-2 grid md:grid-cols-3 gap-3">
+                <div className=" grid md:grid-cols-3 gap-3">
                   {offDays.map((od) => (
                     <Card.Root key={od.id} className="border-gray-200">
                       <Card.Panel className="p-3 md:p-4">

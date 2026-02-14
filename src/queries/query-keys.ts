@@ -9,7 +9,8 @@ export const queryKeys = {
 
   // Patients
   patients: ['patients'] as const,
-  patientsList: () => [...queryKeys.patients, 'list'] as const,
+  patientsList: (params?: { page?: number; pageSize?: number }) =>
+    [...queryKeys.patients, 'list', params] as const,
   patient: (id: string) => [...queryKeys.patients, 'detail', id] as const,
   patientSearch: (query: string, limit?: number) =>
     limit === undefined

@@ -24,10 +24,14 @@ export const patientQueryOptions = {
       enabled: Boolean(id),
     }),
 
-  list: () =>
-    queryOptions<PatientSearchResult[]>({
-      queryKey: queryKeys.patientsList(),
-      queryFn: () => patientService.getAll(),
+  list: (params?: { page?: number; pageSize?: number }) =>
+    queryOptions({
+      queryKey: queryKeys.patientsList(params),
+      queryFn: () =>
+        patientService.getAllPaginated(
+          params?.page ?? 1,
+          params?.pageSize ?? 20,
+        ),
     }),
 
   recent: (limit = 10) =>
@@ -45,8 +49,8 @@ export function usePatient(id: string) {
   return useQuery(patientQueryOptions.detail(id));
 }
 
-export function useAllPatients() {
-  return useQuery(patientQueryOptions.list());
+export function useAllPatients(params?: { page?: number; pageSize?: number }) {
+  return useQuery(patientQueryOptions.list(params));
 }
 
 export function useRecentPatients(limit = 10) {

@@ -28,26 +28,12 @@ const STATUS_LABEL = {
   NO_SHOW: 'No Show',
 } as const;
 
-const Lable = ({ status }: { status: keyof typeof APPOINTMENT_STATUS }) => {
-  return (
-    <span
-      className={cn(`px-2 py-1 rounded-full text-xs font-normal text-white`, {
-        'bg-yellow-500': status === APPOINTMENT_STATUS.WAITING,
-        'bg-primary': status === APPOINTMENT_STATUS.CHECKED_IN,
-        'bg-red-800': status === APPOINTMENT_STATUS.NO_SHOW,
-      })}
-    >
-      {STATUS_LABEL[status]}
-    </span>
-  );
-};
-
-const CheckIn = ({ appointment }: { appointment: Appointment }) => {
+const useMarkCheckIn = () => {
   const updateAppointmentStatusMutation = useUpdateAppointmentStatus();
 
   const handleMarkCheckIn = async (
-    appointmentId: string,
     e: React.MouseEvent,
+    appointmentId: string,
   ) => {
     e.stopPropagation();
 
@@ -64,13 +50,34 @@ const CheckIn = ({ appointment }: { appointment: Appointment }) => {
     );
   };
 
+  return { handleMarkCheckIn, ...updateAppointmentStatusMutation };
+};
+
+const Lable = ({ status }: { status: keyof typeof APPOINTMENT_STATUS }) => {
+  return (
+    <span
+      className={cn(`px-2 py-1 rounded-full text-xs text-white`, {
+        'bg-yellow-500': status === APPOINTMENT_STATUS.WAITING,
+        'bg-primary': status === APPOINTMENT_STATUS.CHECKED_IN,
+        'bg-red-800': status === APPOINTMENT_STATUS.NO_SHOW,
+      })}
+    >
+      {STATUS_LABEL[status]}
+    </span>
+  );
+};
+
+const CheckIn = ({ appointment }: { appointment: Appointment }) => {
+  const { handleMarkCheckIn, ...updateAppointmentStatusMutation } =
+    useMarkCheckIn();
+
   if (appointment.appointment_status === APPOINTMENT_STATUS.WAITING) {
     return (
       <Button
         size="xs"
         variant="outline"
         disabled={updateAppointmentStatusMutation.isPending}
-        onClick={(e) => handleMarkCheckIn(appointment.id, e)}
+        onClick={(e) => handleMarkCheckIn(e, appointment.id)}
         className="ml-2"
       >
         Check In
@@ -105,7 +112,7 @@ export const appointmentColumns: ColumnDef<Appointment>[] = [
     header: 'Name',
     size: 200,
     cell: ({ getValue }) => (
-      <span className="block truncate capitalize">
+      <span className="block truncate capitalize text-xs">
         {getValue<string>() || '-'}
       </span>
     ),
@@ -115,7 +122,9 @@ export const appointmentColumns: ColumnDef<Appointment>[] = [
     header: 'Mobile',
     size: 150,
     cell: ({ getValue }) => (
-      <span className="block truncate">{getValue<string>() || '-'}</span>
+      <span className="block truncate  text-xs">
+        {getValue<string>() || '-'}
+      </span>
     ),
   },
   {
@@ -123,7 +132,7 @@ export const appointmentColumns: ColumnDef<Appointment>[] = [
     header: 'Doctor',
     size: 180,
     cell: ({ getValue }) => (
-      <span className="block truncate capitalize">
+      <span className="block truncate capitalize text-xs">
         {getValue<string>() || '-'}
       </span>
     ),
@@ -133,7 +142,7 @@ export const appointmentColumns: ColumnDef<Appointment>[] = [
     header: 'Time',
     size: 180,
     cell: ({ row: { original } }) => (
-      <span className="block truncate capitalize">
+      <span className="block truncate capitalize text-xs">
         {formatAppointmentTime(original)}
       </span>
     ),
@@ -141,12 +150,23 @@ export const appointmentColumns: ColumnDef<Appointment>[] = [
   {
     accessorKey: 'appointment_status',
     header: ' Status',
-    size: 180,
+    size: 100,
     cell: ({ row: { original } }) => {
       const { appointment_status } = original;
       return (
-        <span className="block">
+        <span className="block justify-between">
           <Lable status={appointment_status} />
+        </span>
+      );
+    },
+  },
+  {
+    accessorKey: 'appointment_status',
+    header: ' Status',
+    size: 100,
+    cell: ({ row: { original } }) => {
+      return (
+        <span className="block justify-between">
           <CheckIn appointment={original} />
         </span>
       );
@@ -157,8 +177,9 @@ export const appointmentColumns: ColumnDef<Appointment>[] = [
 export default function AppointmentsScreen() {
   const { data: clinic } = useCurrentClinic();
   const doctors = clinic?.doctors || [];
-  const updateAppointmentStatusMutation = useUpdateAppointmentStatus();
   const createAppointmentsModal = useModal();
+  const { handleMarkCheckIn, ...updateAppointmentStatusMutation } =
+    useMarkCheckIn();
 
   const { values, updateFilter, updateMultipleFilters } = useFilters({
     initialValue: {
@@ -323,10 +344,8 @@ export default function AppointmentsScreen() {
                                     updateAppointmentStatusMutation.isPending
                                   }
                                   size="xs"
-                                  onClick={
-                                    (e) => {}
-                                    // TODO: fix this
-                                    // handleMarkCheckIn(appointment.id, e)
+                                  onClick={(e) =>
+                                    handleMarkCheckIn(e, appointment.id)
                                   }
                                   variant="outline"
                                 >

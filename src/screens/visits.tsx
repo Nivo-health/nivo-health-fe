@@ -16,7 +16,6 @@ import {
   usePatientSearchLazy,
 } from '@/queries/patients.queries';
 import { useCreateVisit, useVisitsList } from '@/queries/visits.queries';
-import { useFiltersStore } from '@/stores/filters.store';
 import type { Patient, Visit } from '@/types/api';
 import {
   extractValidationErrors,
@@ -28,7 +27,6 @@ import {
   validatePhoneNumber,
 } from '@/utils/phone-validation';
 import { ColumnDef } from '@tanstack/react-table';
-import dayjs from 'dayjs';
 import ClipboardList from 'lucide-react/dist/esm/icons/clipboard-list';
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -80,11 +78,23 @@ const Lable = ({ status }: { status: keyof typeof VISIT_STATUS }) => {
 
 export const appointmentColumns: ColumnDef<Visit>[] = [
   {
+    accessorKey: 'token_number',
+    header: () => <div className="text-center">Token</div>,
+    size: 30,
+    cell: ({ getValue }) => (
+      <div className="flex items-center justify-center w-ful">
+        <span className="text-xs truncate capitalize px-2 py-1 rounded-md bg-primary/70 text-white">
+          {getValue<string>() || '-'}
+        </span>
+      </div>
+    ),
+  },
+  {
     accessorKey: 'patient.name',
     header: 'Name',
-    size: 200,
+    size: 300,
     cell: ({ getValue }) => (
-      <span className="block truncate capitalize py-2">
+      <span className="text-xs block truncate capitalize">
         {getValue<string>() || '-'}
       </span>
     ),
@@ -92,25 +102,18 @@ export const appointmentColumns: ColumnDef<Visit>[] = [
   {
     accessorKey: 'patient.mobile',
     header: 'Mobile',
-    size: 150,
+    size: 100,
     cell: ({ getValue }) => (
-      <span className="block truncate">{getValue<string>() || '-'}</span>
-    ),
-  },
-  {
-    accessorKey: 'token_number',
-    header: 'Token',
-    size: 180,
-    cell: ({ getValue }) => (
-      <span className="truncate capitalize px-2 py-1 rounded-md bg-primary text-white">
+      <span className="text-xs block truncate">
         {getValue<string>() || '-'}
       </span>
     ),
   },
+
   {
     accessorKey: 'visit_status',
     header: 'Status',
-    size: 180,
+    size: 80,
     cell: ({ row: { original } }) => {
       const { visit_status } = original;
       return <Lable status={visit_status!} />;
@@ -368,14 +371,6 @@ export default function VisitsScreen() {
   };
 
   const selectedDoc = clinicDoctors.find((doc) => doc.id === values.DOCTOR_ID);
-
-  if (loading) {
-    return (
-      <div className="h-screen bg-background flex items-center justify-center">
-        <div className="text-muted-foreground">Loading visits...</div>
-      </div>
-    );
-  }
 
   return (
     <div className="h-screen bg-background overflow-x-hidden md:pb-0 pb-24">

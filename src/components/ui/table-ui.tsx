@@ -27,7 +27,7 @@ export function DataTable<T>({ columns, data, onRowClick }: DataTableProps<T>) {
   });
 
   return (
-    <Table.Root>
+    <Table.Root className="rounded-2xl over">
       <Table.Header>
         {table.getHeaderGroups().map((headerGroup) => (
           <Table.Row key={headerGroup.id}>

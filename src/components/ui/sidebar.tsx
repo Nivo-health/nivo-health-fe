@@ -56,7 +56,6 @@ function Provider({
   onOpenChange?: (open: boolean) => void;
 }) {
   // const isMobile = useIsMobile();
-  // TODO: @sandeep add useIsMobile
   const isMobile = false;
   const [openMobile, setOpenMobile] = React.useState(false);
 

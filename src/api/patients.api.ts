@@ -141,6 +141,75 @@ export const patientService = {
   },
 
   /**
+   * Get all patients for a clinic (paginated)
+   * GET /api/patients/all?page={page}&page_size={pageSize}
+   */
+  async getAllPaginated(
+    page: number = 1,
+    pageSize: number = 20,
+  ): Promise<{ patients: PatientSearchResult[]; count: number }> {
+    try {
+      const response = await get<any>(`/patients/all`, {
+        page,
+        page_size: pageSize,
+      });
+
+      if (response.data !== undefined && response.data !== null) {
+        let patientsArray: any[] = [];
+        let count = 0;
+
+        if (Array.isArray(response.data)) {
+          patientsArray = response.data;
+          count = patientsArray.length;
+        } else if (typeof response.data === 'object') {
+          const possibleArrayFields = [
+            'data',
+            'patients',
+            'items',
+            'results',
+            'content',
+          ];
+          for (const field of possibleArrayFields) {
+            if (response.data[field] && Array.isArray(response.data[field])) {
+              patientsArray = response.data[field];
+              break;
+            }
+          }
+          count =
+            response.data.count ?? response.data.total ?? patientsArray.length;
+        }
+
+        const mappedPatients = patientsArray.map((apiPatient: any) => ({
+          id: apiPatient.id,
+          name: apiPatient.name || '',
+          mobile:
+            apiPatient.mobile_number ||
+            apiPatient.mobile ||
+            apiPatient.phone ||
+            '',
+          age: this.getAgeFromApiPatient(apiPatient),
+          gender: this.mapGender(apiPatient.gender),
+          createdAt:
+            apiPatient.created_at ||
+            apiPatient.createdAt ||
+            dayjs().toISOString(),
+          ...(apiPatient.address && { address: apiPatient.address }),
+          ...(apiPatient.email && { email: apiPatient.email }),
+          ...(apiPatient.blood_group && {
+            bloodGroup: apiPatient.blood_group,
+          }),
+        }));
+
+        return { patients: mappedPatients, count };
+      }
+
+      return { patients: [], count: 0 };
+    } catch (error) {
+      return { patients: [], count: 0 };
+    }
+  },
+
+  /**
    * Get all patients for a clinic
    * GET /api/patients/all
    */

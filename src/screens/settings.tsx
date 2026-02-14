@@ -24,7 +24,7 @@ export default function SettingsScreen() {
 
   return (
     <div className="h-screen bg-background p-6">
-      <div className="mx-auto">
+      <div className="max-w-7xl mx-auto px-3 md:px-6 py-4 md:py-6">
         <div className="mb-4 md:mb-6">
           <h6 className="text-sm md:text-sm font-medium text-foreground flex items-center gap-2">
             <Settings className="size-4" /> Settings

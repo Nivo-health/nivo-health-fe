@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAllPatients, useCreatePatient } from '../queries/patients.queries';
-import { useFiltersStore } from '../stores/filters.store';
 import {
   validatePhoneNumber,
   formatPhoneForAPI,
@@ -15,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { toast } from '@/components/ui/toast';
+import { useFilters } from '@/hooks';
 import AddPatientModal from '@/components/all-patients/modals/add-patient-modal';
 import Users from 'lucide-react/dist/esm/icons/users';
 import { DataTable } from '@/components/ui/table-ui';
@@ -27,7 +27,7 @@ export const patientsColumns: ColumnDef<Patient>[] = [
     header: 'Name',
     size: 200,
     cell: ({ getValue }) => (
-      <span className="block truncate capitalize py-2">
+      <span className="text-xs block truncate capitalize py-0.5">
         {getValue<string>() || '-'}
       </span>
     ),
@@ -37,7 +37,9 @@ export const patientsColumns: ColumnDef<Patient>[] = [
     header: 'Mobile',
     size: 150,
     cell: ({ getValue }) => (
-      <span className="block truncate">{getValue<string>() || '-'}</span>
+      <span className="text-xs block truncate">
+        {getValue<string>() || '-'}
+      </span>
     ),
   },
   {
@@ -45,7 +47,7 @@ export const patientsColumns: ColumnDef<Patient>[] = [
     header: 'Age',
     size: 180,
     cell: ({ getValue }) => (
-      <span className="block truncate capitalize">
+      <span className="text-xs block truncate capitalize">
         {getValue<string>() || 'N/A'}
       </span>
     ),
@@ -55,7 +57,7 @@ export const patientsColumns: ColumnDef<Patient>[] = [
     header: 'Gender',
     size: 180,
     cell: ({ getValue }) => (
-      <span className="block truncate capitalize">
+      <span className="text-xs block truncate capitalize">
         {getValue<string>() || 'N/A'}
       </span>
     ),
@@ -64,10 +66,7 @@ export const patientsColumns: ColumnDef<Patient>[] = [
 
 export default function AllPatientsScreen() {
   const navigate = useNavigate();
-  const { data: patients = [], isLoading } = useAllPatients();
   const createPatientMutation = useCreatePatient();
-  const patientSearch = useFiltersStore((state) => state.patientSearch);
-  const setPatientSearch = useFiltersStore((state) => state.setPatientSearch);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newPatient, setNewPatient] = useState({
     name: '',
@@ -77,18 +76,33 @@ export default function AllPatientsScreen() {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  const { values, updateFilter } = useFilters({
+    initialValue: {
+      SEARCH: '',
+      PAGE: 1,
+      PAGE_SIZE: 20,
+    },
+    useQueryParams: true,
+  });
+
+  const { data: patientsResult, isLoading } = useAllPatients({
+    page: values.PAGE,
+    pageSize: values.PAGE_SIZE,
+  });
+
+  const totalCount = patientsResult?.count || 0;
+  const totalPages = Math.max(1, Math.ceil(totalCount / values.PAGE_SIZE));
+
   const filteredPatients = useMemo(() => {
-    let filtered = [...patients];
-    if (patientSearch.trim() !== '') {
-      const query = patientSearch.toLowerCase();
-      filtered = filtered.filter(
-        (patient) =>
-          patient.name.toLowerCase().includes(query) ||
-          patient.mobile.includes(patientSearch),
-      );
-    }
-    return filtered;
-  }, [patients, patientSearch]);
+    const patients = patientsResult?.patients || [];
+    if (!values.SEARCH.trim()) return patients;
+    const query = values.SEARCH.toLowerCase();
+    return patients.filter(
+      (patient) =>
+        patient.name.toLowerCase().includes(query) ||
+        patient.mobile.includes(values.SEARCH),
+    );
+  }, [values.SEARCH, patientsResult]);
 
   const handleAddNewPatient = () => {
     setIsModalOpen(true);
@@ -182,9 +196,33 @@ export default function AllPatientsScreen() {
           <Input
             type="text"
             placeholder="Search by name or mobile..."
-            value={patientSearch}
-            onChange={(e) => setPatientSearch(e.target.value)}
+            defaultValue={values.SEARCH}
+            onChange={(e) => updateFilter('SEARCH', e.target.value)}
           />
+        </div>
+
+        <div className="mb-4 flex items-center justify-between gap-2">
+          <div className="text-xs md:text-sm text-gray-600">
+            Page {values.PAGE} of {totalPages}
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="xs"
+              onClick={() => updateFilter('PAGE', Math.max(1, values.PAGE - 1))}
+              disabled={values.PAGE <= 1}
+            >
+              Prev
+            </Button>
+            <Button
+              variant="outline"
+              size="xs"
+              onClick={() => updateFilter('PAGE', Math.max(1, values.PAGE + 1))}
+              disabled={values.PAGE >= totalPages}
+            >
+              Next
+            </Button>
+          </div>
         </div>
 
         {isLoading ? (
