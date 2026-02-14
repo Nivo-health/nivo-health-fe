@@ -17,6 +17,50 @@ import { Card } from '@/components/ui/card';
 import { toast } from '@/components/ui/toast';
 import AddPatientModal from '@/components/all-patients/modals/add-patient-modal';
 import Users from 'lucide-react/dist/esm/icons/users';
+import { DataTable } from '@/components/ui/table-ui';
+import { ColumnDef } from '@tanstack/react-table';
+import { Patient } from '@/types';
+
+export const patientsColumns: ColumnDef<Patient>[] = [
+  {
+    accessorKey: 'name',
+    header: 'Name',
+    size: 200,
+    cell: ({ getValue }) => (
+      <span className="block truncate capitalize">
+        {getValue<string>() || '-'}
+      </span>
+    ),
+  },
+  {
+    accessorKey: 'mobile',
+    header: 'Mobile',
+    size: 150,
+    cell: ({ getValue }) => (
+      <span className="block truncate">{getValue<string>() || '-'}</span>
+    ),
+  },
+  {
+    accessorKey: 'age',
+    header: 'Age',
+    size: 180,
+    cell: ({ getValue }) => (
+      <span className="block truncate capitalize">
+        {getValue<string>() || 'N/A'}
+      </span>
+    ),
+  },
+  {
+    accessorKey: 'gender',
+    header: 'Gender',
+    size: 180,
+    cell: ({ getValue }) => (
+      <span className="block truncate capitalize">
+        {getValue<string>() || 'N/A'}
+      </span>
+    ),
+  },
+];
 
 export default function AllPatientsScreen() {
   const navigate = useNavigate();
@@ -117,19 +161,11 @@ export default function AllPatientsScreen() {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="h-screen bg-background flex items-center justify-center">
-        <div className="text-muted-foreground">Loading patients...</div>
-      </div>
-    );
-  }
-
   return (
-    <div className="h-screen bg-background overflow-x-hidden">
+    <div className="h-screen bg-background overflow-x-hidden  md:pb-0 pb-24">
       <div className="max-w-7xl mx-auto px-3 md:px-6 py-4 md:py-6">
         {/* Header - Compact on Mobile */}
-        <div className="mb-4 md:mb-3">
+        <div className="mb-3">
           <div className="flex items-start justify-between gap-3 mb-3">
             <div className="flex-1 min-w-0">
               <h6 className="text-sm md:text-sm font-medium text-foreground flex items-center gap-2">
@@ -137,169 +173,154 @@ export default function AllPatientsScreen() {
               </h6>
               <h1 className="text-xl md:text-3xl font-bold text-foreground"></h1>
             </div>
-            <Button
-              onClick={handleAddNewPatient}
-              className="shrink-0 text-sm md:text-base px-3 md:px-4"
-              size="sm"
-            >
+            <Button onClick={handleAddNewPatient} size="sm">
               + Add
             </Button>
           </div>
         </div>
-
-        {/* Search - Compact on Mobile */}
-        <div className="mb-4 md:mb-6">
+        <div className="mb-3">
           <Input
             type="text"
             placeholder="Search by name or mobile..."
             value={patientSearch}
             onChange={(e) => setPatientSearch(e.target.value)}
-            className="w-full text-sm md:text-base"
           />
         </div>
 
-        {filteredPatients.length > 0 ? (
-          <div className="grid gap-3">
-            {filteredPatients.map((patient) => (
-              <Card.Root
-                key={patient.id}
-                className="border-primary-foreground hover:border-teal-400 hover:shadow-lg transition-all md:border-0"
-              >
-                <Card.Panel className="p-3 md:p-5">
-                  <button
-                    type="button"
-                    onClick={() => navigate(`/patient/${patient.id}`)}
-                    className="w-full text-left"
-                  >
-                    {/* Mobile View - Compact Layout */}
-                    <div className="md:hidden">
-                      <div className="flex items-center gap-3">
-                        {/* Patient Info - 2 Column Grid */}
-                        <div className="flex-1 min-w-0 grid grid-cols-2 gap-x-3 gap-y-1.5">
-                          {/* Name - Full Width */}
-                          <div className="col-span-2">
-                            <h3 className="text-base text-gray-900 truncate flex-1">
-                              {patient.name}
-                            </h3>
-                          </div>
-
-                          {/* Mobile Number */}
-                          <div className="min-w-0">
-                            {patient.mobile ? (
-                              <span className="text-xs text-gray-600 whitespace-nowrap block truncate">
-                                Mobile: {patient.mobile}
-                              </span>
-                            ) : (
-                              <span className="text-xs text-gray-400">—</span>
-                            )}
-                          </div>
-
-                          {/* Age */}
-                          <div className="min-w-0">
-                            <span className="text-xs text-gray-600 whitespace-nowrap block">
-                              Age:{' '}
-                              {patient.age !== undefined && patient.age !== null
-                                ? `${patient.age} yrs`
-                                : 'N/A'}
-                            </span>
-                          </div>
-
-                          {/* Gender */}
-                          <div className="col-span-2">
-                            {patient.gender ? (
-                              <span className="text-xs text-gray-600 whitespace-nowrap">
-                                Gender:{' '}
-                                {patient.gender === 'M' ? 'Male' : 'Female'}
-                              </span>
-                            ) : (
-                              <span className="text-xs text-gray-400">—</span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Desktop View - Column Layout */}
-                    <div className="hidden md:flex items-center gap-4">
-                      {/* Column-based layout for desktop */}
-                      <div className="flex-1 min-w-0 grid grid-cols-[minmax(150px,1fr)_minmax(120px,auto)_minmax(80px,auto)_minmax(100px,auto)] gap-4 items-center">
-                        {/* Name Column */}
-                        <div className="min-w-0">
-                          <h3 className="text-base text-gray-900 truncate flex-1">
-                            {patient.name}
-                          </h3>
-                        </div>
-
-                        {/* Mobile Column */}
-                        <div className="min-w-0">
-                          {patient.mobile ? (
-                            <span className="text-sm text-gray-600 whitespace-nowrap">
-                              {patient.mobile || 'N/A'}
-                            </span>
-                          ) : (
-                            <span className="text-sm text-gray-400">—</span>
-                          )}
-                        </div>
-
-                        {/* Age Column */}
-                        <div className="min-w-0">
-                          <span className="text-sm text-gray-600 whitespace-nowrap">
-                            {patient.age !== undefined && patient.age !== null
-                              ? patient.age
-                              : 'N/A'}
-                          </span>
-                        </div>
-
-                        {/* Gender Column */}
-                        <div className="min-w-0">
-                          {patient.gender ? (
-                            <span className="text-sm text-gray-600 whitespace-nowrap">
-                              {patient.gender === 'M' ? 'Male' : 'Female'}
-                            </span>
-                          ) : (
-                            <span className="text-sm text-gray-400">—</span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </button>
-                </Card.Panel>
-              </Card.Root>
-            ))}
+        {isLoading ? (
+          <div className="h-96 bg-background flex items-center justify-center">
+            <div className="text-muted-foreground">Loading...</div>
           </div>
         ) : (
-          <Card.Root className="border-teal-200">
-            <Card.Panel className="p-12 text-center">
-              <div className="text-gray-500">
-                {patientSearch ? (
-                  <>
+          <>
+            {filteredPatients.length > 0 ? (
+              <>
+                <div className="md:block hidden">
+                  <DataTable
+                    data={filteredPatients}
+                    columns={patientsColumns}
+                  />
+                </div>
+                <div className="md:hidden grid gap-3">
+                  {filteredPatients.map((patient) => (
+                    <Card.Root
+                      key={patient.id}
+                      className="border-neutral-200 transition-all md:border-0"
+                    >
+                      <Card.Panel className="p-3 md:p-5">
+                        <button
+                          type="button"
+                          onClick={() => navigate(`/patient/${patient.id}`)}
+                          className="w-full text-left cursor-pointer"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="flex-1 min-w-0 grid grid-cols-2 gap-x-3 gap-y-1.5">
+                              {/* Name - Full Width */}
+                              <div className="col-span-2">
+                                <h3 className="text-base text-gray-900 truncate flex-1">
+                                  {patient.name}
+                                </h3>
+                              </div>
+
+                              {/* Mobile Number */}
+                              <div className="min-w-0">
+                                {patient.mobile ? (
+                                  <span className="text-xs text-gray-600 whitespace-nowrap block truncate">
+                                    Mobile: {patient.mobile}
+                                  </span>
+                                ) : (
+                                  <span className="text-xs text-gray-400">
+                                    —
+                                  </span>
+                                )}
+                              </div>
+
+                              {/* Age */}
+                              <div className="min-w-0">
+                                <span className="text-xs text-gray-600 whitespace-nowrap block">
+                                  Age:{' '}
+                                  {patient.age !== undefined &&
+                                  patient.age !== null
+                                    ? `${patient.age} yrs`
+                                    : 'N/A'}
+                                </span>
+                              </div>
+
+                              <div className="col-span-2">
+                                {patient.gender ? (
+                                  <span className="text-xs text-gray-600 whitespace-nowrap">
+                                    Gender:{' '}
+                                    {patient.gender === 'M' ? 'Male' : 'Female'}
+                                  </span>
+                                ) : (
+                                  <span className="text-xs text-gray-400">
+                                    —
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="hidden md:flex items-center gap-4">
+                            <div className="flex-1 min-w-0 grid grid-cols-[minmax(150px,1fr)_minmax(120px,auto)_minmax(80px,auto)_minmax(100px,auto)] gap-4 items-center">
+                              <div className="min-w-0">
+                                <h3 className="text-base text-gray-900 truncate flex-1">
+                                  {patient.name}
+                                </h3>
+                              </div>
+
+                              <div className="min-w-0">
+                                {patient.mobile ? (
+                                  <span className="text-sm text-gray-600 whitespace-nowrap">
+                                    {patient.mobile || 'N/A'}
+                                  </span>
+                                ) : (
+                                  <span className="text-sm text-gray-400">
+                                    —
+                                  </span>
+                                )}
+                              </div>
+
+                              <div className="min-w-0">
+                                <span className="text-sm text-gray-600 whitespace-nowrap">
+                                  {patient.age !== undefined &&
+                                  patient.age !== null
+                                    ? patient.age
+                                    : 'N/A'}
+                                </span>
+                              </div>
+
+                              <div className="min-w-0">
+                                {patient.gender ? (
+                                  <span className="text-sm text-gray-600 whitespace-nowrap">
+                                    {patient.gender === 'M' ? 'Male' : 'Female'}
+                                  </span>
+                                ) : (
+                                  <span className="text-sm text-gray-400">
+                                    —
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </button>
+                      </Card.Panel>
+                    </Card.Root>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <Card.Root className="border-teal-200">
+                <Card.Panel className="p-12 text-center">
+                  <div className="text-gray-500">
                     <p className="text-lg font-medium mb-2">
                       No patients found
                     </p>
-                    <p className="text-sm">
-                      Try a different search term or{' '}
-                      <button
-                        onClick={() => navigate('/visits')}
-                        className="text-teal-600 hover:text-teal-700 underline"
-                      >
-                        add a new patient
-                      </button>
-                    </p>
-                  </>
-                ) : (
-                  <>
-                    <p className="text-lg font-medium mb-2">No patients yet</p>
-                    <p className="text-sm mb-4">
-                      Get started by adding your first patient
-                    </p>
-                    <Button onClick={() => navigate('/visits')}>
-                      + Add New Patient
-                    </Button>
-                  </>
-                )}
-              </div>
-            </Card.Panel>
-          </Card.Root>
+                  </div>
+                </Card.Panel>
+              </Card.Root>
+            )}
+          </>
         )}
       </div>
 

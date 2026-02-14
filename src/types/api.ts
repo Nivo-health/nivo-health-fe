@@ -1,3 +1,21 @@
+export const APPOINTMENT_STATUS = {
+  WAITING: 'WAITING',
+  CHECKED_IN: 'CHECKED_IN',
+  NO_SHOW: 'NO_SHOW',
+} as const;
+
+export const GENDER = {
+  MALE: 'MALE',
+  FEMALE: 'FEMALE',
+  OTHER: 'OTHER',
+} as const;
+
+export const VISIT_STATUS = {
+  WAITING: 'WAITING',
+  IN_PROGRESS: 'IN_PROGRESS',
+  COMPLETED: 'COMPLETED',
+} as const;
+
 export interface Patient {
   id: string;
   name: string;
@@ -34,16 +52,15 @@ export interface Visit {
   prescription?: Prescription;
   followUp?: FollowUp;
   status: 'waiting' | 'in_progress' | 'completed';
-  // New API fields
   patient?: Patient;
   clinic_id?: string;
   doctor_id?: string;
   visit_reason?: string;
-  visit_status?: 'WAITING' | 'IN_PROGRESS' | 'COMPLETED';
+  visit_status?: keyof typeof VISIT_STATUS;
   visit_date?: string;
   created_at?: string;
   updated_at?: string;
-  prescription_id?: string | null; // ID of the prescription if it exists
+  prescription_id?: string | null;
   token_number?: number;
 }
 
@@ -122,12 +139,12 @@ export interface Appointment {
   id: string;
   name: string;
   mobile_number: string;
-  gender: 'MALE' | 'FEMALE' | 'OTHER';
+  gender: keyof typeof GENDER;
   doctor?: ClinicDoctor;
   clinic_id: string;
   slot: AppointmentSlot | null;
   appointment_date_time?: string;
-  appointment_status: 'WAITING' | 'CHECKED_IN' | 'NO_SHOW';
+  appointment_status: keyof typeof APPOINTMENT_STATUS;
   source: string;
   created_at?: string;
   updated_at?: string;
