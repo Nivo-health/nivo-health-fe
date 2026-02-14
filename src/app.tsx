@@ -14,6 +14,8 @@ import PrintPreviewScreen from './screens/print-preview';
 import SettingsScreen from './screens/settings';
 import VisitContextScreen from './screens/visit-context';
 import VisitsScreen from './screens/visits';
+import ForgotPassword from './screens/forgot-password';
+import ResetPassword from './screens/reset-password';
 
 function App() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -27,6 +29,8 @@ function App() {
             isAuthenticated ? <Navigate to="/" replace /> : <LoginScreen />
           }
         />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
 
         {/* Protected routes */}
         <Route

@@ -73,7 +73,7 @@ function Button({
     children: (
       <>
         {loading && <Loader2 className="animate-spin" />}
-        <span className={cn(loading && 'opacity-0')}>{children}</span>
+        <span className={cn(loading && 'hidden')}>{children}</span>
       </>
     ),
   };

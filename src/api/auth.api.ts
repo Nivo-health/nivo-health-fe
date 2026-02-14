@@ -15,9 +15,19 @@ export interface LoginCredentials {
   password: string;
 }
 
+export interface SetPasswordCredentials {
+  token: string;
+  new_password: string;
+}
+
 export interface LoginResponse {
   access: string;
   refresh: string;
+}
+
+export interface ResetPasswordResponse {
+  message: string;
+  success: true;
 }
 
 export const authService = {
@@ -53,6 +63,64 @@ export const authService = {
     setTokens(loginData.access, loginData.refresh);
 
     return loginData;
+  },
+
+  async restPassword(credentials: {
+    email: string;
+  }): Promise<ResetPasswordResponse> {
+    const response = await post<ResetPasswordResponse>(
+      '/auth/password-reset/request',
+      credentials,
+    );
+
+    let resetMessage: ResetPasswordResponse;
+    if (response.success && response.data) {
+      resetMessage = response.data;
+    } else if (
+      response.data &&
+      (response.data.success || response.data.message)
+    ) {
+      resetMessage = response.data;
+    } else {
+      const errorMessage = response.error?.message || 'Failed to send mail';
+      throw new ApiError(
+        errorMessage,
+        response.error?.code || 'AUTH_ERROR',
+        response.error?.statusCode,
+        response.error?.details,
+      );
+    }
+
+    return resetMessage;
+  },
+
+  async setPassword(
+    credentials: SetPasswordCredentials,
+  ): Promise<ResetPasswordResponse> {
+    const response = await post<ResetPasswordResponse>(
+      '/auth/password-reset/confirm',
+      credentials,
+    );
+
+    let resetMessage: ResetPasswordResponse;
+    if (response.success && response.data) {
+      resetMessage = response.data;
+    } else if (
+      response.data &&
+      (response.data.success || response.data.message)
+    ) {
+      resetMessage = response.data;
+    } else {
+      const errorMessage = response.error?.message || 'Failed to set password';
+      throw new ApiError(
+        errorMessage,
+        response.error?.code || 'AUTH_ERROR',
+        response.error?.statusCode,
+        response.error?.details,
+      );
+    }
+
+    return resetMessage;
   },
 
   /**

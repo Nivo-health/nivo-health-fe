@@ -10,11 +10,14 @@ import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { useLogin } from '../queries/auth.queries';
 import { useAuthStore } from '../stores/auth.store';
+import { useShow } from '@/hooks/use-show';
+import { Eye, EyeOff } from 'lucide-react';
 
 export default function LoginScreen() {
   const navigate = useNavigate();
   const loginMutation = useLogin();
   const setTokens = useAuthStore((state) => state.setTokens);
+  const { toggle, shown } = useShow();
 
   const {
     register,
@@ -58,75 +61,104 @@ export default function LoginScreen() {
   const loading = isSubmitting || loginMutation.isPending;
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-teal-50 to-white flex items-center justify-center px-4">
-      <div className="w-full max-w-md">
-        <div className="bg-white rounded-lg shadow-lg border border-teal-200 p-6 md:p-8">
-          {/* Title */}
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-teal-900 mb-2">
-              Clinic Management
-            </h1>
-            <p className="text-gray-600">Sign in to continue</p>
-          </div>
+    <div className="min-h-screen bg-primary/30 flex flex-col items-center justify-center px-4">
+      <div className="text-center mb-8">
+        <h1 className="text-3xl font-bold text-primary">Welcome</h1>
+        <p className="mt-2 text-sm text-primary">
+          Your patients are waiting. Sign in to continue care.
+        </p>
+      </div>
+      <div className="w-full max-w-md bg-primary-foreground rounded-2xl shadow-lg border border-primary/30 p-6 md:p-8">
+        <div className="text-center mb-8 flex justify-center items-center gap-3">
+          <img
+            src="/logo.png"
+            alt="Nivo health"
+            className="size-9 rounded-full object-contain border border-primary"
+          />
+          <h1 className="text-xl font-bold text-primary">Nivo health</h1>
+        </div>
 
-          <Form onSubmit={handleSubmit(onSubmit)}>
-            <Fieldset.Root className="w-full">
-              <Field.Root name="email">
-                <Field.Label htmlFor="email">Email *</Field.Label>
+        <Form onSubmit={handleSubmit(onSubmit)}>
+          <Fieldset.Root className="w-full gap-4">
+            <Field.Root name="email">
+              <Field.Item block>
+                <Field.Control
+                  id="email"
+                  render={
+                    <Input
+                      size="lg"
+                      id="email"
+                      type="email"
+                      placeholder="Email"
+                      autoFocus
+                      disabled={loading}
+                      {...register('email')}
+                    />
+                  }
+                />
+              </Field.Item>
 
-                <Field.Item block>
-                  <Field.Control
-                    id="email"
-                    render={
+              {errors.email && (
+                <Field.Error>{errors.email.message}</Field.Error>
+              )}
+            </Field.Root>
+
+            <Field.Root name="password">
+              <Field.Item block>
+                <Field.Control
+                  id="password"
+                  render={
+                    <div className="relative w-full">
                       <Input
                         size="lg"
-                        id="email"
-                        type="email"
-                        placeholder="Enter your email"
-                        autoFocus
-                        disabled={loading}
-                        {...register('email')}
-                      />
-                    }
-                  />
-                </Field.Item>
-
-                {errors.email && (
-                  <Field.Error>{errors.email.message}</Field.Error>
-                )}
-              </Field.Root>
-
-              <Field.Root name="password">
-                <Field.Label htmlFor="password">Password *</Field.Label>
-
-                <Field.Item block>
-                  <Field.Control
-                    id="password"
-                    render={
-                      <Input
                         id="password"
-                        type="password"
-                        placeholder="Enter your password"
+                        type={shown ? 'text' : 'password'}
+                        placeholder="Password"
                         disabled={loading}
                         {...register('password')}
+                        className="pr-8"
                       />
-                    }
-                  />
-                </Field.Item>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggle();
+                        }}
+                        className="size-5 absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        {shown ? (
+                          <EyeOff className="size-5" />
+                        ) : (
+                          <Eye className="size-5" />
+                        )}
+                      </button>
+                    </div>
+                  }
+                />
+              </Field.Item>
 
-                {errors.password && (
-                  <Field.Error>{errors.password.message}</Field.Error>
-                )}
-              </Field.Root>
-            </Fieldset.Root>
+              {errors.password && (
+                <Field.Error>{errors.password.message}</Field.Error>
+              )}
+            </Field.Root>
+          </Fieldset.Root>
 
-            {/* Submit */}
-            <Button type="submit" className="w-full mt-6" disabled={loading}>
-              {loading ? 'Signing in...' : 'Sign In'}
-            </Button>
-          </Form>
-        </div>
+          <Button size="lg" type="submit" disabled={loading} loading={loading}>
+            Get Started
+          </Button>
+        </Form>
+        <Button
+          className="w-full mt-3"
+          type="submit"
+          variant="link"
+          onClick={() => navigate('/forgot-password')}
+        >
+          Forgot password?
+        </Button>
       </div>
+      <p className="text-center mt-6 text-xs text-primary">
+        © 2026 Nivo Health. All rights reserved.
+      </p>
     </div>
   );
 }
