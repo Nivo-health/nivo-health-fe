@@ -187,13 +187,12 @@ export default function CreateAppointmentDialog(
       resetAll();
       props.close();
     } catch (error: any) {
+      toast.add({
+        title: error.message,
+        type: 'error',
+      });
       // Handle 409 CONFLICT specifically
-      if (error?.statusCode === 409 || error?.code === 'CONFLICT') {
-        toast.add({
-          title:
-            'This slot was just booked by someone else. Please select another.',
-          type: 'error',
-        });
+      if (error?.statusCode === 409) {
         setSelectedSlot(null);
         setStep('slot-picker');
         return;
