@@ -4,16 +4,9 @@ import { cn } from '@/lib/utils';
 
 function Root({ className, ...props }: React.ComponentProps<'table'>) {
   return (
-    <div
-      className="relative w-full overflow-x-auto"
-      data-slot="table-container"
-    >
+    <div className="relative w-full overflow-x-auto">
       <table
-        className={cn(
-          'w-full caption-bottom in-data-[slot=frame]:border-separate in-data-[slot=frame]:border-spacing-0 text-sm',
-          className,
-        )}
-        data-slot="table"
+        className={cn('w-full table-fixed caption-bottom text-sm', className)}
         {...props}
       />
     </div>
@@ -24,7 +17,7 @@ function Header({ className, ...props }: React.ComponentProps<'thead'>) {
   return (
     <thead
       className={cn(
-        '[&_tr]:border-b in-data-[slot=frame]:**:[th]:h-9 in-data-[slot=frame]:*:[tr]:border-none in-data-[slot=frame]:*:[tr]:hover:bg-transparent',
+        '[&_tr]:border-b in-data-[slot=frame]:**:[th]:h-9 in-data-[slot=frame]:*:[tr]:border-none in-data-[slot=frame]:*:[tr]:hover:bg-transparent bg-primary-foreground',
         className,
       )}
       data-slot="table-header"
@@ -89,7 +82,7 @@ function Cell({ className, ...props }: React.ComponentProps<'td'>) {
   return (
     <td
       className={cn(
-        'whitespace-nowrap p-2 align-middle leading-none in-data-[slot=frame]:first:p-[calc(--spacing(2.5)-1px)] in-data-[slot=frame]:last:p-[calc(--spacing(2.5)-1px)] has-[[role=checkbox]]:pe-0',
+        'p-2 align-middle leading-none in-data-[slot=frame]:first:p-[calc(--spacing(2.5)-1px)] in-data-[slot=frame]:last:p-[calc(--spacing(2.5)-1px)] has-[[role=checkbox]]:pe-0',
         className,
       )}
       data-slot="table-cell"

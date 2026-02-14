@@ -52,8 +52,7 @@ export interface Visit {
   prescription?: Prescription;
   followUp?: FollowUp;
   status: 'waiting' | 'in_progress' | 'completed';
-  // New API fields
-  patient?: Patient;
+  patient: Patient;
   clinic_id?: string;
   doctor_id?: string;
   visit_reason?: string;
@@ -61,7 +60,7 @@ export interface Visit {
   visit_date?: string;
   created_at?: string;
   updated_at?: string;
-  prescription_id?: string | null; // ID of the prescription if it exists
+  prescription_id?: string | null;
   token_number?: number;
 }
 

@@ -4,7 +4,6 @@ import { Card } from '@/components/ui/card';
 import { DatePicker } from '@/components/ui/date-picker';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
-import { Table } from '@/components/ui/table';
 import { toast } from '@/components/ui/toast';
 import { useFilters } from '@/hooks';
 import { useModal } from '@/hooks/use-modal';
@@ -19,6 +18,8 @@ import { formatTimeShort } from '@/utils/date-format';
 import dayjs from 'dayjs';
 import CalendarDays from 'lucide-react/dist/esm/icons/calendar-days';
 import { useMemo } from 'react';
+import { DataTable } from '@/components/ui/table-ui';
+import { ColumnDef } from '@tanstack/react-table';
 
 const STATUS_LABEL = {
   WAITING: 'Waiting',
@@ -40,65 +41,8 @@ const Lable = ({ status }: { status: keyof typeof APPOINTMENT_STATUS }) => {
   );
 };
 
-const formatAppointmentTime = (appointment: Appointment) => {
-  if (appointment.slot) {
-    const date = dayjs(appointment.slot.date).format('DD MMM YYYY');
-    const time = formatTimeShort(appointment.slot.start_time);
-    return `${date} | ${time}`;
-  }
-  if (appointment.appointment_date_time) {
-    try {
-      return dayjs(appointment.appointment_date_time).format(
-        'DD MMM YYYY | hh:mm A',
-      );
-    } catch {
-      return appointment.appointment_date_time;
-    }
-  }
-  return '-';
-};
-
-export default function AppointmentsScreen() {
-  const { data: clinic } = useCurrentClinic();
-  const doctors = clinic?.doctors || [];
+const CheckIn = ({ appointment }: { appointment: Appointment }) => {
   const updateAppointmentStatusMutation = useUpdateAppointmentStatus();
-  const createAppointmentsModal = useModal();
-
-  const { values, updateFilter, updateMultipleFilters } = useFilters({
-    initialValue: {
-      SEARCH: '',
-      DATE: '',
-      DOCTOR_ID: 'all',
-      PAGE: 1,
-      PAGE_SIZE: 20,
-    },
-    useQueryParams: true,
-  });
-
-  const doctorId =
-    values.DOCTOR_ID && values.DOCTOR_ID !== 'all'
-      ? values.DOCTOR_ID
-      : undefined;
-
-  const { data: appointmentsResult, isLoading: loading } = useAppointments({
-    page: values.PAGE,
-    pageSize: values.PAGE_SIZE,
-    date: values.DATE,
-    doctorId: doctorId,
-  });
-
-  const totalCount = appointmentsResult?.count || 0;
-  const totalPages = Math.max(1, Math.ceil(totalCount / values.PAGE_SIZE));
-  const filteredAppointments = useMemo(() => {
-    const appointments = appointmentsResult?.appointments || [];
-    if (!values.SEARCH.trim()) return appointments;
-    const query = values.SEARCH.toLowerCase();
-    return appointments.filter((appointment) => {
-      const nameMatch = appointment.name?.toLowerCase().includes(query);
-      const mobileMatch = appointment.mobile_number?.includes(query);
-      return nameMatch || mobileMatch;
-    });
-  }, [values.SEARCH, appointmentsResult]);
 
   const handleMarkCheckIn = async (
     appointmentId: string,
@@ -119,10 +63,143 @@ export default function AppointmentsScreen() {
     );
   };
 
+  if (appointment.appointment_status === APPOINTMENT_STATUS.WAITING) {
+    return (
+      <Button
+        size="xs"
+        variant="outline"
+        disabled={updateAppointmentStatusMutation.isPending}
+        onClick={(e) => handleMarkCheckIn(appointment.id, e)}
+        className="ml-2"
+      >
+        Check In
+      </Button>
+    );
+  }
+
+  return null;
+};
+
+const formatAppointmentTime = (appointment: Appointment) => {
+  if (appointment.slot) {
+    const date = dayjs(appointment.slot.date).format('DD MMM YYYY');
+    const time = formatTimeShort(appointment.slot.start_time);
+    return `${date} | ${time}`;
+  }
+  if (appointment.appointment_date_time) {
+    try {
+      return dayjs(appointment.appointment_date_time).format(
+        'DD MMM YYYY | hh:mm A',
+      );
+    } catch {
+      return appointment.appointment_date_time;
+    }
+  }
+  return '-';
+};
+
+export const appointmentColumns: ColumnDef<Appointment>[] = [
+  {
+    accessorKey: 'name',
+    header: 'Name',
+    size: 200,
+    cell: ({ getValue }) => (
+      <span className="block truncate capitalize">
+        {getValue<string>() || '-'}
+      </span>
+    ),
+  },
+  {
+    accessorKey: 'mobile_number',
+    header: 'Mobile',
+    size: 150,
+    cell: ({ getValue }) => (
+      <span className="block truncate">{getValue<string>() || '-'}</span>
+    ),
+  },
+  {
+    accessorKey: 'doctor.name',
+    header: 'Doctor',
+    size: 180,
+    cell: ({ getValue }) => (
+      <span className="block truncate capitalize">
+        {getValue<string>() || '-'}
+      </span>
+    ),
+  },
+  {
+    accessorKey: 'slot',
+    header: 'Time',
+    size: 180,
+    cell: ({ row: { original } }) => (
+      <span className="block truncate capitalize">
+        {formatAppointmentTime(original)}
+      </span>
+    ),
+  },
+  {
+    accessorKey: 'appointment_status',
+    header: ' Status',
+    size: 180,
+    cell: ({ row: { original } }) => {
+      const { appointment_status } = original;
+      return (
+        <span className="block">
+          <Lable status={appointment_status} />
+          <CheckIn appointment={original} />
+        </span>
+      );
+    },
+  },
+];
+
+export default function AppointmentsScreen() {
+  const { data: clinic } = useCurrentClinic();
+  const doctors = clinic?.doctors || [];
+  const updateAppointmentStatusMutation = useUpdateAppointmentStatus();
+  const createAppointmentsModal = useModal();
+
+  const { values, updateFilter, updateMultipleFilters } = useFilters({
+    initialValue: {
+      SEARCH: '',
+      DATE: '',
+      DOCTOR_ID: 'ALL',
+      PAGE: 1,
+      PAGE_SIZE: 20,
+    },
+    useQueryParams: true,
+  });
+
+  const doctorId =
+    values.DOCTOR_ID && values.DOCTOR_ID !== 'ALL'
+      ? values.DOCTOR_ID
+      : undefined;
+
+  const { data: appointmentsResult, isLoading: loading } = useAppointments({
+    page: values.PAGE,
+    pageSize: values.PAGE_SIZE,
+    date: values.DATE,
+    doctorId: doctorId,
+  });
+
+  const totalCount = appointmentsResult?.count || 0;
+  const totalPages = Math.max(1, Math.ceil(totalCount / values.PAGE_SIZE));
+
+  const filteredAppointments = useMemo(() => {
+    const appointments = appointmentsResult?.appointments || [];
+    if (!values.SEARCH.trim()) return appointments;
+    const query = values.SEARCH.toLowerCase();
+    return appointments.filter((appointment) => {
+      const nameMatch = appointment.name?.toLowerCase().includes(query);
+      const mobileMatch = appointment.mobile_number?.includes(query);
+      return nameMatch || mobileMatch;
+    });
+  }, [values.SEARCH, appointmentsResult]);
+
   const selectedDoc = doctors.find((doc) => doc.id === values.DOCTOR_ID);
 
   return (
-    <div className="h-screen bg-background overflow-x-hidden">
+    <div className="h-screen bg-background overflow-x-hidden md:pb-0 pb-24">
       <div className="max-w-7xl mx-auto px-3 md:px-6 py-4 md:py-6">
         {/* Header - Compact on Mobile */}
         <div className="mb-4 md:mb-3">
@@ -161,20 +238,19 @@ export default function AppointmentsScreen() {
           {doctors.length > 0 && (
             <div className="flex flex-col items-start gap-2 sm:w-48 md:w-56">
               <Select.Root
-                value={values.DOCTOR_ID || 'all'}
+                value={values.DOCTOR_ID}
                 onValueChange={(value) => {
                   updateMultipleFilters({ DOCTOR_ID: value || '', PAGE: 1 });
                 }}
               >
                 <Select.Trigger className="w-full text-sm">
                   <Select.Value placeholder="All Doctors">
-                    {selectedDoc?.name}
+                    {selectedDoc?.name || 'All Doctors'}
                   </Select.Value>
                 </Select.Trigger>
 
                 <Select.Popup>
-                  <Select.Item value="all">All Doctors</Select.Item>
-
+                  <Select.Item value="ALL">All Doctors</Select.Item>
                   {doctors.map((doc) => (
                     <Select.Item key={doc.id} value={doc.id}>
                       {doc.name}
@@ -211,78 +287,19 @@ export default function AppointmentsScreen() {
         </div>
         {loading ? (
           <div className="h-96 bg-background flex items-center justify-center">
-            <div className="text-muted-foreground">Loading appointments...</div>
+            <div className="text-muted-foreground">Loading...</div>
           </div>
         ) : (
           <>
             {filteredAppointments.length > 0 ? (
               <>
                 {/* Desktop Table  View */}
-                <Table.Root className="md:block hidden rounded-lg overflow-hidden">
-                  <Table.Header className="bg-primary-foreground">
-                    <Table.Row>
-                      <Table.Head className="text-primary font-normal">
-                        Name
-                      </Table.Head>
-                      <Table.Head className="text-primary font-normal">
-                        Mobile
-                      </Table.Head>
-                      <Table.Head className="text-primary font-normal">
-                        Doctor
-                      </Table.Head>
-                      <Table.Head className="text-primary font-normal">
-                        Time
-                      </Table.Head>
-                      <Table.Head className="text-primary font-normal">
-                        Status
-                      </Table.Head>
-                    </Table.Row>
-                  </Table.Header>
-                  {filteredAppointments.map((appointment) => {
-                    const status = appointment.appointment_status;
-                    return (
-                      <Table.Row
-                        key={appointment.id}
-                        className="hover:bg-teal-50/50"
-                      >
-                        <Table.Cell className="min-w-62.5">
-                          <h6 className="text-sm text-neutral-800 truncate flex-1 capitalize">
-                            {appointment.name || '-'}
-                          </h6>
-                        </Table.Cell>
-                        <Table.Cell className="min-w-62.5 text-sm text-neutral-800 truncate flex-1">
-                          {appointment.mobile_number || '-'}
-                        </Table.Cell>
-                        <Table.Cell className="min-w-62.5 text-sm text-neutral-800 truncate flex-1 capitalize">
-                          {appointment.doctor?.name || '-'}
-                        </Table.Cell>
-                        <Table.Cell className="min-w-62.5 text-sm text-neutral-800 truncate flex-1">
-                          {formatAppointmentTime(appointment)}
-                        </Table.Cell>
-                        <Table.Cell className="min-w-62.5 text-sm text-neutral-800 truncate flex-1">
-                          <div className="flex items-center gap-3 shrink-0">
-                            <Lable status={status} />
-                            {status === APPOINTMENT_STATUS.WAITING && (
-                              <Button
-                                size="xs"
-                                variant="outline"
-                                disabled={
-                                  updateAppointmentStatusMutation.isPending
-                                }
-                                onClick={(e) =>
-                                  handleMarkCheckIn(appointment.id, e)
-                                }
-                                className="whitespace-nowrap"
-                              >
-                                Check In
-                              </Button>
-                            )}
-                          </div>
-                        </Table.Cell>
-                      </Table.Row>
-                    );
-                  })}
-                </Table.Root>
+                <div className="md:block hidden">
+                  <DataTable<Appointment>
+                    data={filteredAppointments}
+                    columns={appointmentColumns}
+                  />
+                </div>
 
                 {/* Mobile card view */}
                 <div className="md:hidden grid gap-2 ">
@@ -295,9 +312,9 @@ export default function AppointmentsScreen() {
                         <div className="flex-1 min-w-0">
                           <div className="space-y-2">
                             <div className="flex items-start justify-between gap-2">
-                              <h3 className="text-base text-neutral-800 truncate flex-1">
+                              <span className="text-base text-neutral-800 line-clamp-2 block capitalize">
                                 {appointment.name || 'Unknown'}
-                              </h3>
+                              </span>
                               {appointment.appointment_status ===
                                 APPOINTMENT_STATUS.WAITING && (
                                 <Button
@@ -305,8 +322,10 @@ export default function AppointmentsScreen() {
                                     updateAppointmentStatusMutation.isPending
                                   }
                                   size="xs"
-                                  onClick={(e) =>
-                                    handleMarkCheckIn(appointment.id, e)
+                                  onClick={
+                                    (e) => {}
+                                    // TODO: fix this
+                                    // handleMarkCheckIn(appointment.id, e)
                                   }
                                   variant="outline"
                                 >
@@ -322,7 +341,7 @@ export default function AppointmentsScreen() {
                             )}
 
                             {appointment.doctor && (
-                              <div className="text-xs text-muted-foreground">
+                              <div className="text-xs text-muted-foreground capitalize">
                                 Doctor: {appointment.doctor.name}
                               </div>
                             )}
@@ -345,21 +364,9 @@ export default function AppointmentsScreen() {
               <Card.Root className="border-teal-200">
                 <Card.Panel className="p-12 text-center">
                   <div className="text-gray-500">
-                    {values.SEARCH ? (
-                      <>
-                        <p className="text-lg font-medium mb-2">
-                          No appointments found
-                        </p>
-                        <p className="text-sm">Try a different search term</p>
-                      </>
-                    ) : (
-                      <>
-                        <p className="text-lg font-medium mb-2">
-                          No appointments yet
-                        </p>
-                        <p className="text-sm">Appointments will appear here</p>
-                      </>
-                    )}
+                    <p className="text-lg font-medium mb-2">
+                      No appointments found
+                    </p>
                   </div>
                 </Card.Panel>
               </Card.Root>
