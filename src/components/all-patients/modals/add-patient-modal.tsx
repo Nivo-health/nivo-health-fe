@@ -19,6 +19,7 @@ interface AddPatientModalProps {
   errors: Record<string, string>;
   onPatientChange: (patient: AddPatientFormValue) => void;
   onSave: () => void;
+  isCreating: boolean;
 }
 
 export default function AddPatientModal({
@@ -28,6 +29,7 @@ export default function AddPatientModal({
   errors,
   onPatientChange,
   onSave,
+  isCreating,
 }: AddPatientModalProps) {
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
@@ -133,10 +135,14 @@ export default function AddPatientModal({
         </Dialog.Panel>
 
         <Dialog.Footer>
-          <Dialog.Close render={<Button variant="outline" />}>
+          <Dialog.Close
+            render={<Button disabled={isCreating} variant="outline" />}
+          >
             Cancel
           </Dialog.Close>
-          <Button onClick={onSave}>Save Patient</Button>
+          <Button disabled={isCreating} loading={isCreating} onClick={onSave}>
+            Save Patient
+          </Button>
         </Dialog.Footer>
       </Dialog.Popup>
     </Dialog.Root>

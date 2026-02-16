@@ -372,6 +372,7 @@ export default function AllPatientsScreen() {
         errors={errors}
         onPatientChange={setNewPatient}
         onSave={handleSavePatient}
+        isCreating={createPatientMutation.isPending}
       />
     </div>
   );
