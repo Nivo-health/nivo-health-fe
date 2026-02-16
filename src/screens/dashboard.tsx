@@ -79,7 +79,7 @@ export default function HomeScreen() {
   };
 
   return (
-    <div className="h-screen bg-background overflow-x-hidden">
+    <div className="h-screen bg-background overflow-x-hidden md:pb-0 pb-24">
       <div className="max-w-7xl mx-auto px-3 md:px-6 py-4 md:py-6">
         {/* Header - Compact on Mobile */}
         <header className="mb-4 md:mb-3">

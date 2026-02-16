@@ -1,12 +1,11 @@
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import Settings from 'lucide-react/dist/esm/icons/settings';
 import { useNavigate } from 'react-router-dom';
 import { useClinic } from '../hooks/use-clinic';
 import { useAuthStore } from '../stores/auth.store';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { toast } from '@/components/ui/toast';
-import Settings from 'lucide-react/dist/esm/icons/settings';
 
 export default function SettingsScreen() {
   const navigate = useNavigate();
@@ -15,10 +14,6 @@ export default function SettingsScreen() {
 
   const handleLogout = () => {
     logout();
-    toast.add({
-      type: 'success',
-      title: 'Logged out successfully',
-    });
     navigate('/login');
   };
 
