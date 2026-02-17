@@ -45,9 +45,6 @@ export default function PrintPreviewScreen() {
         prescriptionId: visit.prescription_id,
       });
 
-      window.open(res?.pdf_url, '_blank');
-      console.re.log(res);
-
       // @ts-ignore
       newTab.location.href = res?.pdf_url; // ✅ works on iOS Safari
 
@@ -63,8 +60,6 @@ export default function PrintPreviewScreen() {
         title: error.message,
         type: 'error',
       });
-      console.log({ error });
-      console.re.log(error);
     }
   };
 
