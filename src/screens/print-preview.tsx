@@ -76,7 +76,13 @@ export default function PrintPreviewScreen() {
           <h1 className="text-xl md:text-2xl font-semibold text-gray-900">
             Print Preview
           </h1>
-          <Button onClick={handlePrint} size="lg" className="w-full sm:w-auto">
+          <Button
+            disabled={getPdfLazy.isPending}
+            loading={getPdfLazy.isPending}
+            onClick={handlePrint}
+            size="lg"
+            className="w-full sm:w-auto"
+          >
             Print
           </Button>
         </div>
