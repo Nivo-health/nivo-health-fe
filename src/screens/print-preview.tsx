@@ -14,6 +14,7 @@ import {
   useVisit,
 } from '../queries/visits.queries';
 import { visitSteps } from '../utils/visit-stepper';
+import { toast } from '@/components/ui/toast';
 
 export default function PrintPreviewScreen() {
   const { visitId } = useParams<{ visitId: string }>();
@@ -35,20 +36,30 @@ export default function PrintPreviewScreen() {
   }, [visit, prescriptionData]);
 
   const handlePrint = async () => {
-    if (!visit || !patient || !prescription || !visit.prescription_id) return;
+    try {
+      if (!visit || !patient || !prescription || !visit.prescription_id) return;
 
-    const res = await getPdfLazy.mutateAsync({
-      prescriptionId: visit.prescription_id,
-    });
-
-    window.open(res?.pdf_url, '_blank');
-
-    // Update visit status to completed after printing
-    if (visitId) {
-      await updateVisitStatusMutation.mutateAsync({
-        id: visitId,
-        status: 'completed',
+      const res = await getPdfLazy.mutateAsync({
+        prescriptionId: visit.prescription_id,
       });
+
+      window.open(res?.pdf_url, '_blank');
+      console.re.log(res);
+
+      // Update visit status to completed after printing
+      if (visitId) {
+        await updateVisitStatusMutation.mutateAsync({
+          id: visitId,
+          status: 'completed',
+        });
+      }
+    } catch (error: any) {
+      toast.add({
+        title: error.message,
+        type: 'error',
+      });
+      console.log({ error });
+      console.re.log(error);
     }
   };
 
