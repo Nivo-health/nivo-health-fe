@@ -1,16 +1,19 @@
-import { useMemo, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Stepper } from '../components/ui/stepper';
-import { printUtils } from '../utils/print';
-import { visitSteps } from '../utils/visit-stepper';
-import { useClinic } from '../hooks/use-clinic';
-import { useVisit, useUpdateVisitStatus } from '../queries/visits.queries';
-import { usePatient } from '../queries/patients.queries';
-import { usePrescription } from '../queries/prescriptions.queries';
-import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { Tabs } from '@/components/ui/tabs';
 import dayjs from 'dayjs';
+import { useMemo, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Stepper } from '../components/ui/stepper';
+import { useClinic } from '../hooks/use-clinic';
+import { usePatient } from '../queries/patients.queries';
+import { usePrescription } from '../queries/prescriptions.queries';
+import {
+  useGetPrintLazy,
+  useUpdateVisitStatus,
+  useVisit,
+} from '../queries/visits.queries';
+import { visitSteps } from '../utils/visit-stepper';
 
 export default function PrintPreviewScreen() {
   const { visitId } = useParams<{ visitId: string }>();
@@ -24,6 +27,7 @@ export default function PrintPreviewScreen() {
     visit?.prescription_id || '',
   );
   const updateVisitStatusMutation = useUpdateVisitStatus();
+  const getPdfLazy = useGetPrintLazy();
 
   const prescription = useMemo(() => {
     if (visit?.prescription_id) return prescriptionData || null;
@@ -31,13 +35,13 @@ export default function PrintPreviewScreen() {
   }, [visit, prescriptionData]);
 
   const handlePrint = async () => {
-    if (!visit || !patient || !prescription) return;
+    if (!visit || !patient || !prescription || !visit.prescription_id) return;
 
-    if (activeTab === 'a4') {
-      printUtils.printA4(patient, visit, prescription, clinicName);
-    } else {
-      printUtils.printThermal(patient, visit, prescription, clinicName);
-    }
+    const res = await getPdfLazy.mutateAsync({
+      prescriptionId: visit.prescription_id,
+    });
+
+    window.open(res?.pdf_url, '_blank');
 
     // Update visit status to completed after printing
     if (visitId) {

@@ -1,14 +1,14 @@
+import { VISIT_STATUS } from '@/constants/api';
+import type { Visit } from '@/types/api';
 import {
   QueryClient,
+  queryOptions,
   useMutation,
   useQuery,
   useQueryClient,
-  queryOptions,
 } from '@tanstack/react-query';
 import { visitService } from '../api/visits.api';
-import type { Visit } from '@/types/api';
 import { queryKeys } from './query-keys';
-import { VISIT_STATUS } from '@/constants/api';
 
 interface VisitListParams {
   page?: number;
@@ -189,5 +189,13 @@ export function useCompleteVisit() {
         });
       }
     },
+  });
+}
+
+export function useGetPrintLazy() {
+  return useMutation({
+    mutationKey: ['visits', 'complete'],
+    mutationFn: ({ prescriptionId }: { prescriptionId: string }) =>
+      visitService.getPrint({ prescriptionId }),
   });
 }
