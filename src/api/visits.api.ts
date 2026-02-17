@@ -2,10 +2,10 @@
 // Currently uses mock API client (localStorage), ready for backend integration
 
 import { VISIT_STATUS } from '@/constants/api';
-import { get, post, put, patch } from './client';
 import { ApiError } from '@/lib/query-client';
-import type { Visit, Patient } from '@/types/api';
+import type { GetPDF, Patient, Visit } from '@/types/api';
 import dayjs from 'dayjs';
+import { get, patch, post, put } from './client';
 
 export const visitService = {
   mapApiVisitToVisit(apiVisit: any, fallbackPatientId?: string): Visit {
@@ -382,6 +382,25 @@ export const visitService = {
       gender: mapGender(apiPatient.gender),
       createdAt:
         apiPatient.created_at || apiPatient.createdAt || dayjs().toISOString(),
+    };
+  },
+
+  async getPrint({
+    prescriptionId,
+  }: {
+    prescriptionId: string;
+  }): Promise<GetPDF | null> {
+    const response = await get<GetPDF>(
+      `/visits/prescription/${prescriptionId}/pdf`,
+    );
+
+    if (!response.success || !response.data) {
+      throw new Error(response.error?.message);
+    }
+
+    // Map and return updated visit
+    return {
+      pdf_url: response.data.pdf_url,
     };
   },
 };

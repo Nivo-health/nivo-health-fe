@@ -28,6 +28,10 @@ export interface Patient {
   createdAt: string;
 }
 
+export interface GetPDF {
+  pdf_url: string;
+}
+
 export interface FollowUp {
   value: number;
   unit: 'days' | 'weeks' | 'months';

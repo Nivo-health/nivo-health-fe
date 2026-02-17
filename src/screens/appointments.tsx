@@ -4,7 +4,9 @@ import { Card } from '@/components/ui/card';
 import { DatePicker } from '@/components/ui/date-picker';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
+import { DataTable } from '@/components/ui/table-ui';
 import { toast } from '@/components/ui/toast';
+import { APPOINTMENT_STATUS } from '@/constants/api';
 import { useFilters } from '@/hooks';
 import { useModal } from '@/hooks/use-modal';
 import { cn } from '@/lib/utils';
@@ -15,12 +17,10 @@ import {
 import { useCurrentClinic } from '@/queries/clinic.queries';
 import { type Appointment } from '@/types/api';
 import { formatTimeShort } from '@/utils/date-format';
+import { ColumnDef } from '@tanstack/react-table';
 import dayjs from 'dayjs';
 import CalendarDays from 'lucide-react/dist/esm/icons/calendar-days';
 import { useMemo } from 'react';
-import { DataTable } from '@/components/ui/table-ui';
-import { ColumnDef } from '@tanstack/react-table';
-import { APPOINTMENT_STATUS } from '@/constants/api';
 
 const STATUS_LABEL = {
   WAITING: 'Waiting',
@@ -106,7 +106,7 @@ const formatAppointmentTime = (appointment: Appointment) => {
   return '-';
 };
 
-export const appointmentColumns: ColumnDef<Appointment>[] = [
+const appointmentColumns: ColumnDef<Appointment>[] = [
   {
     accessorKey: 'name',
     header: 'Name',
